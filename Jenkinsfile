@@ -3,13 +3,7 @@ node {
     // some block
 
     stage("Checkout") {
-      checkout([
-        $class: 'GitSCM',
-        branches: [[name: "${BRANCH_NAME}"]],
-        doGenerateSubmoduleConfigurations: false,
-        extensions: [],
-        submoduleCfg: []
-      ])
+      checkout scm
     }
     stage("Static Analyse") {
       echo "analyzing code..."
