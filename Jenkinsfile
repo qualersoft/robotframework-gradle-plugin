@@ -57,7 +57,7 @@ def execGradle(args) {
   if (Boolean.valueOf(env.UNIX)) {
     sh "./gradle $args"
   } else {
-    bat "./gradle $args"
+    bat "./gradlew $args"
   }
 }
 
