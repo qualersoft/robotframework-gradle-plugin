@@ -1,9 +1,14 @@
 plugins {
   kotlin("jvm")
   id("java-gradle-plugin")
-  `maven-publish`
+
   id("org.jetbrains.dokka")
+
   jacoco
+  id("io.gitlab.arturbosch.detekt")
+  id("org.sonarqube")
+
+  `maven-publish`
 }
 
 group = "de.qualersoft"
@@ -22,9 +27,9 @@ dependencies {
   testImplementation(group = "io.kotlintest", name = "kotlintest-runner-junit5", version = "3.4.2")
 
   val kotestVersion = "4.0.5"
-  testImplementation(group =  "io.kotest",name = "kotest-runner-junit5-jvm", version = kotestVersion) // for kotest framework
-  testImplementation(group =  "io.kotest",name = "kotest-assertions-core-jvm", version = kotestVersion) // for kotest core jvm assertions
-  testImplementation(group =  "io.kotest",name = "kotest-property-jvm", version = kotestVersion) // for kotest property test
+  testImplementation(group = "io.kotest", name = "kotest-runner-junit5-jvm", version = kotestVersion) // for kotest framework
+  testImplementation(group = "io.kotest", name = "kotest-assertions-core-jvm", version = kotestVersion) // for kotest core jvm assertions
+  testImplementation(group = "io.kotest", name = "kotest-property-jvm", version = kotestVersion) // for kotest property test
   testRuntimeOnly(kotlin("script-runtime"))
 }
 
@@ -34,6 +39,31 @@ gradlePlugin {
       id = "de.qualersoft.robotframework"
       implementationClass = "de.qualersoft.robotframework.gradleplugin.RobotFrameworkPlugin"
     }
+  }
+}
+
+detekt {
+  failFast = true
+  buildUponDefaultConfig = true
+  config = files("$projectDir/detekt.yml")
+
+  reports {
+    html.enabled = true
+    xml.enabled = true
+    txt.enabled = false
+  }
+}
+
+tasks.detekt {
+  // Target version of the generated JVM bytecode. It is used for type resolution.
+  this.jvmTarget = JavaVersion.VERSION_11.toString()
+}
+
+sonarqube {
+  properties {
+    property("sonar.projectName", project.name)
+    property("sonar.projectKey", project.name)
+    property("sonar.version", project.version)
   }
 }
 
@@ -50,6 +80,8 @@ tasks.jacocoTestReport {
   dependsOn(tasks.test)
   reports {
     xml.isEnabled = true
+    html.isEnabled = false
+    csv.isEnabled = false
   }
 }
 

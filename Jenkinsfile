@@ -7,26 +7,33 @@ node {
     }
     stage("Static Analyse") {
       echo "analyzing code..."
-      analyzeWithSonarQubeAndWaitForQualityGoal();
+      execGradle 'detekt'
     }
     stage("Compiling") {
       echo "Compiling artifacts..."
-      exec './gradlew clean classes'
+      execGradle 'clean classes'
       stash("build")
     }
     stage("Test") {
       echo "testing artifacts..."
       try {
         unstash("build")
-        exec './gradlew test'
+        execGradle 'test'
       } finally {
         junit '**/build/test-results/test/*.xml'
       }
     }
+    stage("Report") {
+      execGradle 'jacocoTestReport'
+      withCredentials([string(credentialsId: 'CODECOV_TOKEN', variable: 'TOKEN')]) {
+        exec 'curl -s https://codecov.io/bash | bash -t TOKEN'
+      }
+      analyzeWithSonarQubeAndWaitForQualityGoal()
+    }
     stage("Package") {
       echo "Package artifacts..."
       unstash("build")
-      exec './gradlew jar'
+      execGradle 'jar'
     }
     stage("Publish") {
       echo "publish artifacts..."
@@ -36,13 +43,21 @@ node {
 
 void analyzeWithSonarQubeAndWaitForQualityGoal() {
   withSonarQubeEnv('SQ_MeMathze') {
-    exec "./gradlew sonarqube -D'sonar.login=${SONAR_AUTH_TOKEN}'"
+    execGradle "sonarqube -D'sonar.login=${SONAR_AUTH_TOKEN}'"
   }
   timeout(time: 2, unit: 'MINUTES') {
     def qg = waitForQualityGate(webhookSecretId: 'sonar_build')
     if (qg.status != 'OK') {
       currentBuild.result = 'UNSTABLE'
     }
+  }
+}
+
+def execGradle(args) {
+  if (Boolean.valueOf(env.UNIX)) {
+    sh "./gradle $args"
+  } else {
+    bat "./gradle $args"
   }
 }
 

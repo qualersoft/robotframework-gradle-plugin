@@ -15,9 +15,9 @@ class RobotFrameworkPlugin : Plugin<Project> {
     }
 
     val robConf = target.configurations.register("robot")
-    var conf = target.configurations.findByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)
+    val conf = target.configurations.findByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)
     if (null != conf) {
-      conf!!.extendsFrom(robConf.get())
+      conf.extendsFrom(robConf.get())
     } else {
       println("No configuration found for 'implementation', not even after the 'java' plugin has been applied!")
     }
