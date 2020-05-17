@@ -30,7 +30,7 @@ node {
           [System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
           (Invoke-WebRequest -Uri https://codecov.io/bash -UseBasicParsing).Content''')
 
-        bash(script: '-t $TOKEN ' + bsh)
+        sh(script: 'bash -t $TOKEN ' + bsh)
       }
       analyzeWithSonarQubeAndWaitForQualityGoal()
     }
