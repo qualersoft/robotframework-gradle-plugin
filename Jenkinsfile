@@ -26,7 +26,11 @@ node {
     stage("Report") {
       execGradle 'jacocoTestReport'
       withCredentials([string(credentialsId: 'CODECOV_TOKEN', variable: 'TOKEN')]) {
-        exec 'curl -s https://codecov.io/bash | bash -t TOKEN'
+        def bsh = powershell(returnStdout: true, script:  """$AllProtocols = [System.Net.SecurityProtocolType]'Tls11,Tls12'
+          [System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
+          (Invoke-WebRequest https://codecov.io/bash).Content""")
+        println "DEBUG: $bsh"
+        bash bsh -t TOKEN
       }
       analyzeWithSonarQubeAndWaitForQualityGoal()
     }
