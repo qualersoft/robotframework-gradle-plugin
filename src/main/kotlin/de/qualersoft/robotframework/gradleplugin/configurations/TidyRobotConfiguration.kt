@@ -1,0 +1,3 @@
+package de.qualersoft.robotframework.gradleplugin.configurations
+
+open class TidyRobotConfiguration
