@@ -25,8 +25,11 @@ node {
     }
     stage("Report") {
       execGradle 'jacocoTestReport'
-      withCredentials([string(credentialsId: 'CODECOV_TOKEN', variable: 'TOKEN')]) {
-        exec 'curl -s https://codecov.io/bash | bash -t TOKEN'
+      withCredentials([string(credentialsId: 'CODECOV_TOKEN', variable: 'CC_TOKEN')]) {
+        powershell(script:  '''$AllProtocols = [System.Net.SecurityProtocolType]'Tls11,Tls12'
+          [System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
+          (Invoke-WebRequest -Uri https://codecov.io/bash -UseBasicParsing).Content | Out-File -File ccScript -Force -Encoding UTF8NoBOM''')
+        sh(script: './ccScript -t $CC_TOKEN')
       }
       analyzeWithSonarQubeAndWaitForQualityGoal()
     }

@@ -1,3 +1,5 @@
+import io.gitlab.arturbosch.detekt.internal.configurableFileCollection
+
 plugins {
   kotlin("jvm")
   id("java-gradle-plugin")
@@ -41,11 +43,14 @@ gradlePlugin {
     }
   }
 }
+tasks.validatePlugins {
+  enableStricterValidation.set(true)
+}
 
 detekt {
   failFast = true
-  buildUponDefaultConfig = true
   config = files("$projectDir/detekt.yml")
+  input = project.configurableFileCollection().from("src/main/kotlin")
 
   reports {
     html.enabled = true
