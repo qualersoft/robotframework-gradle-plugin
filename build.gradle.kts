@@ -26,7 +26,7 @@ dependencies {
 
   implementation(group = "org.robotframework", name = "robotframework", version = "3.2")
 
-  testImplementation(group = "io.kotlintest", name = "kotlintest-runner-junit5", version = "3.4.2")
+  testImplementation(kotlin("test-junit5"))
 
   val kotestVersion = "4.0.5"
   testImplementation(group = "io.kotest", name = "kotest-runner-junit5-jvm", version = kotestVersion) // for kotest framework
@@ -85,7 +85,7 @@ tasks.jacocoTestReport {
   dependsOn(tasks.test)
   reports {
     xml.isEnabled = true
-    html.isEnabled = false
+    html.isEnabled = true
     csv.isEnabled = false
   }
 }

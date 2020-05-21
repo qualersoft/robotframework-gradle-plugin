@@ -48,7 +48,9 @@ open class Arguments {
 
   fun addListToArguments(variablesToAdd: String?, flag: String) {
     if (null != variablesToAdd) {
-      addListToArguments(variablesToAdd.split(","), flag)
+      addListToArguments(
+        variablesToAdd.split(",").map { it.trim() }
+        , flag)
     }
   }
 
