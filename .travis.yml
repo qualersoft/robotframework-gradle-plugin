@@ -19,19 +19,19 @@ jobs:
   include:
     - stage: "Static analyse"
       name: "Detekt"
-      script: gradlew detekt
+      script: ./gradlew detekt
     - stage: "Compile"
       name: "Compile classes"
-      script: gradlew clean classes
+      script: ./gradlew clean classes
     - stage: "Test"
       name: "Unit tests"
-      script: gradlew test
+      script: ./gradlew test
     - stage: "Report"
       name: "Report coverage"
-      script: jacocoTestReport
+      script: ./gradlew jacocoTestReport
     - stage: "Pack"
       name: "Create artifact"
-      script: gradlew jar
+      script: ./gradlew jar
     - stage: "Deploy"
       name: "Publish"
       deploy:
