@@ -1,5 +1,5 @@
-sudo: false
-
+dist: xenial
+os: linux
 language: java
 jdk:
   - openjdk11
@@ -36,8 +36,8 @@ jobs:
       name: "Publish"
       deploy:
         provider: releases
-        api_key: $GITHUB_OAUTH_TOKEN
-        skip_cleanup: true
+        token: $GITHUB_OAUTH_TOKEN
+        cleanup: false
         on:
           tags: true
 
