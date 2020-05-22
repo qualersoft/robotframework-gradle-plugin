@@ -1,0 +1,51 @@
+sudo: false
+
+language: java
+jdk:
+  - openjdk11
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+git:
+  quiet: true
+  autocrlf: input
+
+jobs:
+  include:
+    - stage: "Static analyse"
+      name: "Detekt"
+      script: gradlew detekt
+    - stage: "Compile"
+      name: "Compile classes"
+      script: gradlew clean classes
+    - stage: "Test"
+      name: "Unit tests"
+      script: gradlew test
+    - stage: "Report"
+      name: "Report coverage"
+      script: jacocoTestReport
+    - stage: "Pack"
+      name: "Create artifact"
+      script: gradlew jar
+    - stage: "Deploy"
+      name: "Publish"
+      deploy:
+        provider: releases
+        api_key: $GITHUB_OAUTH_TOKEN
+        skip_cleanup: true
+        on:
+          tags: true
+
+stages:
+  - "Static analyse"
+  - Compile
+  - Test
+  - Report
+  - Pack
+  - name: Deploy
+    if: branch = master
