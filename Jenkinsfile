@@ -26,10 +26,7 @@ node {
     stage("Report") {
       execGradle 'jacocoTestReport'
       withCredentials([string(credentialsId: 'CODECOV_TOKEN', variable: 'CC_TOKEN')]) {
-        powershell(script:  '''$AllProtocols = [System.Net.SecurityProtocolType]'Tls11,Tls12'
-          [System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
-          (Invoke-WebRequest -Uri https://codecov.io/bash -UseBasicParsing).Content | Out-File -File ccScript -Force -Encoding UTF8NoBOM''')
-        sh(script: './ccScript -t $CC_TOKEN')
+        execShFromCurl('https://codecov.io/bash', scriptName='ccScript', scriptArgs='-t $CC_TOKEN')
       }
       analyzeWithSonarQubeAndWaitForQualityGoal()
     }
@@ -70,4 +67,22 @@ def exec(cmd) {
   } else {
     bat cmd
   }
+}
+
+def execShFromCurl(getUrl, Map<String, String> headers=null, scriptName, String scriptArgs=null) {
+  def curlCmd = "Invoke-WebReques -Uri $getUrl"
+  if (headers) {
+    curlCmd += " - Headers @{"
+    curlCmd += headers.collect { k, v -> "'${k}' = '${v}'" }.join(';')
+    curlCmd += "}"
+  }
+  powershell(script:  """\$AllProtocols = [System.Net.SecurityProtocolType]'Tls11,Tls12'
+          [System.Net.ServicePointManager]::SecurityProtocol = \$AllProtocols
+          ($curlCmd -UseBasicParsing).Content | Out-File -File $scriptName -Force -Encoding UTF8NoBOM""")
+  def shCmd = "script: './$scriptName"
+  if (scriptArgs) {
+    shCmd += " $scriptArgs"
+  }
+  shCmd += "'"
+  sh(shCmd)
 }
