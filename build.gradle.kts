@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "de.qualersoft"
-version = "0.0.0-SNAPSHOT"
+version = "0.0.1-SNAPSHOT"
 
 repositories {
   jcenter()
