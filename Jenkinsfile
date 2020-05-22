@@ -8,6 +8,9 @@ node {
     stage("Static Analyse") {
       echo "analyzing code..."
       execGradle 'detekt'
+
+      echo "analyzing dependencies"
+      execShFromCurl('https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh', ['Cache-Control': 'no-cache'], 'fossa')
     }
     stage("Compiling") {
       echo "Compiling artifacts..."
@@ -26,7 +29,7 @@ node {
     stage("Report") {
       execGradle 'jacocoTestReport'
       withCredentials([string(credentialsId: 'CODECOV_TOKEN', variable: 'CC_TOKEN')]) {
-        execShFromCurl('https://codecov.io/bash', scriptName='ccScript', scriptArgs='-t $CC_TOKEN')
+        execShFromCurl('https://codecov.io/bash', scriptName: 'ccScript', scriptArgs: '-t $CC_TOKEN')
       }
       analyzeWithSonarQubeAndWaitForQualityGoal()
     }
