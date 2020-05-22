@@ -8,6 +8,18 @@ node {
     stage("Static Analyse") {
       echo "analyzing code..."
       execGradle 'detekt'
+
+      echo "analyzing dependencies"
+      withEnv(["PATH+FOSSA=${env.ALLUSERSPROFILE}\\fossa-cli"]) {
+        powershell(script: """\$AllProtocols = [System.Net.SecurityProtocolType]'Tls11,Tls12'
+            [System.Net.ServicePointManager]::SecurityProtocol = \$AllProtocols
+            (Invoke-WebRequest -Headers @{'Cache-Control' = 'no-cache'} -Uri 'https://raw.githubusercontent.com/fossas/fossa-cli/master/install.ps1' -UseBasicParsing).Content | Out-File -File fossaInstall.ps1 -Force -Encoding UTF8NoBOM""")
+        powershell(script: './fossaInstall.ps1')
+        bat 'fossa init'
+        withCredentials([string(credentialsId: 'FOSSA_TOKEN', variable: 'FOSSA_API_KEY')]) {
+          bat 'fossa analyze'
+        }
+      }
     }
     stage("Compiling") {
       echo "Compiling artifacts..."
@@ -57,11 +69,7 @@ void analyzeWithSonarQubeAndWaitForQualityGoal() {
 }
 
 def execGradle(args) {
-  if (Boolean.valueOf(env.UNIX)) {
-    sh "./gradle $args"
-  } else {
-    bat "./gradlew $args"
-  }
+  exec "./gradlew $args"
 }
 
 def exec(cmd) {
