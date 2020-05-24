@@ -48,7 +48,7 @@ open class BaseRobotFrameworkFunctionalTest {
     .withPluginClasspath()
 
   private fun copyTestFileToTemp(resource: String, ext: String): File {
-    var res = resource
+    var res = resource + ext
     // if we have a rootfolder
     rootFolder()?.also {
       res = "$it${File.separator}$res"

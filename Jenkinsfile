@@ -31,8 +31,19 @@ node {
       try {
         unstash("build")
         execGradle 'test'
+        stash("build")
       } finally {
         junit '**/build/test-results/test/*.xml'
+      }
+    }
+    stage("Functional test") {
+      echo "executing functional tests"
+      try {
+        unstash("build")
+        execGradle 'funcTest'
+        stash("build")
+      } finally {
+        junit '**/build/test-results/funcTest/*.xml'
       }
     }
     stage("Report") {
