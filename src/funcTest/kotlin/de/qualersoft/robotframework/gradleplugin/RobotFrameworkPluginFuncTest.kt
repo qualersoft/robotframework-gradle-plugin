@@ -2,6 +2,8 @@ package de.qualersoft.robotframework.gradleplugin
 
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldNotContain
+import io.kotest.matchers.should
+import io.kotest.matchers.string.contain
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -48,5 +50,27 @@ class RobotFrameworkPluginFuncTest : BaseRobotFrameworkFunctionalTest() {
       .withArguments("tasks")
       .build()
     result.output.lines() shouldNotContain "Applying java plugin"
+  }
+
+  @Test
+  @KotlinTag
+  @DisplayName("Kotlin Running the dependencies task should list the robotframework dependency")
+  fun testKotlinExecuteDependenciesShouldListDefaultRobotLib() {
+    val result = setupKotlinTest("build_minimal_test")
+      .withArguments("dependencies")
+      .build()
+    println(result.output)
+    result.output should contain("org.robotframework:robotframework:3.2")
+  }
+
+  @Test
+  @GroovyTag
+  @DisplayName("Running the dependencies task should list the robotframework dependency")
+  fun testGroovyExecuteDependenciesShouldListDefaultRobotLib() {
+    val result = setupGroovyTest("build_minimal_test")
+      .withArguments("dependencies")
+      .build()
+    println(result.output)
+    result.output should contain("org.robotframework:robotframework:3.2")
   }
 }

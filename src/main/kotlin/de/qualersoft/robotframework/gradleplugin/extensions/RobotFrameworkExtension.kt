@@ -2,12 +2,16 @@ package de.qualersoft.robotframework.gradleplugin.extensions
 
 import de.qualersoft.robotframework.gradleplugin.configurations.LibdocRobotConfiguration
 import de.qualersoft.robotframework.gradleplugin.configurations.RebotRobotConfiguration
+import de.qualersoft.robotframework.gradleplugin.configurations.RobotframeworkConfiguration
 import de.qualersoft.robotframework.gradleplugin.configurations.RunRobotConfiguration
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import org.gradle.api.Action
 import org.gradle.api.Project
 
 open class RobotFrameworkExtension(project: Project) {
+
+  val robotVersion by GradleProperty(project, RobotframeworkConfiguration::class, RobotframeworkConfiguration(project))
+
   val rebot by GradleProperty(project, RebotRobotConfiguration::class, RebotRobotConfiguration(project))
   @Suppress("Unused")
   fun rebot(action: Action<RebotRobotConfiguration>) {
