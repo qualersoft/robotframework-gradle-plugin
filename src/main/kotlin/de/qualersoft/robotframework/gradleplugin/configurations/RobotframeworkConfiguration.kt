@@ -5,8 +5,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 
-class RobotframeworkConfiguration(val project: Project) {
-
+class RobotframeworkConfiguration(private val project: Project) {
 
   fun applyTo(rtConf: Configuration) {
     rtConf.dependencies.add(createRobotLibDependency())
