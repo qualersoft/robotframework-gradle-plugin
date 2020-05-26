@@ -11,6 +11,12 @@ import org.gradle.api.Project
 open class RobotFrameworkExtension(project: Project) {
 
   val robotVersion by GradleProperty(project, RobotframeworkConfiguration::class, RobotframeworkConfiguration(project))
+  fun robotVersion(action: Action<RobotframeworkConfiguration>) {
+    action.execute(robotVersion)
+  }
+  fun robotVersion(config: RobotframeworkConfiguration.() -> Unit) {
+    robotVersion.apply(config)
+  }
 
   val rebot by GradleProperty(project, RebotRobotConfiguration::class, RebotRobotConfiguration(project))
   @Suppress("Unused")
