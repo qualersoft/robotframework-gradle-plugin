@@ -3,6 +3,7 @@ package de.qualersoft.robotframework.gradleplugin
 import org.gradle.internal.impldep.org.junit.rules.TemporaryFolder
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Tag
 import java.io.File
 
@@ -10,6 +11,8 @@ private const val EXT_GR = ".gradle"
 private const val EXT_KT = "$EXT_GR.kts"
 
 open class BaseRobotFrameworkFunctionalTest {
+
+  companion object { const val BUG492 = "Accessing properties of extension in kotlin dsl an error is raised see https://github.com/gradle/kotlin-dsl-samples/issues/492" }
 
   @Tag("groovy")
   annotation class GroovyTag
@@ -45,13 +48,13 @@ open class BaseRobotFrameworkFunctionalTest {
   }
 
   private fun createRunner() = GradleRunner.create().withProjectDir(testProjectDir.root)
-    .withPluginClasspath()
+    .withPluginClasspath().withDebug(true)
 
   private fun copyTestFileToTemp(resource: String, ext: String): File {
     var res = resource + ext
     // if we have a rootfolder
     rootFolder()?.also {
-      res = "$it${File.separator}$res"
+      res = "$it/$res"
     }
 
     val file = File(RobotFrameworkPluginFuncTest::class.java.classLoader.getResource(res)!!.file)
@@ -68,7 +71,11 @@ open class BaseRobotFrameworkFunctionalTest {
         // only get those files not starting with the build-script resource name
         !(f.isFile && f.name.startsWith(resource))
       }?.forEach { f ->
-        f.copyRecursively(testProjectDir.root)
+        f.copyRecursively(if (f.isFile) {
+          File(testProjectDir.root, f.name)
+        } else {
+          testProjectDir.root
+        })
       }
     }
     return result
