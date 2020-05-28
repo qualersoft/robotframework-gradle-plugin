@@ -2,44 +2,59 @@ package de.qualersoft.robotframework.gradleplugin
 
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldNotContain
-import io.kotest.matchers.should
-import io.kotest.matchers.string.contain
+import io.kotest.matchers.string.shouldContain
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
 @Tag("smoke-test")
-@DisplayName("Functional Robot Framework plugin tests")
+@DisplayName("Minimal functional Robot Framework plugin tests")
 class RobotFrameworkPluginFuncTest : BaseRobotFrameworkFunctionalTest() {
 
-  @Test
-  @KotlinTag
-  @DisplayName("Applying plain plugin in Kotlin should also apply the java plugin")
-  fun testMinimalKotlinBuildScript() {
-    val result = setupKotlinTest("build_minimal_test")
-      .withArguments("tasks")
-      .build()
-    result.output.lines() shouldContain "Applying java plugin"
-  }
 
-  @Test
-  @KotlinTag
-  @DisplayName("Applying plugin in Kotlin with java plugin should not apply the java plugin")
-  fun testMinimalWithJavaKotlinBuildScript() {
-    val result = setupKotlinTest("build_minimal_withjava_test")
-      .withArguments("tasks")
-      .build()
-    result.output.lines() shouldNotContain "Applying java plugin"
-  }
+  @Nested
+  @DisplayName("Applying plain plugin should")
+  inner class PlainScript {
+    @Test
+    @KotlinTag
+    @DisplayName("apply the java plugin in Kotlin")
+    fun testMinimalKotlinBuildScript() {
+      val result = setupKotlinTest("build_minimal_test")
+        .withArguments("tasks")
+        .build()
+      result.output.lines() shouldContain "Applying java plugin"
+    }
 
-  @Test
-  @GroovyTag
-  @DisplayName("Applying plain plugin in Groovy should also apply the java plugin")
-  fun testMinimalGroovyBuildScript() {
-    val result = setupGroovyTest("build_minimal_test")
-      .withArguments("tasks")
-      .build()
-    result.output.lines() shouldContain "Applying java plugin"
+    @Test
+    @GroovyTag
+    @DisplayName("apply the java plugin in Groovy")
+    fun testMinimalGroovyBuildScript() {
+      val result = setupGroovyTest("build_minimal_test")
+        .withArguments("tasks")
+        .build()
+      result.output.lines() shouldContain "Applying java plugin"
+    }
+
+    @Test
+    @GroovyTag
+    @DisplayName("add the robotframework libraray dependency in Groovy")
+    fun testRobotDependencyForGroovy() {
+      val result = setupGroovyTest("build_minimal_test")
+        .withArguments("dependencies")
+        .build()
+      result.output shouldContain "org.robotframework:robotframework:3.2"
+    }
+
+    @Test
+    @KotlinTag
+    @DisplayName("add the robotframework libraray dependency in Kotlin")
+    fun testRobotDependencyForKotlin() {
+      val result = setupKotlinTest("build_minimal_test")
+        .withArguments("dependencies")
+        .build()
+      result.output shouldContain "org.robotframework:robotframework:3.2"
+    }
   }
 
   @Test
@@ -54,23 +69,11 @@ class RobotFrameworkPluginFuncTest : BaseRobotFrameworkFunctionalTest() {
 
   @Test
   @KotlinTag
-  @DisplayName("Kotlin Running the dependencies task should list the robotframework dependency")
-  fun testKotlinExecuteDependenciesShouldListDefaultRobotLib() {
-    val result = setupKotlinTest("build_minimal_test")
-      .withArguments("dependencies")
+  @DisplayName("Applying plugin in Kotlin with java plugin should not apply the java plugin")
+  fun testMinimalWithJavaKotlinBuildScript() {
+    val result = setupKotlinTest("build_minimal_withjava_test")
+      .withArguments("tasks")
       .build()
-    println(result.output)
-    result.output should contain("org.robotframework:robotframework:3.2")
-  }
-
-  @Test
-  @GroovyTag
-  @DisplayName("Running the dependencies task should list the robotframework dependency")
-  fun testGroovyExecuteDependenciesShouldListDefaultRobotLib() {
-    val result = setupGroovyTest("build_minimal_test")
-      .withArguments("dependencies")
-      .build()
-    println(result.output)
-    result.output should contain("org.robotframework:robotframework:3.2")
+    result.output.lines() shouldNotContain "Applying java plugin"
   }
 }

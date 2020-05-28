@@ -48,7 +48,8 @@ open class BaseRobotFrameworkFunctionalTest {
   }
 
   private fun createRunner() = GradleRunner.create().withProjectDir(testProjectDir.root)
-    .withPluginClasspath().withDebug(true)
+    // Attention: do not enable debug! Details see https://github.com/gradle/gradle/issues/6862
+    .withPluginClasspath()
 
   private fun copyTestFileToTemp(resource: String, ext: String): File {
     var res = resource + ext

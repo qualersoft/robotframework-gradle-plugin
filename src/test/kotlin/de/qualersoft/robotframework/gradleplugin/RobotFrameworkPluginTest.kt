@@ -40,8 +40,4 @@ class RobotFrameworkPluginTest : StringSpec ({
       actual shouldNot beNull()
     }
   }
-
-  "Using the configuration" should {
-    ""
-  }
 })
