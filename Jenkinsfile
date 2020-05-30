@@ -47,7 +47,9 @@ node {
       }
     }
     stage("Report") {
-      execGradle 'jacocoTestReport'
+      unstash("build")
+      execGradle 'jacocoMerge'
+      execGradle 'reportMerge'
       withCredentials([string(credentialsId: 'CODECOV_TOKEN', variable: 'CC_TOKEN')]) {
         powershell(script:  '''$AllProtocols = [System.Net.SecurityProtocolType]'Tls11,Tls12'
           [System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols

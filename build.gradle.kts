@@ -8,6 +8,9 @@ plugins {
 
   id("org.unbroken-dome.test-sets") version "3.0.1"
   jacoco
+  // workaround to integrate jacoco coverage into integration tests. (See https://github.com/gradle/gradle/issues/1465)
+  id("pl.droidsonroids.jacoco.testkit") version "1.0.7"
+
   id("io.gitlab.arturbosch.detekt")
   id("org.sonarqube")
 
@@ -22,6 +25,9 @@ testSets {
     description = "Runs the functional tests"
     extendsFrom("unitTest")
   }
+}
+jacocoTestKit {
+  applyTo("testRuntime", tasks.named("funcTest"))
 }
 
 gradlePlugin {
@@ -97,6 +103,20 @@ tasks.jacocoTestReport {
     html.isEnabled = true
     csv.isEnabled = false
   }
+}
+
+tasks.create<JacocoMerge>("jacocoMerge") {
+  executionData(tasks.withType<Test>())
+}
+
+tasks.create<JacocoReport>("reportMerge") {
+  reports {
+    xml.isEnabled = true
+    html.isEnabled = true
+    csv.isEnabled = false
+  }
+  classDirectories.from(sourceSets.main.get().output.classesDirs)
+  executionData(tasks.getByName<JacocoMerge>("jacocoMerge").destinationFile)
 }
 
 tasks.dokka {

@@ -3,9 +3,9 @@ package de.qualersoft.robotframework.gradleplugin
 import org.gradle.internal.impldep.org.junit.rules.TemporaryFolder
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Tag
 import java.io.File
+import java.io.InputStream
 
 private const val EXT_GR = ".gradle"
 private const val EXT_KT = "$EXT_GR.kts"
