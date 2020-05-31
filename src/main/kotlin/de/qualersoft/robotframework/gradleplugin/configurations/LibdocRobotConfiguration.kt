@@ -3,16 +3,15 @@ package de.qualersoft.robotframework.gradleplugin.configurations
 import de.qualersoft.robotframework.gradleplugin.harvester.ClassNameHarvester
 import de.qualersoft.robotframework.gradleplugin.harvester.HarvestUtils
 import de.qualersoft.robotframework.gradleplugin.harvester.ResourceNameHarvester
-import de.qualersoft.robotframework.gradleplugin.harvester.SourceFileNameHarvester
 import de.qualersoft.robotframework.gradleplugin.utils.Arguments
 import de.qualersoft.robotframework.gradleplugin.utils.GradleFileNullableProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleFileProperty
-import de.qualersoft.robotframework.gradleplugin.utils.GradleListProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleNullableProperty
 import org.gradle.api.Project
+import org.gradle.api.file.ConfigurableFileTree
+import org.gradle.api.file.FileTree
 import java.io.File
 import java.io.IOException
-import kotlin.collections.ArrayList
 
 
 /**
@@ -124,7 +123,7 @@ class LibdocRobotConfiguration(private val project: Project) : CommonRobotConfig
    * e.g. src/main/java/com/test/
    */
   @Suppress("private")
-  val extraPathDirectories by GradleListProperty(project, File::class)
+  val extraPathDirectories: ConfigurableFileTree = project.objects.fileTree()
 
   /**
    * The default location where extra packages will be searched. Effective if extraPathDirectories
@@ -134,8 +133,7 @@ class LibdocRobotConfiguration(private val project: Project) : CommonRobotConfig
    * @readonly
    */
   @Suppress("private")
-  var defaultExtraPath by GradleFileProperty(project, File(project.projectDir,
-    joinPaths("src", "test", "resources", "robotframework", "libraries")))
+  var defaultExtraPath: ConfigurableFileTree = project.objects.fileTree().from(project.projectDir)
   //</editor-fold>
 
   fun generateRunArguments(): List<Array<String>> {
@@ -171,7 +169,7 @@ class LibdocRobotConfiguration(private val project: Project) : CommonRobotConfig
       this.addNonEmptyStringToArguments(name, "--name")
     }
     this.addNonEmptyStringToArguments(version, "--version")
-    this.addFileListToArguments(getExtraPathDirectoriesWithDefault(), "--pythonpath")
+    this.addFileListToArguments(getExtraPathDirectoriesWithDefault().toList(), "--pythonpath")
     this.add(fileArgument)
     if (multipleOutputs) {
       // Derive the output file name id from the source and from the
@@ -218,35 +216,25 @@ class LibdocRobotConfiguration(private val project: Project) : CommonRobotConfig
   }
 
   private fun processPattern(rootDir: File, pattern: String): Set<String> {
-    val harv = SourceFileNameHarvester(rootDir)
-    return if (HarvestUtils.hasDirectoryStructure(pattern)) {
-      // Directory structure, no class resolution, harvest file names.
-      harv.harvest(pattern)
+    return if (pattern.contains('/') || pattern.contains('\\')) {
+      val tree = project.objects.fileTree().from(rootDir)
+      tree.include(pattern)
+      tree.map { it.absolutePath }.toSet()
     } else {
       // A) May have files, try for harvesting file names first.
-      var harvested = harv.harvest(pattern)
+      val harvested = ClassNameHarvester().harvest(pattern)
       if (harvested.isNotEmpty()) {
         harvested
       } else {
-        // B) If no files found, try harvesting classes.
-        harvested = ClassNameHarvester().harvest(pattern)
-        if (harvested.isNotEmpty()) {
-          harvested
-        } else {
-          // C) If no files found, try harvesting resources.
-          ResourceNameHarvester().harvest(pattern)
-        } // resources
-      } // classes
+        // C) If no files found, try harvesting resources.
+        ResourceNameHarvester().harvest(pattern)
+      } // resources
     } // files
   }
 
-  private fun getExtraPathDirectoriesWithDefault(): List<File> {
-    return if (extraPathDirectories.isEmpty()) {
-      listOf(defaultExtraPath)
-    } else {
-      extraPathDirectories
-    }
-  }
+  private fun getExtraPathDirectoriesWithDefault(): FileTree =
+    if (extraPathDirectories.isEmpty) defaultExtraPath
+    else extraPathDirectories
 
   @Throws(IOException::class)
   fun ensureOutputDirectoryExists() {

@@ -80,16 +80,6 @@ class HarvestUtils {
     fun isAbsolutePathFragment(fragment: String): Boolean = File(fragment).isAbsolute
 
     /**
-     * Whether the fragment hints to a directory structure, supporting Windows
-     * or *nix file systems.
-     *
-     * @param fragment to check
-     * @return true if given fragment describes directory structure
-     */
-    fun hasDirectoryStructure(fragment: String): Boolean = (-1 < fragment.indexOf("/")) ||
-      (-1 < fragment.indexOf("\\"))
-
-    /**
      * Extracts from the filename what could serve as extension.
      *
      * @param filename filename to get extension from
