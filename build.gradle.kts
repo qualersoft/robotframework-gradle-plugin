@@ -115,6 +115,7 @@ tasks.create<JacocoReport>("reportMerge") {
     html.isEnabled = true
     csv.isEnabled = false
   }
+  sourceDirectories.from(sourceSets.main.get().allSource.srcDirs)
   classDirectories.from(sourceSets.main.get().output.classesDirs)
   executionData(tasks.getByName<JacocoMerge>("jacocoMerge").destinationFile)
 }
