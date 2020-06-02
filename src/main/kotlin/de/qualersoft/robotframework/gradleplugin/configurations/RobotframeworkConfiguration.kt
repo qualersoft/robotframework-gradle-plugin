@@ -4,6 +4,7 @@ import groovy.lang.Closure
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
+import org.gradle.api.provider.Property
 
 class RobotframeworkConfiguration(private val project: Project) {
 
@@ -35,4 +36,7 @@ class RobotframeworkConfiguration(private val project: Project) {
   var classifier: String? = null
   var ext: String? = null
   var configureClosure: Closure<Any>? = null
+  var mainClass: Property<String> = project.objects.property(String::class.java).also {
+    it.set("org.robotframework.RobotFramework")
+  }
 }
