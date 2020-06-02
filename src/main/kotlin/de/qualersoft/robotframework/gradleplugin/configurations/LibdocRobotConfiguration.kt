@@ -217,13 +217,15 @@ class LibdocRobotConfiguration(private val project: Project) : CommonRobotConfig
 
   private fun processPattern(rootDir: File, pattern: String): Set<String> {
     return if (pattern.contains('/') || pattern.contains('\\')) {
-      val tree = project.objects.fileTree().from(rootDir)
-      tree.include(pattern)
+      // A) May have files or folders, use fileTree to harvest them.
+      val tree = project.objects.fileTree().from(rootDir).also {
+        it.include(pattern)
+      }
       tree.map { it.absolutePath }.toSet()
     } else {
-      // A) May have files, try for harvesting file names first.
+      // B) May have a class path
       val harvested = ClassNameHarvester().harvest(pattern)
-      if (harvested.isNotEmpty()) {
+      if (!harvested.contains(pattern)) {
         harvested
       } else {
         // C) If no files found, try harvesting resources.

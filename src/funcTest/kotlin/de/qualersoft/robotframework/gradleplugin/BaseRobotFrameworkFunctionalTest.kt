@@ -12,7 +12,9 @@ private const val EXT_KT = "$EXT_GR.kts"
 
 open class BaseRobotFrameworkFunctionalTest {
 
-  companion object { const val BUG492 = "Accessing properties of extension in kotlin dsl an error is raised see https://github.com/gradle/kotlin-dsl-samples/issues/492" }
+  companion object {
+    const val BUG492 = "Accessing properties of extension in kotlin dsl an error is raised see https://github.com/gradle/kotlin-dsl-samples/issues/492"
+  }
 
   @Tag("groovy")
   annotation class GroovyTag
@@ -20,8 +22,7 @@ open class BaseRobotFrameworkFunctionalTest {
   @Tag("kotlin")
   annotation class KotlinTag
 
-
-  protected val testProjectDir = TemporaryFolder()
+  private val testProjectDir = TemporaryFolder()
 
   @AfterEach
   fun cleanup() {
@@ -36,7 +37,6 @@ open class BaseRobotFrameworkFunctionalTest {
    */
   protected open fun rootFolder(): String? = null
 
-
   protected fun setupKotlinTest(baseFileName: String): GradleRunner {
     copyTestFileToTemp(baseFileName, EXT_KT)
     return createRunner()
@@ -50,10 +50,12 @@ open class BaseRobotFrameworkFunctionalTest {
   private fun createRunner() = GradleRunner.create().withProjectDir(testProjectDir.root)
     // Attention: do not enable debug! Details see https://github.com/gradle/gradle/issues/6862
     .withPluginClasspath()
+    .withTestKitDir(testProjectDir.newFolder())
+    .withJaCoCo()
 
   private fun copyTestFileToTemp(resource: String, ext: String): File {
     var res = resource + ext
-    // if we have a rootfolder
+    // if we have a root folder
     rootFolder()?.also {
       res = "$it/$res"
     }
@@ -75,10 +77,21 @@ open class BaseRobotFrameworkFunctionalTest {
         f.copyRecursively(if (f.isFile) {
           File(testProjectDir.root, f.name)
         } else {
-          testProjectDir.root
+          File(testProjectDir.root, f.name).also { folder -> folder.mkdir() }
         })
       }
     }
     return result
+  }
+
+  private fun InputStream.toFile(file: File) {
+    use { input ->
+      file.outputStream().use { input.copyTo(it) }
+    }
+  }
+
+  private fun GradleRunner.withJaCoCo(): GradleRunner {
+    javaClass.classLoader.getResourceAsStream("testkit-gradle.properties")?.toFile(File(projectDir, "gradle.properties"))
+    return this
   }
 }
