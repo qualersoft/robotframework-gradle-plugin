@@ -8,7 +8,7 @@ abstract class  BasicRobotFrameworkTask : JavaExec() {
 
   var rfArgs by GradleStringListProperty(project)
 
-  internal fun executeRobotCommand(cmd: String, vararg additionalArgs: String) {
+  internal fun executeRobotCommand(cmd: String, additionalArgs: Collection<String>) {
     classpath = project.extensions.getByType(SourceSetContainer::class.java).getByName("main").runtimeClasspath
     args = listOf(cmd) + rfArgs + additionalArgs
     super.exec()

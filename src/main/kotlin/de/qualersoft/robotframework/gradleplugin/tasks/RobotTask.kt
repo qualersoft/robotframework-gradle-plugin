@@ -39,6 +39,6 @@ open class RobotTask : BasicRobotFrameworkTask {
   override fun exec() {
     val srcFile = sources.files.map { it.absolutePath }
     rfArgs = (robot.generateArguments().toMutableList() + rfArgs) as MutableList<String>
-    super.executeRobotCommand("run", *srcFile.toTypedArray())
+    super.executeRobotCommand("run", srcFile)
   }
 }

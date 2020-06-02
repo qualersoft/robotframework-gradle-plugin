@@ -235,8 +235,11 @@ class LibdocRobotConfiguration(private val project: Project) : CommonRobotConfig
   }
 
   private fun getExtraPathDirectoriesWithDefault(): FileTree =
-    if (extraPathDirectories.isEmpty) defaultExtraPath
-    else extraPathDirectories
+    if (extraPathDirectories.isEmpty) {
+      defaultExtraPath
+    } else {
+      extraPathDirectories
+    }
 
   @Throws(IOException::class)
   fun ensureOutputDirectoryExists() {
