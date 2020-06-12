@@ -15,20 +15,26 @@ class RobotFrameworkPlugin : Plugin<Project> {
       RobotFrameworkExtension::class.java,
       target)
 
-    if (!target.pluginManager.hasPlugin("java")) {
-      println("Applying java plugin")
-      target.pluginManager.apply(JavaPlugin::class.java)
-    }
-
-    val robConf = target.configurations.register("robot")
-    target.configurations.findByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)?.also {
-      it.extendsFrom(robConf.get())
-    }
-
     target.afterEvaluate {
+      applyJavaPluginIfRequired(target)
+      registerRobotConfiguration(target)
       it.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)?.also { rtConf ->
         extension.robotVersion.applyTo(rtConf)
       }
+    }
+  }
+
+  private fun applyJavaPluginIfRequired(project: Project) {
+    if (null == project.configurations.findByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)) {
+      println("Applying java plugin")
+      project.pluginManager.apply(JavaPlugin::class.java)
+    }
+  }
+
+  private fun registerRobotConfiguration(project: Project) {
+    val robConf = project.configurations.register("robot")
+    project.configurations.findByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)?.also {
+      it.extendsFrom(robConf.get())
     }
   }
 }

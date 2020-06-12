@@ -75,14 +75,8 @@ class RobotframeworkConfigurationTest {
     sut.group should be("myGroup")
     sut.name should be("myName")
     sut.version should be("0.0.0-myVersion")
-//    val ext =
-//    ext shouldNot beNull()
     sut.ext!! should be("myExt")
-//    val clas =
-//    clas shouldNot beNull()
-//    clas!! should be("myClassifier")
     sut.classifier!! should be("myClassifier")
-
   }
 
   private fun getRuntimeConfig(): Configuration = project.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)!!
@@ -105,10 +99,9 @@ class RobotframeworkConfigurationTest {
       null != dependency.artifacts.find {
         (it.name == name) && if (null != ext) {
           it.extension == ext
-        } else {
+        } else { // if no extension was set it defaults to jar
           it.extension == "jar"
-        } // if no extension was set it defaults to jar
-          && (it.classifier == classifier)
+        } && (it.classifier == classifier)
       }
     } else {
       true // we return true because if no classifier and no extension are set -> no artifact will be created

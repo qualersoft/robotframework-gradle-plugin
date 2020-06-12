@@ -89,13 +89,13 @@ class LibdocRobotConfiguration(private val project: Project) : CommonRobotConfig
    * relative to the [outputDirectory] of the project.
    */
   @Suppress("private")
-  val outputFile by GradleFileNullableProperty(project)
+  var outputFile by GradleFileNullableProperty(project)
 
   /**
    * Sets the version of the documented library or resource.
    */
   @Suppress("private")
-  val version by GradleNullableProperty(project, String::class)
+  var version by GradleNullableProperty(project, String::class)
 
   /**
    * Name or path of the documented library or resource file.
@@ -115,7 +115,7 @@ class LibdocRobotConfiguration(private val project: Project) : CommonRobotConfig
    *
    */
   @Suppress("private")
-  val libraryOrResourceFile by GradleNullableProperty(project, String::class)
+  var libraryOrResourceFile by GradleNullableProperty(project, String::class)
 
   /**
    * A directory to be added to the PYTHONPATH/CLASSPATH when creating
@@ -123,7 +123,7 @@ class LibdocRobotConfiguration(private val project: Project) : CommonRobotConfig
    * e.g. src/main/java/com/test/
    */
   @Suppress("private")
-  val extraPathDirectories: ConfigurableFileTree = project.objects.fileTree()
+  var extraPathDirectories: ConfigurableFileTree? = null
 
   /**
    * The default location where extra packages will be searched. Effective if extraPathDirectories
@@ -133,7 +133,8 @@ class LibdocRobotConfiguration(private val project: Project) : CommonRobotConfig
    * @readonly
    */
   @Suppress("private")
-  var defaultExtraPath: ConfigurableFileTree = project.objects.fileTree().from(project.projectDir)
+  var defaultExtraPath: ConfigurableFileTree = project.objects.fileTree()
+    .from(File(project.projectDir, "src/test/resources/robotframework/libraries"))
   //</editor-fold>
 
   fun generateRunArguments(): List<Array<String>> {
@@ -161,6 +162,7 @@ class LibdocRobotConfiguration(private val project: Project) : CommonRobotConfig
   private fun generateLibdocArgumentList(projectBaseDir: File, multipleOutputs: Boolean,
                                          fileArgument: String): Arguments = Arguments().apply {
     this.add("libdoc")
+    this.addArgs(generateArguments())
     if (multipleOutputs) {
       // Derive the name from the input.
       this.addNonEmptyStringToArguments(HarvestUtils.extractName(fileArgument), "--name")
@@ -189,15 +191,17 @@ class LibdocRobotConfiguration(private val project: Project) : CommonRobotConfig
         HarvestUtils.extractExtension(outputFile!!.name))
     } else {
       // Preserve original single-file behavior.
-      if (outputFile!!.name.contains("*")) {
-        // We deal with a pattern, so we need to get the name from the
-        // input file.
-        val tf = File(fileArgument)
-        this.add(outputDirectory.absolutePath + File.separator + tf.name
-          + HarvestUtils.extractExtension(outputFile!!.name))
-      } else {
-        // Use the output name directly.
-        this.add(joinPaths(outputDirectory.absolutePath, outputFile!!.name))
+      outputFile?.also {
+        if (it.name.contains("*")) {
+          // We deal with a pattern, so we need to get the name from the
+          // input file.
+          val tf = File(fileArgument)
+          this.add(outputDirectory.absolutePath + File.separator + tf.name
+            + HarvestUtils.extractExtension(it.name))
+        } else {
+          // Use the output name directly.
+          this.add(joinPaths(outputDirectory.absolutePath, it.name))
+        }
       }
     }
   }
@@ -234,12 +238,14 @@ class LibdocRobotConfiguration(private val project: Project) : CommonRobotConfig
     } // files
   }
 
-  private fun getExtraPathDirectoriesWithDefault(): FileTree =
-    if (extraPathDirectories.isEmpty) {
+  private fun getExtraPathDirectoriesWithDefault(): FileTree {
+    val path = extraPathDirectories
+    return if ((null == path) || path.isEmpty) {
       defaultExtraPath
     } else {
-      extraPathDirectories
+      path
     }
+  }
 
   @Throws(IOException::class)
   fun ensureOutputDirectoryExists() {

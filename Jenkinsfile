@@ -31,7 +31,7 @@ node {
       try {
         unstash("build")
         execGradle 'test'
-        stash("build")
+        stash("test")
       } finally {
         junit '**/build/test-results/test/*.xml'
       }
@@ -39,15 +39,15 @@ node {
     stage("Functional test") {
       echo "executing functional tests"
       try {
-        unstash("build")
+        unstash("test")
         execGradle 'funcTest'
-        stash("build")
+        stash("funcTest")
       } finally {
         junit '**/build/test-results/funcTest/*.xml'
       }
     }
     stage("Report") {
-      unstash("build")
+      unstash("funcTest")
       execGradle 'jacocoMerge'
       execGradle 'reportMerge'
       withCredentials([string(credentialsId: 'CODECOV_TOKEN', variable: 'CC_TOKEN')]) {
