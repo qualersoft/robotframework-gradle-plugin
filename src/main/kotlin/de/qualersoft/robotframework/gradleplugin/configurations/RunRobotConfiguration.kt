@@ -1,6 +1,5 @@
 package de.qualersoft.robotframework.gradleplugin.configurations
 
-
 import de.qualersoft.robotframework.gradleplugin.utils.Arguments
 import de.qualersoft.robotframework.gradleplugin.utils.GradleNullableProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty

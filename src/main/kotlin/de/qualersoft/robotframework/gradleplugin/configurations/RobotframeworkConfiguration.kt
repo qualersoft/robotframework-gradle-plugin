@@ -10,6 +10,7 @@ class RobotframeworkConfiguration(private val project: Project) {
 
   fun applyTo(rtConf: Configuration) {
     rtConf.dependencies.add(createRobotLibDependency())
+    rtConf.dependencies.add(createJythonLibDependency())
   }
 
   private fun createRobotLibDependency(): Dependency {
@@ -20,6 +21,11 @@ class RobotframeworkConfiguration(private val project: Project) {
     } else {
       project.dependencies.create(depNot)
     }
+  }
+
+  private fun createJythonLibDependency(): Dependency {
+    val depNot = mapOf("group" to "org.python", "name" to "jython-standalone", "version" to "2.7.2")
+    return project.dependencies.create(depNot)
   }
 
   internal fun createDependencyNotation(): Map<String, String> = mutableMapOf<String, String>().also { res ->

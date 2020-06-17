@@ -22,7 +22,7 @@ open class BaseRobotFrameworkFunctionalTest {
   @Tag("kotlin")
   annotation class KotlinTag
 
-  private val testProjectDir = TemporaryFolder()
+  protected val testProjectDir = TemporaryFolder()
 
   @AfterEach
   fun cleanup() {

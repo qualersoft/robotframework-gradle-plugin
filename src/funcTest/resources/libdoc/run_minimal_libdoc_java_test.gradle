@@ -1,0 +1,15 @@
+plugins {
+  id 'de.qualersoft.robotframework'
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+tasks.register("libdocRun", de.qualersoft.robotframework.gradleplugin.tasks.LibdocTask) {
+  libdoc {
+    outputFile = file("libdoc.html")
+    libraryOrResourceFile = file("src/main/java/ALib.java")
+  }
+}

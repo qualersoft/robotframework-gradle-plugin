@@ -1,15 +1,14 @@
 package de.qualersoft.robotframework.gradleplugin.configurations
 
-
 import de.qualersoft.robotframework.gradleplugin.utils.Arguments
 import de.qualersoft.robotframework.gradleplugin.utils.GradleFileNullableProperty
-import de.qualersoft.robotframework.gradleplugin.utils.GradleFileProperty
-import de.qualersoft.robotframework.gradleplugin.utils.GradleListProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleNullableProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleStringListProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleStringMapProperty
 import org.gradle.api.Project
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.ConfigurableFileTree
 import java.io.File
 
 open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(project) {
@@ -121,10 +120,11 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * Where to create output files. The given path is considered
    * relative to command execution directory unless it is absolute.
    *
-   * Default: `${project.buildDir}/robotframework-reports`.
+   * Default: `${project.buildDir}/reports/robotframework`.
    */
   @Suppress("private")
-  var outputDir by GradleFileProperty(project, File(project.buildDir, "robotframework-reports"))
+  var outputDir = project.objects.directoryProperty().fileValue(File(project.buildDir,
+    joinPaths("reports", "robotframework")))
 
   /**
    * XML output file. Not created unless this option is
@@ -392,7 +392,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
     addListToArguments(exclude, "--exclude")
     addListToArguments(critical, "--critical")
     addListToArguments(nonCritical, "--noncritical")
-    addFileToArguments(outputDir, "-d")
+    addFileToArguments(outputDir.get().asFile, "-d")
     addOptionalFile(output, "-o")
     addFileToArguments(log, "-l")
     addFileToArguments(report, "-r")
@@ -432,10 +432,14 @@ open class CommonRobotConfiguration(project: Project) {
    * e.g. src/main/java/com/test/
    */
   @Suppress("private")
-  var additionalPythonPaths by GradleListProperty(project, File::class)
+  var additionalPythonPaths: ConfigurableFileCollection? = null
 
   open fun generateArguments(): Array<String> = Arguments().apply {
     addStringToArguments(name, "--name")
-    addFileListToArguments(additionalPythonPaths, "--pythonpath")
+    val files = additionalPythonPaths?.files?.toList()
+    addFileListToArguments(files, "--pythonpath")
   }.toArray()
+
+
+  protected fun joinPaths(vararg parts: String): String = parts.joinToString(File.separator)
 }

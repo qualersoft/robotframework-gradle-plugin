@@ -82,12 +82,13 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
   //</editor-fold>
 
   fun ensureOutputDirectoryExists() {
-    if (!outputDir.exists() && !outputDir.mkdirs()) {
-      throw IOException("Target output direcotry connot be created: ${outputDir.absolutePath}")
+    var dir = outputDir.asFile.get()
+    if (!dir.exists() && !dir.mkdirs()) {
+      throw IOException("Target output direcotry connot be created: ${dir.absolutePath}")
     }
   }
 
-  private fun getOutputPath(): String = File(outputDir.absoluteFile, outputFile).absolutePath
+  private fun getOutputPath(): String = File(outputDir.get().asFile.absoluteFile, outputFile).absolutePath
 
   override fun generateArguments(): Array<String> = Arguments().apply {
     add("rebot")

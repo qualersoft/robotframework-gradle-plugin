@@ -1,16 +1,45 @@
 package de.qualersoft.robotframework.gradleplugin.tasks
 
-import de.qualersoft.robotframework.gradleplugin.utils.GradleStringListProperty
+import de.qualersoft.robotframework.gradleplugin.robotframework
+import org.gradle.api.DefaultTask
+import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.JavaExec
-import org.gradle.api.tasks.SourceSetContainer
+import org.robotframework.RobotFramework
 
-abstract class  BasicRobotFrameworkTask : JavaExec() {
+abstract class BasicRobotFrameworkTask : JavaExec() {
 
-  var rfArgs by GradleStringListProperty(project)
+  init {
+    val rfVersion = project.robotframework().robotVersion
+    mainClass.set(rfVersion.mainClass)
+  }
+  /**
+   * Additional properties that will be append to end of the configuration arguments.
+   * Can be used to 'override' configuration or to provide task specific parameters.
+   */
+  @Input
+  var rfArgs = listOf<String>()
 
-  internal fun executeRobotCommand(cmd: String, additionalArgs: Collection<String>) {
-    classpath = project.extensions.getByType(SourceSetContainer::class.java).getByName("main").runtimeClasspath
-    args = listOf(cmd) + rfArgs + additionalArgs
+  /**
+   * Provide access to the `RobotFrameworkExtension`
+   */
+  @Internal
+  protected val extension = project.robotframework()
+
+  internal fun executeRobotCommand(cmd: String, additionalArgs: Collection<String>? = null) {
+    val robotArgs = listOf(cmd)  + rfArgs + (additionalArgs ?: listOf())
+    println("Starting cmd '$cmd' with arguments $rfArgs and task specific additional arguments $additionalArgs and ")
+    ensureRobotLib()
+    args(robotArgs)
     super.exec()
+  }
+
+  private fun ensureRobotLib() {
+    val rfVersion = extension.robotVersion
+    val jar = project.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)?.find {
+      it.isFile && it.name.contains(rfVersion.name)
+    }
+    classpath(project.files(jar))
   }
 }

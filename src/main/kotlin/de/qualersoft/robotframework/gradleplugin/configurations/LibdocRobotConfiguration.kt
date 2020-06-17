@@ -1,17 +1,14 @@
 package de.qualersoft.robotframework.gradleplugin.configurations
 
-import de.qualersoft.robotframework.gradleplugin.harvester.ClassNameHarvester
-import de.qualersoft.robotframework.gradleplugin.harvester.HarvestUtils
-import de.qualersoft.robotframework.gradleplugin.harvester.ResourceNameHarvester
 import de.qualersoft.robotframework.gradleplugin.utils.Arguments
+import de.qualersoft.robotframework.gradleplugin.utils.GradleDirectoryProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleFileNullableProperty
-import de.qualersoft.robotframework.gradleplugin.utils.GradleFileProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleNullableProperty
 import org.gradle.api.Project
-import org.gradle.api.file.ConfigurableFileTree
-import org.gradle.api.file.FileTree
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.Directory
+import org.gradle.api.file.FileCollection
 import java.io.File
-import java.io.IOException
 
 
 /**
@@ -43,11 +40,12 @@ import java.io.IOException
  *
  * ## Optional settings:
  * + [outputDirectory]       Specifies the directory where documentation files are written.
- *                            Considered relative to the `${basedir}` of the project, but also supports absolute paths.
- *                            Defaults to `${project.build.directory}/robotframework/libdoc`
+ *                           Considered relative to the `${basedir}` of the project, but also supports absolute paths.
+ *                           Defaults to `${project.build.directory}/robotframework/libdoc`
  * + [name]                  Sets the name of the documented library or resource.
  * + [version]               Sets the version of the documented library or resource.
- * + [extraPathDirectories]  A directory to be added to the PYTHONPATH/CLASSPATH when creating documentation.
+ * + [additionalPythonPaths] Additional locations where to search for libraries
+and resources.
  * E.g.: `src/main/java/com/test/`
  *
  *
@@ -72,7 +70,7 @@ import java.io.IOException
  *      <libraryOrResourceFile>com.**.*Lib</libraryOrResourceFile>
  *    </libdoc>
  */
-class LibdocRobotConfiguration(private val project: Project) : CommonRobotConfiguration(project) {
+class LibdocRobotConfiguration(project: Project) : CommonRobotConfiguration(project) {
 
   //<editor-fold desc="Properties">
   /**
@@ -81,7 +79,7 @@ class LibdocRobotConfiguration(private val project: Project) : CommonRobotConfig
    * Default-value: `${project.buildDir}/robotframework/libdoc`
    */
   @Suppress("private")
-  var outputDirectory: File by GradleFileProperty(project,
+  var outputDirectory: Directory by GradleDirectoryProperty(project,
     File(project.buildDir, joinPaths("robotframework", "libdoc")))
 
   /**
@@ -104,7 +102,7 @@ class LibdocRobotConfiguration(private val project: Project) : CommonRobotConfig
    * data, for example `BuiltIn` or
    * `com.acme.FooLibrary`. When name is used, the library is
    * imported the same as when running the tests. Use
-   * [extraPathDirectories] to set PYTHONPATH/CLASSPATH accordingly.
+   * [additionalPythonPaths] to set PYTHONPATH/CLASSPATH accordingly.
    *
    * Paths are considered relative to the location of `build.gradle` and
    * must point to a valid Python/Java source file or a resource file. For
@@ -115,15 +113,7 @@ class LibdocRobotConfiguration(private val project: Project) : CommonRobotConfig
    *
    */
   @Suppress("private")
-  var libraryOrResourceFile by GradleNullableProperty(project, String::class)
-
-  /**
-   * A directory to be added to the PYTHONPATH/CLASSPATH when creating
-   * documentation.
-   * e.g. src/main/java/com/test/
-   */
-  @Suppress("private")
-  var extraPathDirectories: ConfigurableFileTree? = null
+  var libraryOrResourceFile by GradleFileNullableProperty(project)
 
   /**
    * The default location where extra packages will be searched. Effective if extraPathDirectories
@@ -133,126 +123,39 @@ class LibdocRobotConfiguration(private val project: Project) : CommonRobotConfig
    * @readonly
    */
   @Suppress("private")
-  var defaultExtraPath: ConfigurableFileTree = project.objects.fileTree()
-    .from(File(project.projectDir, "src/test/resources/robotframework/libraries"))
+  var defaultExtraPath: ConfigurableFileCollection = project.objects.fileCollection()
+    .from(File(project.projectDir, joinPaths("src", "test", "resources", "robotframework", "libraries")))
   //</editor-fold>
 
-  fun generateRunArguments(): List<Array<String>> {
-    val result = ArrayList<Array<String>>()
-
-    val projectBaseDir = project.projectDir
-    // Phase I - harvest the files/classes/resources, if any
-    val fileArguments: List<String> = if (null != libraryOrResourceFile) {
-      harvestResourceOrFileCandidates(projectBaseDir, libraryOrResourceFile!!)
-    } else listOf()
-
-    // Phase II - prepare the argument lines for the harvested files/classes/resources.
-
-    /* with single argument line, we can use the original single entity parameters,
-    souse this flag to switch. */
-    val multipleOutputs = 1 < fileArguments.size
-
-    for (fileArgument in fileArguments) {
-      val generatedArguments = generateLibdocArgumentList(projectBaseDir, multipleOutputs, fileArgument)
-      result.add(generatedArguments.toArray())
+  fun generateRunArguments(): List<String> = ArrayList<String>().apply {
+    libraryOrResourceFile?.also {
+      val generatedArguments = generateLibdocArgumentList(it.path)
+      addAll(generatedArguments.toArray())
     }
-    return result
   }
 
-  private fun generateLibdocArgumentList(projectBaseDir: File, multipleOutputs: Boolean,
-                                         fileArgument: String): Arguments = Arguments().apply {
-    this.add("libdoc")
+  private fun generateLibdocArgumentList(fileArgument: String):
+    Arguments = Arguments().apply {
     this.addArgs(generateArguments())
-    if (multipleOutputs) {
-      // Derive the name from the input.
-      this.addNonEmptyStringToArguments(HarvestUtils.extractName(fileArgument), "--name")
-    } else {
-      // Preserve the original single-file behavior.
-      this.addNonEmptyStringToArguments(name, "--name")
-    }
+    this.addNonEmptyStringToArguments(name, "--name")
     this.addNonEmptyStringToArguments(version, "--version")
     this.addFileListToArguments(getExtraPathDirectoriesWithDefault().toList(), "--pythonpath")
     this.add(fileArgument)
-    if (multipleOutputs) {
-      // Derive the output file name id from the source and from the
-      // output file given.
-      // Generate a unique name.
-      val normalizedArgument: String = if (HarvestUtils.isAbsolutePathFragment(fileArgument)) {
-        // Cut out the project directory, so that we have shorter id
-        // names.
-        // TODO - perhaps later, we can preserve the directory structure
-        // relative to the output directory.
-        HarvestUtils.removePrefixDirectory(projectBaseDir, fileArgument)
-      } else {
-        fileArgument
-      }
-      this.add(outputDirectory.absolutePath + File.separator +
-        HarvestUtils.generateIdName(normalizedArgument) +
-        HarvestUtils.extractExtension(outputFile!!.name))
-    } else {
-      // Preserve original single-file behavior.
-      outputFile?.also {
-        if (it.name.contains("*")) {
-          // We deal with a pattern, so we need to get the name from the
-          // input file.
-          val tf = File(fileArgument)
-          this.add(outputDirectory.absolutePath + File.separator + tf.name
-            + HarvestUtils.extractExtension(it.name))
-        } else {
-          // Use the output name directly.
-          this.add(joinPaths(outputDirectory.absolutePath, it.name))
-        }
-      }
+    outputFile?.also {
+      this.add(joinPaths(outputDirectory.asFile.absolutePath, it.name))
     }
+    if (!outputDirectory.asFile.exists()) {
+      outputDirectory.asFile.mkdirs()
+    }
+    println("Writing output to directory '${outputDirectory.asFile.absolutePath}'")
   }
 
-  private fun harvestResourceOrFileCandidates(rootDir: File, pattern: String): ArrayList<String> {
-    val libOrResource = File(pattern)
-    val fileArguments = ArrayList<String>()
-    if (libOrResource.isFile) {
-      // Single file specification, no patterns.
-      fileArguments.add(libOrResource.absolutePath)
-    } else {
-      // Possible pattern, process further.
-      fileArguments.addAll(processPattern(rootDir, pattern))
-    } // single file or pattern
-    return fileArguments
-  }
-
-  private fun processPattern(rootDir: File, pattern: String): Set<String> {
-    return if (pattern.contains('/') || pattern.contains('\\')) {
-      // A) May have files or folders, use fileTree to harvest them.
-      val tree = project.objects.fileTree().from(rootDir).also {
-        it.include(pattern)
-      }
-      tree.map { it.absolutePath }.toSet()
-    } else {
-      // B) May have a class path
-      val harvested = ClassNameHarvester().harvest(pattern)
-      if (!harvested.contains(pattern)) {
-        harvested
-      } else {
-        // C) If no files found, try harvesting resources.
-        ResourceNameHarvester().harvest(pattern)
-      } // resources
-    } // files
-  }
-
-  private fun getExtraPathDirectoriesWithDefault(): FileTree {
-    val path = extraPathDirectories
+  private fun getExtraPathDirectoriesWithDefault(): FileCollection {
+    val path = additionalPythonPaths
     return if ((null == path) || path.isEmpty) {
       defaultExtraPath
     } else {
       path
     }
   }
-
-  @Throws(IOException::class)
-  fun ensureOutputDirectoryExists() {
-    if (!outputDirectory.exists() && !outputDirectory.mkdirs()) {
-      throw IOException("Target output directory cannot be created: " + outputDirectory.absolutePath)
-    }
-  }
-
-  private fun joinPaths(vararg parts: String): String = parts.joinToString(File.separator)
 }

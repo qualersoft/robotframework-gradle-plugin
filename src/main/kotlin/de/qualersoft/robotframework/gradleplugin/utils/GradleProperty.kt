@@ -1,9 +1,12 @@
 package de.qualersoft.robotframework.gradleplugin.utils
 
 import org.gradle.api.Project
+import org.gradle.api.file.Directory
+import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import java.io.File
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -92,4 +95,19 @@ internal class GradleFileProperty<T>(
   }
   operator fun getValue(thisRef: T, property: KProperty<*>): File = this.property.get()
   operator fun setValue(thisRef: T, property: KProperty<*>, value: File) = this.property.set(value)
+  operator fun setValue(thisRef: T, property: KProperty<*>, value: Provider<File>) = this.property.set(value)
+}
+
+internal class GradleDirectoryProperty<T>(
+  project: Project,
+  default: File
+) {
+  private val property = project.objects.directoryProperty().apply {
+    set(default)
+  }
+
+  operator fun getValue(thisRef: T, property: KProperty<*>): Directory = this.property.get()
+  operator fun setValue(thisRef: T, property: KProperty<*>, value: File) = this.property.set(value)
+  operator fun setValue(thisRef: T, property: KProperty<*>, value: Directory) = this.property.set(value)
+  operator fun setValue(thisRef: T, property: KProperty<*>, value: Provider<Directory>) = this.property.set(value)
 }
