@@ -139,7 +139,6 @@ class LibdocRobotConfiguration(project: Project) : CommonRobotConfiguration(proj
     this.addArgs(generateArguments())
     this.addNonEmptyStringToArguments(name, "--name")
     this.addNonEmptyStringToArguments(version, "--version")
-    this.addFileListToArguments(getExtraPathDirectoriesWithDefault().toList(), "--pythonpath")
     this.add(fileArgument)
     outputFile?.also {
       this.add(joinPaths(outputDirectory.asFile.absolutePath, it.name))
@@ -148,14 +147,5 @@ class LibdocRobotConfiguration(project: Project) : CommonRobotConfiguration(proj
       outputDirectory.asFile.mkdirs()
     }
     println("Writing output to directory '${outputDirectory.asFile.absolutePath}'")
-  }
-
-  private fun getExtraPathDirectoriesWithDefault(): FileCollection {
-    val path = additionalPythonPaths
-    return if ((null == path) || path.isEmpty) {
-      defaultExtraPath
-    } else {
-      path
-    }
   }
 }

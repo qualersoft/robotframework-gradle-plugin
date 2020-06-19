@@ -4,15 +4,11 @@ import de.qualersoft.robotframework.gradleplugin.configurations.RunRobotConfigur
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import org.gradle.api.Action
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.FileTree
+import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
-import org.gradle.api.tasks.TaskAction
-
 
 open class RobotTask : BasicRobotFrameworkTask() {
 
@@ -22,15 +18,14 @@ open class RobotTask : BasicRobotFrameworkTask() {
    */
   @InputFiles
   @PathSensitive(PathSensitivity.ABSOLUTE)
-  var sources: FileTree = project.objects.fileTree()
+  var sources: FileCollection = project.objects.fileCollection().from(extension.robot.dataSources)
 
   /**
    * Directory where the output shall be put to
-   * TODO: Link to robot property as default supplier
    */
   @OutputDirectory
   val outputDir: DirectoryProperty = project.objects.directoryProperty()
-    .fileProvider(project.provider { robot.outputDir.get().asFile })
+          .convention(project.provider { robot.outputDir.get() })
 
   private var robot by GradleProperty(project, RunRobotConfiguration::class, RunRobotConfiguration(project))
   fun robot(action: Action<RunRobotConfiguration>) {

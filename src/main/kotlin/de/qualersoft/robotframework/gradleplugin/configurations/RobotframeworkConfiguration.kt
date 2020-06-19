@@ -11,6 +11,7 @@ class RobotframeworkConfiguration(private val project: Project) {
   fun applyTo(rtConf: Configuration) {
     rtConf.dependencies.add(createRobotLibDependency())
     rtConf.dependencies.add(createJythonLibDependency())
+    rtConf.dependencies.add(createRfJavaLibDependency())
   }
 
   private fun createRobotLibDependency(): Dependency {
@@ -24,7 +25,14 @@ class RobotframeworkConfiguration(private val project: Project) {
   }
 
   private fun createJythonLibDependency(): Dependency {
+    // TODO If this works, make it configurable
     val depNot = mapOf("group" to "org.python", "name" to "jython-standalone", "version" to "2.7.2")
+    return project.dependencies.create(depNot)
+  }
+
+  private fun createRfJavaLibDependency(): Dependency? {
+    // TODO If this works, make it configurable
+    val depNot = mapOf("group" to "org.robotframework", "name" to "javalib-core", "version" to "2.0.3")
     return project.dependencies.create(depNot)
   }
 

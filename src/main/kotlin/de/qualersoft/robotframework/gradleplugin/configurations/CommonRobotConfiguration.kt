@@ -432,7 +432,7 @@ open class CommonRobotConfiguration(project: Project) {
    * e.g. src/main/java/com/test/
    */
   @Suppress("private")
-  var additionalPythonPaths: ConfigurableFileCollection? = null
+  var additionalPythonPaths: ConfigurableFileCollection = project.objects.fileCollection()
 
   open fun generateArguments(): Array<String> = Arguments().apply {
     addStringToArguments(name, "--name")

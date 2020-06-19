@@ -1,7 +1,7 @@
 package de.qualersoft.robotframework.gradleplugin
 
-import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.beNull
+import io.kotest.matchers.sequences.shouldHaveSize
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldNot
 import io.kotest.matchers.string.contain
@@ -29,10 +29,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
       .withArguments("libdocRun")
       .build()
     println(result.output)
-    /* TODO 'ImportError: No module named robot'
     result.output shouldNot contain("Documenting Java test libraries requires Jython")
     checkForHtmlDoc(::checkRobotLib)
-    */
   }
 
   @Test
@@ -40,14 +38,12 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
   @DisplayName("When run libdoc for robot-file from kotlin script, a documentation should be generated.")
   fun testGenerateDocForRobotWithKotlin() {
     getFolderAction = { "libdoc" }
-    val result = setupGroovyTest("run_minimal_libdoc_robot_test")
+    val result = setupKotlinTest("run_minimal_libdoc_robot_test")
       .withArguments("libdocRun")
       .build()
     println(result.output)
-    /* TODO 'ImportError: No module named robot'
     result.output shouldNot contain("Documenting Java test libraries requires Jython")
     checkForHtmlDoc(::checkRobotLib)
-    */
   }
 
   @Test
@@ -62,7 +58,7 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
     /* TODO libdoc for java files is atm not working
     result.output shouldNot contain("Documenting Java test libraries requires Jython")
     checkForHtmlDoc(::checkJavaLib)
-    */
+    // */
   }
 
   @Test
@@ -77,7 +73,7 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
     /* TODO libdoc for java files is atm not working
     result.output shouldNot contain("Documenting Java test libraries requires Jython")
     checkForHtmlDoc(::checkJavaLib)
-    */
+    // */
   }
 
   private fun checkRobotLib(file: File) {
@@ -97,16 +93,17 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
   }
 
   private fun checkForHtmlDoc(contentChecker: (File) -> Unit) {
-    val files = testProjectDir.root.listFiles { it:File ->
-      it.isFile && it.path.let {
-        it.contains("robotframework") &&
-          it.contains("libdoc") &&
-          it.contains("libdoc.html")
+
+    val files = testProjectDir.root.walkBottomUp().filter {
+      it.isFile && it.path.let { path ->
+        path.contains("robotframework") &&
+        path.contains("libdoc") &&
+        path.contains("libdoc.html")
       }
     }
 
     files shouldNot beNull()
-    files!!.also {
+    files.also {
       assertAll(
         { files shouldHaveSize(1) },
         { val file = files.first()

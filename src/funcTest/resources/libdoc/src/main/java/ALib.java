@@ -4,6 +4,6 @@ import org.robotframework.javalib.library.AnnotationLibrary;
 public class ALib extends AnnotationLibrary {
 
   public ALib() {
-    super("keywords/*.class")
+    super("keywords/*.class");
   }
 }

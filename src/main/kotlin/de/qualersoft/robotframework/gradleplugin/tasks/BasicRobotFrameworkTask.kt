@@ -7,6 +7,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.JavaExec
 import org.robotframework.RobotFramework
+import java.io.File
 
 abstract class BasicRobotFrameworkTask : JavaExec() {
 
@@ -36,10 +37,14 @@ abstract class BasicRobotFrameworkTask : JavaExec() {
   }
 
   private fun ensureRobotLib() {
+    val jar = getRobotLib()
+    classpath(project.files(jar))
+  }
+
+  protected fun getRobotLib(): File? {
     val rfVersion = extension.robotVersion
-    val jar = project.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)?.find {
+    return project.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)?.find {
       it.isFile && it.name.contains(rfVersion.name)
     }
-    classpath(project.files(jar))
   }
 }
