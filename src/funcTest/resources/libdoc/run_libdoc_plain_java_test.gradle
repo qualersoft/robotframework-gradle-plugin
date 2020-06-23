@@ -1,5 +1,6 @@
 plugins {
   id 'de.qualersoft.robotframework'
+  id 'java'
 }
 
 repositories {
@@ -10,6 +11,10 @@ repositories {
 tasks.register("libdocRun", de.qualersoft.robotframework.gradleplugin.tasks.LibdocTask) {
   libdoc {
     outputFile = file("libdoc.html")
-    libraryOrResourceFile = file("src/main/java/ALib.java")
+    libraryOrResourceFile = "src/main/java/ALib.java"
   }
+}
+
+dependencies {
+  implementation(group: "org.robotframework", name: "javalib-core", version: "2.0.3")
 }

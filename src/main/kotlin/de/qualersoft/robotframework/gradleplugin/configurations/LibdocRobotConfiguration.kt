@@ -2,12 +2,10 @@ package de.qualersoft.robotframework.gradleplugin.configurations
 
 import de.qualersoft.robotframework.gradleplugin.utils.Arguments
 import de.qualersoft.robotframework.gradleplugin.utils.GradleDirectoryProperty
-import de.qualersoft.robotframework.gradleplugin.utils.GradleFileNullableProperty
+import de.qualersoft.robotframework.gradleplugin.utils.GradleFileProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleNullableProperty
 import org.gradle.api.Project
-import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.Directory
-import org.gradle.api.file.FileCollection
 import java.io.File
 
 
@@ -70,7 +68,7 @@ and resources.
  *      <libraryOrResourceFile>com.**.*Lib</libraryOrResourceFile>
  *    </libdoc>
  */
-class LibdocRobotConfiguration(project: Project) : CommonRobotConfiguration(project) {
+class LibdocRobotConfiguration(val project: Project) : CommonRobotConfiguration(project) {
 
   //<editor-fold desc="Properties">
   /**
@@ -80,14 +78,15 @@ class LibdocRobotConfiguration(project: Project) : CommonRobotConfiguration(proj
    */
   @Suppress("private")
   var outputDirectory: Directory by GradleDirectoryProperty(project,
-    File(project.buildDir, joinPaths("robotframework", "libdoc")))
+      File(project.buildDir, joinPaths("robotframework", "libdoc")))
 
   /**
    * Specifies the filename of the created documentation. Considered to be
    * relative to the [outputDirectory] of the project.
+   * Default-value: `libdoc.html`
    */
   @Suppress("private")
-  var outputFile by GradleFileNullableProperty(project)
+  var outputFile by GradleFileProperty(project, File("libdoc.html"))
 
   /**
    * Sets the version of the documented library or resource.
@@ -96,7 +95,7 @@ class LibdocRobotConfiguration(project: Project) : CommonRobotConfiguration(proj
   var version by GradleNullableProperty(project, String::class)
 
   /**
-   * Name or path of the documented library or resource file.
+   * Name of the library or path to the resource file.
    *
    * Name must be in the same format as when used in Robot Framework test
    * data, for example `BuiltIn` or
@@ -110,42 +109,68 @@ class LibdocRobotConfiguration(project: Project) : CommonRobotConfiguration(proj
    *
    * One may also use ant-like patterns, for example
    * `src/main/java/com/**/Lib.java`
-   *
    */
   @Suppress("private")
-  var libraryOrResourceFile by GradleFileNullableProperty(project)
-
-  /**
-   * The default location where extra packages will be searched. Effective if extraPathDirectories
-   * attribute is not used.
-   *
-   * @parameter default-value="${project.basedir}/src/test/resources/robotframework/libraries"
-   * @readonly
-   */
-  @Suppress("private")
-  var defaultExtraPath: ConfigurableFileCollection = project.objects.fileCollection()
-    .from(File(project.projectDir, joinPaths("src", "test", "resources", "robotframework", "libraries")))
+  var libraryOrResourceFile: String? = null
   //</editor-fold>
 
-  fun generateRunArguments(): List<String> = ArrayList<String>().apply {
-    libraryOrResourceFile?.also {
-      val generatedArguments = generateLibdocArgumentList(it.path)
-      addAll(generatedArguments.toArray())
+  @Throws(IllegalArgumentException::class)
+  fun generateRunArguments(): List<Arguments> = libraryOrResourceFile?.let { libOrResFile ->
+    val srcFiles = harvestResourceOrFileCandidates(libOrResFile)
+    val multiOutput = 1 < srcFiles.size
+    return srcFiles.map {
+      generateLibdocArgumentList(it, multiOutput)
     }
+  } ?: emptyList()
+
+  @Throws(IllegalArgumentException::class)
+  private fun harvestResourceOrFileCandidates(pattern: String): List<String> {
+    val file = project.projectDir.resolve(pattern).normalize()
+    return if (file.isFile) {
+      // 1. Single file specification, no patterns (try to resolve to projectDir)
+      listOf(file.absolutePath)
+    } else if (pattern.contains("\\") || pattern.contains("/")) {
+      // 2. we have path structure (\ | /)
+      when {
+        file.isDirectory -> file.listFiles()?.filter { it.isFile }?.map { it.absolutePath }
+        pattern.contains(Regex("[*?]")) -> {
+          project.fileTree(project.projectDir).also {
+            it.include(pattern)
+          }.files.filter { it.isFile }.map { it.absolutePath }
+        }
+        else -> null
+      }
+    } else {
+      // 3. we assume a class name
+      listOf(pattern)
+    } ?: throw IllegalArgumentException("The value of libraryOrResourceFile can not interpreted as path or name!")
   }
 
-  private fun generateLibdocArgumentList(fileArgument: String):
-    Arguments = Arguments().apply {
+  private fun generateLibdocArgumentList(fileArgument: String, multiOutput: Boolean) = Arguments().apply {
     this.addArgs(generateArguments())
-    this.addNonEmptyStringToArguments(name, "--name")
+    if (multiOutput) {
+      val partName = extractFileName(fileArgument)
+      this.addNonEmptyStringToArguments(partName, "--name")
+    } else {
+      this.addNonEmptyStringToArguments(name, "--name")
+    }
+
     this.addNonEmptyStringToArguments(version, "--version")
     this.add(fileArgument)
-    outputFile?.also {
-      this.add(joinPaths(outputDirectory.asFile.absolutePath, it.name))
-    }
+
+    val normalizedName = if (multiOutput) extractFileName(fileArgument) else outputFile.name
+    this.add(joinPaths(outputDirectory.asFile.absolutePath, normalizedName))
     if (!outputDirectory.asFile.exists()) {
       outputDirectory.asFile.mkdirs()
     }
     println("Writing output to directory '${outputDirectory.asFile.absolutePath}'")
+  }
+
+  private fun extractFileName(file: String): String {
+    val tmp = File(file)
+    val ext = tmp.extension
+    val name = tmp.nameWithoutExtension.replace("/|\\.|\\\\", "_")
+        .replace(Regex("_+"), "_")
+    return "$name.$ext"
   }
 }

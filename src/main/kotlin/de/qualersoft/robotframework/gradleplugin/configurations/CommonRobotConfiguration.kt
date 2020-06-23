@@ -8,7 +8,6 @@ import de.qualersoft.robotframework.gradleplugin.utils.GradleStringListProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleStringMapProperty
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.ConfigurableFileTree
 import java.io.File
 
 open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(project) {
@@ -436,10 +435,9 @@ open class CommonRobotConfiguration(project: Project) {
 
   open fun generateArguments(): Array<String> = Arguments().apply {
     addStringToArguments(name, "--name")
-    val files = additionalPythonPaths?.files?.toList()
+    val files = additionalPythonPaths.files.toList()
     addFileListToArguments(files, "--pythonpath")
   }.toArray()
-
 
   protected fun joinPaths(vararg parts: String): String = parts.joinToString(File.separator)
 }

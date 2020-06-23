@@ -14,7 +14,6 @@ open class RobotTask : BasicRobotFrameworkTask() {
 
   /**
    * File(s) to be passed to the run command
-   * TODO: Link to robot property as default supplier
    */
   @InputFiles
   @PathSensitive(PathSensitivity.ABSOLUTE)

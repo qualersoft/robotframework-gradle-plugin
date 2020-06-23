@@ -1,12 +1,10 @@
 package de.qualersoft.robotframework.gradleplugin.tasks
 
 import de.qualersoft.robotframework.gradleplugin.robotframework
-import org.gradle.api.DefaultTask
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.JavaExec
-import org.robotframework.RobotFramework
 import java.io.File
 
 abstract class BasicRobotFrameworkTask : JavaExec() {

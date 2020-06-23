@@ -10,6 +10,6 @@ repositories {
 tasks.register<de.qualersoft.robotframework.gradleplugin.tasks.LibdocTask>("libdocRun") {
   libdoc {
     outputFile = file("libdoc.html")
-    libraryOrResourceFile = file("src/test/robot/test.robot")
+    libraryOrResourceFile = "src/test/robot/test.robot"
   }
 }

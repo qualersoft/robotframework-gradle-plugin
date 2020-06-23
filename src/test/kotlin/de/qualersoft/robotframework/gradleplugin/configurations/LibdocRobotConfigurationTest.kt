@@ -14,6 +14,7 @@ import io.kotest.matchers.shouldNot
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.io.File
 
 class LibdocRobotConfigurationTest {
@@ -39,40 +40,56 @@ class LibdocRobotConfigurationTest {
   }
 
   @Test
-  fun `generate with single lib or resource file`() {
+  fun `generate with single relative resource file`() {
     val result = applyConfig {
-      it.libraryOrResourceFile = project.file("./src/test/resources/ALibraryFile.robot")
+      it.libraryOrResourceFile = "./src/test/resources/ALibraryFile.robot"
     }.generateRunArguments()
 
     result shouldNot beNull()
     result shouldNot beEmpty()
-    result should haveElementContains("ALibraryFile.robot")
+    result.first().toArray().toList() should haveElementContains("ALibraryFile.robot")
+  }
+
+  @Test
+  fun `generate with single resource file`() {
+    val result = applyConfig {
+      it.libraryOrResourceFile = "src/test/resources/ALibraryFile.robot"
+    }.generateRunArguments()
+
+    result shouldNot beNull()
+    result shouldNot beEmpty()
+    result.first().toArray().toList() should haveElementContains("ALibraryFile.robot")
   }
 
   @Test
   fun `generate with wildcard lib or resource file`() {
     val result = applyConfig {
-      it.libraryOrResourceFile = project.fileTree(project.projectDir).also {ft ->
-        ft.include("src/test/resources/*.robot")
-      }.singleFile
+      it.libraryOrResourceFile = "src/test/resources/*.robot"
     }.generateRunArguments()
 
     result shouldNot beNull()
     result shouldNot beEmpty()
-    result should haveElementContains("ALibraryFile.robot")
+    result.first().toArray().toList() should haveElementContains("ALibraryFile.robot")
   }
 
   @Test
   fun `generate with folder wildcard lib or resource file`() {
     val result = applyConfig {
-      it.libraryOrResourceFile = project.fileTree(project.projectDir).also {ft ->
-        ft.include("**/resources/*.robot")
-      }.singleFile
+      it.libraryOrResourceFile = "**/resources/*.robot"
     }.generateRunArguments()
 
     result shouldNot beNull()
     result shouldNot beEmpty()
-    result should haveElementContains("ALibraryFile.robot")
+    result.first().toArray().toList() should haveElementContains("ALibraryFile.robot")
+  }
+
+  @Test
+  fun `When libraryOrResourceFile is some strange pattern, an exception is thrown`() {
+    assertThrows<IllegalArgumentException> {
+      applyConfig {
+        it.libraryOrResourceFile = "//.asdf.\\"
+      }.generateRunArguments()
+    }
   }
 
   private fun applyConfig(conf: (LibdocRobotConfiguration) -> Unit): LibdocRobotConfiguration {

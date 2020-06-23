@@ -4,10 +4,8 @@ import de.qualersoft.robotframework.gradleplugin.configurations.LibdocRobotConfi
 import org.gradle.api.Action
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.Internal
-import org.robotframework.RobotFramework
 import java.io.File
 import java.io.FileNotFoundException
-import java.net.URLClassLoader
 
 open class LibdocTask : BasicRobotFrameworkTask() {
 
@@ -25,27 +23,27 @@ open class LibdocTask : BasicRobotFrameworkTask() {
 
   @Throws(FileNotFoundException::class)
   override fun exec() {
-    createClassLoader()
-    libdoc.additionalPythonPaths.from( getJavaLibJar() )
-    rfArgs = (libdoc.generateRunArguments() + rfArgs) as MutableList<String>
-    //executeRobotCommand("libdoc")
-    val args = (listOf("libdoc") + rfArgs).toTypedArray()
-    RobotFramework.run(args)
+    ensureLibraries()
+    val tmp = rfArgs
+    libdoc.generateRunArguments().forEach {
+      rfArgs = (it.toArray() + tmp).toMutableList()
+      executeRobotCommand("libdoc")
+    }
   }
 
-  private fun createClassLoader() {
-    val jars = listOf(getJythonJar(), getJavaLibJar())
-    val urls = jars.filterNotNull().map { it.toURI().toURL() }
-    URLClassLoader(urls.toTypedArray(), this.javaClass.classLoader)
+  private fun ensureLibraries() {
+    val jars = getLibJars()
+    jars?.forEach {
+      classpath(project.files(it))
+    }
   }
 
-  private fun getJythonJar(): File? = project.configurations
-          .findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)?.find {
-    it.isFile && it.name.contains("jython")
-  }
+  private fun getLibJars(): Collection<File>? {
+    val files = libdoc.additionalPythonPaths.files.toMutableList()
 
-  private fun getJavaLibJar(): File? = project.configurations
-          .findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)?.find {
-    it.isFile && it.name.contains("javalib-core")
+    project.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)?.also {
+      files += it.files.toList()
+    }
+    return files
   }
 }
