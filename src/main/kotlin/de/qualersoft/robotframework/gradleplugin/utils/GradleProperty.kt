@@ -37,18 +37,6 @@ internal class GradleNullableProperty<T, V:Any>(
   operator fun setValue(thisRef: T, property: KProperty<*>, value: V?) = this.property.set(value)
 }
 
-internal class GradleListProperty<T, V:Any>(
-  project: Project,
-  type: KClass<V>,
-  default: List<V> = mutableListOf()
-){
-  private val property: ListProperty<V> = project.objects.listProperty(type.java).apply {
-    set(default)
-  }
-  operator fun getValue(thisRef: T, property: KProperty<*>): MutableList<V> = this.property.get()
-  operator fun setValue(thisRef: T, property: KProperty<*>, value: MutableList<V>) = this.property.set(value)
-}
-
 internal class GradleStringListProperty<T>(
   project: Project,
   default: List<String> = mutableListOf()

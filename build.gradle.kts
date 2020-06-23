@@ -94,15 +94,11 @@ tasks.detekt {
 
 tasks.withType<Test> {
   useJUnitPlatform()
-  finalizedBy(tasks.jacocoTestReport)
-}
-
-tasks.jacocoTestReport {
-  reports {
-    xml.isEnabled = true
-    html.isEnabled = true
-    csv.isEnabled = false
-  }
+  finalizedBy(when (name) {
+    "test" -> tasks.jacocoTestReport
+    "funcTest" -> tasks.getByName("jacocoFuncTestReport")
+    else -> throw IllegalArgumentException("Unknown test type '$name'")
+  })
 }
 
 tasks.create<JacocoMerge>("jacocoMerge") {
@@ -110,14 +106,17 @@ tasks.create<JacocoMerge>("jacocoMerge") {
 }
 
 tasks.create<JacocoReport>("reportMerge") {
+  sourceDirectories.from(sourceSets.main.get().allSource.srcDirs)
+  classDirectories.from(sourceSets.main.get().output.classesDirs)
+  executionData(tasks.getByName<JacocoMerge>("jacocoMerge").destinationFile)
+}
+
+tasks.withType<JacocoReport>() {
   reports {
     xml.isEnabled = true
     html.isEnabled = true
     csv.isEnabled = false
   }
-  sourceDirectories.from(sourceSets.main.get().allSource.srcDirs)
-  classDirectories.from(sourceSets.main.get().output.classesDirs)
-  executionData(tasks.getByName<JacocoMerge>("jacocoMerge").destinationFile)
 }
 
 tasks.dokka {
