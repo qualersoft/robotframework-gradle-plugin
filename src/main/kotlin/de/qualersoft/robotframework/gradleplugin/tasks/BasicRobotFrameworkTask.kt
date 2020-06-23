@@ -13,6 +13,7 @@ abstract class BasicRobotFrameworkTask : JavaExec() {
     val rfVersion = project.robotframework().robotVersion
     mainClass.set(rfVersion.mainClass)
   }
+
   /**
    * Additional properties that will be append to end of the configuration arguments.
    * Can be used to 'override' configuration or to provide task specific parameters.
@@ -27,7 +28,7 @@ abstract class BasicRobotFrameworkTask : JavaExec() {
   protected val extension = project.robotframework()
 
   internal fun executeRobotCommand(cmd: String, additionalArgs: Collection<String>? = null) {
-    val robotArgs = listOf(cmd)  + rfArgs + (additionalArgs ?: listOf())
+    val robotArgs = listOf(cmd) + rfArgs + (additionalArgs ?: listOf())
     println("Starting cmd '$cmd' with arguments $rfArgs and task specific additional arguments $additionalArgs and ")
     ensureRobotLib()
     args(robotArgs)

@@ -11,7 +11,6 @@ import org.junit.jupiter.api.assertAll
 import java.io.File
 import java.nio.charset.StandardCharsets
 
-
 const val BUILD_SUCCESSFUL = "BUILD SUCCESSFUL"
 
 open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
@@ -139,7 +138,7 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
     files shouldNot beNull()
     files.also {
       assertAll(
-          { files shouldHaveSize (1) },
+          { files shouldHaveSize 1 },
           {
             val file = files.first()
             contentChecker(file)
