@@ -77,7 +77,7 @@ class LibdocRobotConfiguration(val project: Project) : CommonRobotConfiguration(
    * Default-value: `${project.buildDir}/robotframework/libdoc`
    */
   @Suppress("private")
-  var outputDirectory: Directory by GradleDirectoryProperty(project,
+  var outputDirectory: Directory by GradleDirectoryProperty(objects,
       File(project.buildDir, joinPaths("robotframework", "libdoc")))
 
   /**
@@ -86,13 +86,13 @@ class LibdocRobotConfiguration(val project: Project) : CommonRobotConfiguration(
    * Default-value: `libdoc.html`
    */
   @Suppress("private")
-  var outputFile by GradleFileProperty(project, File("libdoc.html"))
+  var outputFile by GradleFileProperty(objects, File("libdoc.html"))
 
   /**
    * Sets the version of the documented library or resource.
    */
   @Suppress("private")
-  var version by GradleNullableProperty(project, String::class)
+  var version by GradleNullableProperty(objects, String::class)
 
   /**
    * Name of the library or path to the resource file.

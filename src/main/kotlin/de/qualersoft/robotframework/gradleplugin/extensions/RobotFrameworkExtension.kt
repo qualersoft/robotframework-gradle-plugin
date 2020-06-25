@@ -10,7 +10,7 @@ import org.gradle.api.Project
 
 open class RobotFrameworkExtension(project: Project) {
 
-  val robotVersion by GradleProperty(project, RobotframeworkConfiguration::class, RobotframeworkConfiguration(project))
+  val robotVersion by GradleProperty(project.objects, RobotframeworkConfiguration::class, RobotframeworkConfiguration(project))
   fun robotVersion(action: Action<RobotframeworkConfiguration>) {
     action.execute(robotVersion)
   }
@@ -18,7 +18,7 @@ open class RobotFrameworkExtension(project: Project) {
     robotVersion.apply(config)
   }
 
-  val rebot by GradleProperty(project, RebotRobotConfiguration::class, RebotRobotConfiguration(project))
+  val rebot by GradleProperty(project.objects, RebotRobotConfiguration::class, RebotRobotConfiguration(project))
   fun rebot(action: Action<RebotRobotConfiguration>) {
     action.execute(rebot)
   }
@@ -26,7 +26,7 @@ open class RobotFrameworkExtension(project: Project) {
     rebot.apply(config)
   }
 
-  val libdoc by GradleProperty(project, LibdocRobotConfiguration::class, LibdocRobotConfiguration(project))
+  val libdoc by GradleProperty(project.objects, LibdocRobotConfiguration::class, LibdocRobotConfiguration(project))
   fun libdoc(action: Action<LibdocRobotConfiguration>) {
     action.execute(libdoc)
   }
@@ -34,7 +34,7 @@ open class RobotFrameworkExtension(project: Project) {
     libdoc.apply(config)
   }
 
-  val robot by GradleProperty(project, RunRobotConfiguration::class, RunRobotConfiguration(project))
+  val robot by GradleProperty(project.objects, RunRobotConfiguration::class, RunRobotConfiguration(project))
   fun robot(action: Action<RunRobotConfiguration>) {
     action.execute(robot)
   }

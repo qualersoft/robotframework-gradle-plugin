@@ -20,7 +20,7 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
    * Default-value=`false`.
    */
   @Suppress("private")
-  var merge by GradleProperty(project, Boolean::class, false)
+  var merge by GradleProperty(objects, Boolean::class, false)
 
   /**
    * Processes output also if the top level suite is
@@ -28,7 +28,7 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
    * is not an error that there are no matches.
    */
   @Suppress("private")
-  var processEmptySuite by GradleProperty(project, Boolean::class, false)
+  var processEmptySuite by GradleProperty(objects, Boolean::class, false)
 
   /**
    * Syntax: name:&lt;pattern&gt;|tag:&lt;pattern&gt;
@@ -45,7 +45,7 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
    * @since RF 3.2
    */
   @Suppress("private")
-  var expandKeywords by GradleStringListProperty(project)
+  var expandKeywords by GradleStringListProperty(objects)
 
   /**
    * Set execution start time. Timestamp must be given in
@@ -58,7 +58,7 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
    * otherwise be `N/A`.
    */
   @Suppress("private")
-  var startTime by GradleNullableProperty(project, String::class)
+  var startTime by GradleNullableProperty(objects, String::class)
 
   /**
    * Same as [startTime] but for end time. If both options
@@ -68,21 +68,21 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
    * suites together.
    */
   @Suppress("private")
-  var endTime by GradleNullableProperty(project, String::class)
+  var endTime by GradleNullableProperty(objects, String::class)
 
   /**
    * Class to programmatically modify the result
    * model before creating outputs.
    */
   @Suppress("private")
-  var perRobotModifier by GradleStringListProperty(project)
+  var perRobotModifier by GradleStringListProperty(objects)
 
   @Suppress("private")
-  var outputFile by GradleProperty(project, String::class, "output.xml")
+  var outputFile by GradleProperty(objects, String::class, "output.xml")
   //</editor-fold>
 
   fun ensureOutputDirectoryExists() {
-    var dir = outputDir.asFile.get()
+    val dir = outputDir.asFile.get()
     if (!dir.exists() && !dir.mkdirs()) {
       throw IOException("Target output direcotry connot be created: ${dir.absolutePath}")
     }
