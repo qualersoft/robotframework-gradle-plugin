@@ -23,12 +23,11 @@ version = "0.0.1-SNAPSHOT"
 testSets {
   "funcTest" {
     description = "Runs the functional tests"
-    extendsFrom("unitTest")
   }
 }
 
 jacocoTestKit {
-  applyTo("testRuntimeOnly", tasks.named("funcTest"))
+  applyTo("funcTestRuntimeOnly", tasks.named("funcTest"))
 }
 
 gradlePlugin {
@@ -97,7 +96,7 @@ tasks.withType<Test> {
   useJUnitPlatform()
   finalizedBy(when (name) {
     "test" -> tasks.jacocoTestReport
-    "funcTest" -> tasks.getByName("jacocoFuncTestReport")
+    "funcTest" -> tasks.named("jacocoFuncTestReport")
     else -> throw IllegalArgumentException("Unknown test type '$name'")
   })
 }
