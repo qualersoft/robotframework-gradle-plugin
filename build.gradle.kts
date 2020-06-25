@@ -26,8 +26,9 @@ testSets {
     extendsFrom("unitTest")
   }
 }
+
 jacocoTestKit {
-  applyTo("testRuntime", tasks.named("funcTest"))
+  applyTo("testRuntimeOnly", tasks.named("funcTest"))
 }
 
 gradlePlugin {
@@ -37,7 +38,7 @@ gradlePlugin {
       implementationClass = "de.qualersoft.robotframework.gradleplugin.RobotFrameworkPlugin"
     }
   }
-  testSourceSets(*sourceSets.filter { it.name.contains("test") }.toTypedArray())
+  testSourceSets(*sourceSets.filter { it.name.contains("test", true) }.toTypedArray())
 }
 
 detekt {
@@ -111,7 +112,7 @@ tasks.create<JacocoReport>("reportMerge") {
   executionData(tasks.getByName<JacocoMerge>("jacocoMerge").destinationFile)
 }
 
-tasks.withType<JacocoReport>() {
+tasks.withType<JacocoReport> {
   reports {
     xml.isEnabled = true
     html.isEnabled = true
