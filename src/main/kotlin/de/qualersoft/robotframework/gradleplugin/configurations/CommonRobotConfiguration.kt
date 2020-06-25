@@ -8,9 +8,12 @@ import de.qualersoft.robotframework.gradleplugin.utils.GradleStringListProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleStringMapProperty
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import java.io.File
+import javax.inject.Inject
 
-open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(project) {
+open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(project.objects) {
 
   //<editor-fold desc="properties">
 
@@ -418,23 +421,23 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
 }
 
 
-open class CommonRobotConfiguration(project: Project) {
+open class CommonRobotConfiguration @Inject constructor(objects: ObjectFactory) {
 
   /**
    * Sets the name of the documented library or resource.
    */
   @Suppress("private")
-  var name by GradleNullableProperty(project, String::class)
+  val name: Property<String?> = objects.property(String::class.java)
 
   /**
    * Additional locations where to search for libraries and resources.
    * e.g. src/main/java/com/test/
    */
   @Suppress("private")
-  var additionalPythonPaths: ConfigurableFileCollection = project.objects.fileCollection()
+  val additionalPythonPaths: ConfigurableFileCollection = objects.fileCollection()
 
   open fun generateArguments(): Array<String> = Arguments().apply {
-    addStringToArguments(name, "--name")
+    addStringToArguments(name.orNull, "--name")
     val files = additionalPythonPaths.files.toList()
     addFileListToArguments(files, "--pythonpath")
   }.toArray()

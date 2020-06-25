@@ -68,7 +68,7 @@ and resources.
  *      <libraryOrResourceFile>com.**.*Lib</libraryOrResourceFile>
  *    </libdoc>
  */
-class LibdocRobotConfiguration(val project: Project) : CommonRobotConfiguration(project) {
+class LibdocRobotConfiguration(val project: Project) : CommonRobotConfiguration(project.objects) {
 
   //<editor-fold desc="Properties">
   /**
@@ -152,7 +152,7 @@ class LibdocRobotConfiguration(val project: Project) : CommonRobotConfiguration(
       val partName = extractFileName(fileArgument)
       this.addNonEmptyStringToArguments(partName, "--name")
     } else {
-      this.addNonEmptyStringToArguments(name, "--name")
+      this.addNonEmptyStringToArguments(name.orNull, "--name")
     }
 
     this.addNonEmptyStringToArguments(version, "--version")

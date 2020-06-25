@@ -12,7 +12,8 @@ tasks.register<de.qualersoft.robotframework.gradleplugin.tasks.LibdocTask>("libd
   libdoc {
     outputFile = file("libdoc.html")
     libraryOrResourceFile = "ALib"
-    additionalPythonPaths = files(project.tasks.withType<Jar>().first().outputs.files, project.configurations.getByName("runtimeClasspath").files)
+    additionalPythonPaths.from(files(project.tasks.withType<Jar>().first().outputs.files,
+        project.configurations.getByName("runtimeClasspath").files))
   }
 }
 

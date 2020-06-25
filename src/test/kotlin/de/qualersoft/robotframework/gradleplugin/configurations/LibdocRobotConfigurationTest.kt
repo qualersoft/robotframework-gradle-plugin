@@ -3,9 +3,6 @@ package de.qualersoft.robotframework.gradleplugin.configurations
 import de.qualersoft.robotframework.gradleplugin.PLUGIN_ID
 import de.qualersoft.robotframework.gradleplugin.extensions.RobotFrameworkExtension
 import de.qualersoft.robotframework.gradleplugin.robotframework
-import io.kotest.assertions.show.show
-import io.kotest.matchers.Matcher
-import io.kotest.matchers.MatcherResult
 import io.kotest.matchers.collections.beEmpty
 import io.kotest.matchers.nulls.beNull
 import io.kotest.matchers.should
@@ -17,7 +14,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.io.File
 
-class LibdocRobotConfigurationTest {
+class LibdocRobotConfigurationTest : ConfigurationTestBase() {
 
   private val project: Project = ProjectBuilder.builder().build().also {
     this.javaClass.getResource("/ALibraryFile.robot").openStream().use { iS ->
@@ -31,7 +28,7 @@ class LibdocRobotConfigurationTest {
     }
     it.pluginManager.apply(PLUGIN_ID)
   }
-  private val rf: RobotFrameworkExtension = project.robotframework()
+  private val rfExtension: RobotFrameworkExtension = project.robotframework()
 
   @Test
   fun `generating default run arguments`() {
@@ -93,15 +90,8 @@ class LibdocRobotConfigurationTest {
   }
 
   private fun applyConfig(conf: (LibdocRobotConfiguration) -> Unit): LibdocRobotConfiguration {
-    rf.libdoc(conf)
-    return rf.libdoc
+    rfExtension.libdoc(conf)
+    return rfExtension.libdoc
   }
 
-  private fun <C : Collection<String>> haveElementContains(expected: String) = object : Matcher<C> {
-    override fun test(value: C) = MatcherResult(
-      value.any { it.contains(expected) },
-      { "Collection should have element which contains ${expected.show().value}; listing some elements ${value.take(5)}" },
-      { "Collection should not have element which contains ${expected.show().value}" }
-    )
-  }
 }
