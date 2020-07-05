@@ -2,12 +2,12 @@ package de.qualersoft.robotframework.gradleplugin.configurations
 
 import de.qualersoft.robotframework.gradleplugin.utils.Arguments
 import de.qualersoft.robotframework.gradleplugin.utils.GradleFileNullableProperty
-import de.qualersoft.robotframework.gradleplugin.utils.GradleNullableProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleStringListProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleStringMapProperty
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import java.io.File
@@ -34,7 +34,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    *    doc = "Very *good* example"
    */
   @Suppress("private")
-  var doc by GradleNullableProperty(objects, String::class)
+  var doc by GradleProperty(objects, String::class)
 
   /**
    * Set metadata of the top level suite. Value can contain formatting similarly as [doc].
@@ -125,7 +125,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * Default: `${project.buildDir}/reports/robotframework`.
    */
   @Suppress("private")
-  var outputDir = objects.directoryProperty().fileValue(File(project.buildDir,
+  var outputDir: DirectoryProperty = objects.directoryProperty().fileValue(File(project.buildDir,
     joinPaths("reports", "robotframework")))
 
   /**
@@ -200,21 +200,21 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * Default: `false`
    */
   @Suppress("private")
-  var split by GradleNullableProperty(objects, Boolean::class, false)
+  var split by GradleProperty(objects, Boolean::class, false)
 
   /**
    * Title for the generated log file. The default title
    * is `<SuiteName> Test Log`.
    */
   @Suppress("private")
-  var logTitle by GradleNullableProperty(objects, String::class)
+  var logTitle by GradleProperty(objects, String::class)
 
   /**
    * Title for the generated report file. The default
    * title is `<SuiteName> Test Report`.
    */
   @Suppress("private")
-  var reportTitle by GradleNullableProperty(objects, String::class)
+  var reportTitle by GradleProperty(objects, String::class)
 
   /**
    * Background colors to use in the report file.
@@ -226,7 +226,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    *    reportBackground = "#00E:#E00"
    */
   @Suppress("private")
-  var reportBackground by GradleNullableProperty(objects, String::class)
+  var reportBackground by GradleProperty(objects, String::class)
 
   /**
    * The threshold level for logging.
@@ -240,7 +240,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    *    logLevel = "DEBUG:INFO"
    */
   @Suppress("private")
-  var logLevel by GradleNullableProperty(objects, String::class)
+  var logLevel by GradleProperty(objects, String::class)
 
   /**
    * How many levels to show in `Statistics by Suite`
@@ -250,7 +250,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    *    suiteStatLevel = 3
    */
   @Suppress("private")
-  var suiteStatLevel by GradleNullableProperty(objects, Int::class)
+  var suiteStatLevel by GradleProperty(objects, Int::class)
 
   /**
    * Include only matching tags in `Statistics by Tag`
@@ -356,7 +356,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * Note that colors do not work with Jython on Windows.
    */
   @Suppress("private")
-  var consoleColors by GradleNullableProperty(objects, String::class)
+  var consoleColors by GradleProperty(objects, String::class)
 
   /**
    * Text file to read more arguments from. Use special
@@ -383,8 +383,8 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
 
   override fun generateArguments(): Array<String> = Arguments().apply {
     addArgs(super.generateArguments())
-    addFlagToArguments(rpa, "--rpa")
-    addStringToArguments(doc, "--doc")
+    addFlagToArguments(rpa.orNull, "--rpa")
+    addStringToArguments(doc.orNull, "--doc")
     addMapToArguments(metaData, "--metadata")
     addListToArguments(setTags, "--settag")
     addListToArguments(test, "--test")
@@ -399,14 +399,14 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
     addFileToArguments(log, "-l")
     addFileToArguments(report, "-r")
     addOptionalFile(xUnit, "-x")
-    addFlagToArguments(xUnitSkipNonCritical, "--xunitskipnoncritical")
-    addFlagToArguments(timestampOutputs, "--timestampoutputs")
-    addFlagToArguments(split, "--splitoutputs")
-    addNonEmptyStringToArguments(logTitle, "--logtitle")
-    addNonEmptyStringToArguments(reportTitle, "--reporttitle")
-    addNonEmptyStringToArguments(reportBackground, "--reportbackground")
-    addNonEmptyStringToArguments(logLevel, "-L")
-    addStringToArguments(suiteStatLevel?.toString(), "--suitestatlevel")
+    addFlagToArguments(xUnitSkipNonCritical.orNull, "--xunitskipnoncritical")
+    addFlagToArguments(timestampOutputs.orNull, "--timestampoutputs")
+    addFlagToArguments(split.orNull, "--splitoutputs")
+    addNonEmptyStringToArguments(logTitle.orNull, "--logtitle")
+    addNonEmptyStringToArguments(reportTitle.orNull, "--reporttitle")
+    addNonEmptyStringToArguments(reportBackground.orNull, "--reportbackground")
+    addNonEmptyStringToArguments(logLevel.orNull, "-L")
+    addStringToArguments(suiteStatLevel.orNull?.toString(), "--suitestatlevel")
     addListToArguments(tagStatInclude, "--tagstatinclude")
     addListToArguments(tagStatExclude, "--tagstatexclude")
     addMapToArguments(tagStatCombine, "--tagstatcombine")
@@ -414,8 +414,8 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
     addListToArguments(tagStatLink, "--tagstatlink")
     addListToArguments(removeKeywords, "--removekeywords")
     addListToArguments(flattenKeywords, "--flattenkeywords")
-    addFlagToArguments(noStatusSrc, "--nostatusrc")
-    addStringToArguments(consoleColors, "--consolecolors")
+    addFlagToArguments(noStatusSrc.orNull, "--nostatusrc")
+    addStringToArguments(consoleColors.orNull, "--consolecolors")
     addListToArguments(argumentFiles, "--argumentfile")
   }.toArray()
 }

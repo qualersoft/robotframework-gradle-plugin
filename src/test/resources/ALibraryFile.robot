@@ -1,6 +1,6 @@
 *** Settings ***
 
-Resource            ../CommonResource.robot
+Resource            ./ALibraryFile.resource
 
 
 *** Keywords ***

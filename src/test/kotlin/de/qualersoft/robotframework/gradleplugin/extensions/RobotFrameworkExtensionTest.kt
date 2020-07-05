@@ -29,7 +29,7 @@ class RobotFrameworkExtensionTest {
       name = "robotVersion lambda name"
     }
 
-    sut.robotVersion.name shouldBe "robotVersion lambda name"
+    sut.robotVersion.get().name shouldBe "robotVersion lambda name"
   }
 
   @Test
@@ -39,7 +39,7 @@ class RobotFrameworkExtensionTest {
     }
     sut.robotVersion(action)
 
-    sut.robotVersion.name shouldBe "robotVersion action name"
+    sut.robotVersion.get().name shouldBe "robotVersion action name"
   }
 
   @Test
@@ -48,7 +48,7 @@ class RobotFrameworkExtensionTest {
       name.set("libdoc lambda name")
     }
 
-    sut.libdoc.name.get() shouldBe "libdoc lambda name"
+    sut.libdoc.get().name.get() shouldBe "libdoc lambda name"
   }
 
   @Test
@@ -58,7 +58,7 @@ class RobotFrameworkExtensionTest {
     }
     sut.libdoc(action)
 
-    sut.libdoc.name.get() shouldBe "libdoc action name"
+    sut.libdoc.get().name.get() shouldBe "libdoc action name"
   }
 
   @Test
@@ -67,7 +67,7 @@ class RobotFrameworkExtensionTest {
       name.set("robot lambda name")
     }
 
-    sut.robot.name.get() shouldBe "robot lambda name"
+    sut.robot.get().name.get() shouldBe "robot lambda name"
   }
 
   @Test
@@ -77,7 +77,7 @@ class RobotFrameworkExtensionTest {
     }
     sut.robot(action)
 
-    sut.robot.name.get() shouldBe "robot action name"
+    sut.robot.get().name.get() shouldBe "robot action name"
   }
 
   @Test
@@ -86,7 +86,7 @@ class RobotFrameworkExtensionTest {
       name.set("rebot lambda name")
     }
 
-    sut.rebot.name.get() shouldBe "rebot lambda name"
+    sut.rebot.get().name.get() shouldBe "rebot lambda name"
   }
 
   @Test
@@ -96,6 +96,6 @@ class RobotFrameworkExtensionTest {
     }
     sut.rebot(action)
 
-    sut.rebot.name.get() shouldBe "rebot action name"
+    sut.rebot.get().name.get() shouldBe "rebot action name"
   }
 }

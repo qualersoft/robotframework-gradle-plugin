@@ -129,7 +129,7 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
   private fun checkForHtmlDoc(contentChecker: (File) -> Unit) {
     val files = testProjectDir.root.walkBottomUp().filter {
       it.isFile && it.path.let { path ->
-        path.contains("robotframework") &&
+        path.contains("robotdoc") &&
             path.contains("libdoc") &&
             path.contains("libdoc.html")
       }

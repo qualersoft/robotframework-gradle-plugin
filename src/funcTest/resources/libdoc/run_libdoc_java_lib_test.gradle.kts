@@ -3,6 +3,8 @@ plugins {
   `java`
 }
 
+version = "0.0.1"
+
 repositories {
   mavenLocal()
   mavenCentral()
@@ -10,7 +12,7 @@ repositories {
 
 tasks.register<de.qualersoft.robotframework.gradleplugin.tasks.LibdocTask>("libdocRun") {
   libdoc {
-    outputFile = file("libdoc.html")
+    outputFile.set(file("libdoc.html"))
     libraryOrResourceFile = "ALib"
     additionalPythonPaths.from(files(project.tasks.withType<Jar>().first().outputs.files,
         project.configurations.getByName("runtimeClasspath").files))

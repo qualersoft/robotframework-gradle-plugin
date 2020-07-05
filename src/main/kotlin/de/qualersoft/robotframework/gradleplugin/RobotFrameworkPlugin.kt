@@ -19,7 +19,7 @@ class RobotFrameworkPlugin : Plugin<Project> {
       applyJavaPluginIfRequired(target)
       registerRobotConfiguration(target)
       it.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)?.also { rtConf ->
-        extension.robotVersion.applyTo(rtConf)
+        extension.robotVersion.get().applyTo(rtConf)
       }
     }
   }

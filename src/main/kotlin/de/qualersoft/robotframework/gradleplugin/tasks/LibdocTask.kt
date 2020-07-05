@@ -14,18 +14,18 @@ open class LibdocTask : BasicRobotFrameworkTask() {
   var libdoc = extension.libdoc
   @Suppress("Unused")
   fun libdoc(action: Action<LibdocRobotConfiguration>) {
-    action.execute(libdoc)
+    action.execute(libdoc.get())
   }
   @Suppress("Unused")
   fun libdoc(config: LibdocRobotConfiguration.() -> Unit) {
-    libdoc.apply(config)
+    libdoc.get().apply(config)
   }
 
   @Throws(FileNotFoundException::class)
   override fun exec() {
     ensureLibraries()
     val tmp = rfArgs
-    libdoc.generateRunArguments().forEach {
+    libdoc.get().generateRunArguments().forEach {
       rfArgs = (it.toArray() + tmp).toMutableList()
       executeRobotCommand("libdoc")
     }
@@ -39,7 +39,7 @@ open class LibdocTask : BasicRobotFrameworkTask() {
   }
 
   private fun getLibJars(): Collection<File>? {
-    val files = libdoc.additionalPythonPaths.files.toMutableList()
+    val files = libdoc.get().additionalPythonPaths.files.toMutableList()
 
     project.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)?.also {
       files += it.files.toList()

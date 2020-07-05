@@ -11,7 +11,7 @@ abstract class BasicRobotFrameworkTask : JavaExec() {
 
   init {
     val rfVersion = project.robotframework().robotVersion
-    mainClass.set(rfVersion.mainClass)
+    mainClass.set(rfVersion.get().mainClass)
   }
 
   /**
@@ -43,7 +43,7 @@ abstract class BasicRobotFrameworkTask : JavaExec() {
   protected fun getRobotLib(): File? {
     val rfVersion = extension.robotVersion
     return project.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)?.find {
-      it.isFile && it.name.contains(rfVersion.name)
+      it.isFile && it.name.contains(rfVersion.get().name)
     }
   }
 }

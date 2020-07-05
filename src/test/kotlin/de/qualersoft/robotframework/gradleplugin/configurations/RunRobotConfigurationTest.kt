@@ -283,7 +283,7 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
 
   private fun applyConfig(conf: (RunRobotConfiguration) -> Unit): RunRobotConfiguration {
     rf.robot(conf)
-    return rf.robot
+    return rf.robot.get()
   }
 
   private fun createDefaultsWithoutExtensionParam() = listOf(

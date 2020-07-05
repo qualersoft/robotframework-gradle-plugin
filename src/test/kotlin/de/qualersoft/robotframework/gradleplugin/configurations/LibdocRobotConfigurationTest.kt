@@ -4,6 +4,7 @@ import de.qualersoft.robotframework.gradleplugin.PLUGIN_ID
 import de.qualersoft.robotframework.gradleplugin.extensions.RobotFrameworkExtension
 import de.qualersoft.robotframework.gradleplugin.robotframework
 import io.kotest.matchers.collections.beEmpty
+import io.kotest.matchers.collections.haveSize
 import io.kotest.matchers.nulls.beNull
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
@@ -11,19 +12,22 @@ import io.kotest.matchers.shouldNot
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
 import java.io.File
 
 class LibdocRobotConfigurationTest : ConfigurationTestBase() {
 
   private val project: Project = ProjectBuilder.builder().build().also {
-    this.javaClass.getResource("/ALibraryFile.robot").openStream().use { iS ->
-      var fl = File(it.projectDir, "/src/test/resources")
-      fl.mkdirs()
-      fl = File(fl, "ALibraryFile.robot")
-      fl.createNewFile()
-      fl.outputStream().use { os ->
-        iS.copyTo(os)
+    listOf("ALibraryFile.robot", "AResourceFile.resource").forEach { res ->
+      this.javaClass.getResource("/$res").openStream().use { iS ->
+        var fl = File(it.projectDir, "/src/test/resources")
+        fl.mkdirs()
+        fl = File(fl, "$res")
+        fl.createNewFile()
+        fl.outputStream().use { os ->
+          iS.copyTo(os)
+        }
       }
     }
     it.pluginManager.apply(PLUGIN_ID)
@@ -42,9 +46,11 @@ class LibdocRobotConfigurationTest : ConfigurationTestBase() {
       it.libraryOrResourceFile = "./src/test/resources/ALibraryFile.robot"
     }.generateRunArguments()
 
-    result shouldNot beNull()
-    result shouldNot beEmpty()
-    result.first().toArray().toList() should haveElementContains("ALibraryFile.robot")
+    assertAll(
+        { result shouldNot beNull() },
+        { result shouldNot beEmpty() },
+        { result.first().toArray().toList() should haveElementContains("ALibraryFile.robot") }
+    )
   }
 
   @Test
@@ -53,9 +59,11 @@ class LibdocRobotConfigurationTest : ConfigurationTestBase() {
       it.libraryOrResourceFile = "src/test/resources/ALibraryFile.robot"
     }.generateRunArguments()
 
-    result shouldNot beNull()
-    result shouldNot beEmpty()
-    result.first().toArray().toList() should haveElementContains("ALibraryFile.robot")
+    assertAll(
+        { result shouldNot beNull() },
+        { result shouldNot beEmpty() },
+        { result.first().toArray().toList() should haveElementContains("ALibraryFile.robot") }
+    )
   }
 
   @Test
@@ -64,9 +72,11 @@ class LibdocRobotConfigurationTest : ConfigurationTestBase() {
       it.libraryOrResourceFile = "src/test/resources/*.robot"
     }.generateRunArguments()
 
-    result shouldNot beNull()
-    result shouldNot beEmpty()
-    result.first().toArray().toList() should haveElementContains("ALibraryFile.robot")
+    assertAll(
+        { result shouldNot beNull() },
+        { result shouldNot beEmpty() },
+        { result.first().toArray().toList() should haveElementContains("ALibraryFile.robot") }
+    )
   }
 
   @Test
@@ -75,9 +85,11 @@ class LibdocRobotConfigurationTest : ConfigurationTestBase() {
       it.libraryOrResourceFile = "**/resources/*.robot"
     }.generateRunArguments()
 
-    result shouldNot beNull()
-    result shouldNot beEmpty()
-    result.first().toArray().toList() should haveElementContains("ALibraryFile.robot")
+    assertAll(
+        { result shouldNot beNull() },
+        { result shouldNot beEmpty() },
+        { result.first().toArray().toList() should haveElementContains("ALibraryFile.robot") }
+    )
   }
 
   @Test
@@ -89,9 +101,39 @@ class LibdocRobotConfigurationTest : ConfigurationTestBase() {
     }
   }
 
+  @Test
+  fun `When libraryOrResourceFile has a pattern that matches multiply files, then a list of argument list is generated`() {
+    val result = applyConfig {
+      it.libraryOrResourceFile = "**/test/resources/A*File.*"
+    }.generateRunArguments()
+
+    assertAll(
+        { result shouldNot beNull() },
+        { result shouldNot beEmpty() },
+        { result should haveSize(2) },
+        { result[0].toArray().toList() should haveElementContains("ALibraryFile.robot") },
+        { result[1].toArray().toList() should haveElementContains("AResourceFile.resource") }
+    )
+  }
+
+  @Test
+  fun `When given a directory for libraryOrResourceFile, then all files in it will be taken`() {
+    val result = applyConfig {
+      it.libraryOrResourceFile = "./src/test/resources"
+    }.generateRunArguments()
+
+    assertAll(
+        { result shouldNot beNull() },
+        { result shouldNot beEmpty() },
+        { result should haveSize(2) },
+        { result[0].toArray().toList() should haveElementContains("ALibraryFile.robot") },
+        { result[1].toArray().toList() should haveElementContains("AResourceFile.resource") }
+    )
+  }
+
   private fun applyConfig(conf: (LibdocRobotConfiguration) -> Unit): LibdocRobotConfiguration {
     rfExtension.libdoc(conf)
-    return rfExtension.libdoc
+    return rfExtension.libdoc.get()
   }
 
 }

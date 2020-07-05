@@ -3,10 +3,10 @@ package de.qualersoft.robotframework.gradleplugin.configurations
 import de.qualersoft.robotframework.gradleplugin.utils.Arguments
 import de.qualersoft.robotframework.gradleplugin.utils.GradleDirectoryProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleFileProperty
-import de.qualersoft.robotframework.gradleplugin.utils.GradleNullableProperty
+import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import org.gradle.api.Project
-import org.gradle.api.file.Directory
 import java.io.File
+import javax.inject.Inject
 
 
 /**
@@ -68,17 +68,16 @@ and resources.
  *      <libraryOrResourceFile>com.**.*Lib</libraryOrResourceFile>
  *    </libdoc>
  */
-class LibdocRobotConfiguration(val project: Project) : CommonRobotConfiguration(project.objects) {
+class LibdocRobotConfiguration @Inject constructor(val project: Project) : CommonRobotConfiguration(project.objects) {
 
   //<editor-fold desc="Properties">
   /**
-   * Specifies the directory where documentation files are written. Considered
-   * to be relative to the `${basedir}` of the project.
-   * Default-value: `${project.buildDir}/robotframework/libdoc`
+   * Specifies the directory where documentation files are written.
+   * Default-value: `${project.buildDir}/robotdoc/libdoc`
    */
   @Suppress("private")
-  var outputDirectory: Directory by GradleDirectoryProperty(objects,
-      File(project.buildDir, joinPaths("robotframework", "libdoc")))
+  var outputDirectory by GradleDirectoryProperty(objects,
+      project.layout.buildDirectory.dir(joinPaths("robotdoc", "libdoc")))
 
   /**
    * Specifies the filename of the created documentation. Considered to be
@@ -86,13 +85,14 @@ class LibdocRobotConfiguration(val project: Project) : CommonRobotConfiguration(
    * Default-value: `libdoc.html`
    */
   @Suppress("private")
-  var outputFile by GradleFileProperty(objects, File("libdoc.html"))
+  var outputFile by GradleFileProperty(objects, outputDirectory.file("libdoc.html"))
 
   /**
    * Sets the version of the documented library or resource.
+   * Default-value: project.version
    */
   @Suppress("private")
-  var version by GradleNullableProperty(objects, String::class)
+  var version by GradleProperty(objects, String::class, project.version.toString())
 
   /**
    * Name of the library or path to the resource file.
@@ -104,13 +104,17 @@ class LibdocRobotConfiguration(val project: Project) : CommonRobotConfiguration(
    * [additionalPythonPaths] to set PYTHONPATH/CLASSPATH accordingly.
    *
    * Paths are considered relative to the location of `build.gradle` and
-   * must point to a valid Python/Java source file or a resource file. For
-   * example `src/main/java/com/test/ExampleLib.java`
+   * must point to a valid Python/Java source file or a resource file.
+   *
+   * Examples
+   * * `src/main/java/com/test/ExampleLib.java`
+   * * `${buildDir}/libs/ExampleLib.jar`
    *
    * One may also use ant-like patterns, for example
    * `src/main/java/com/**/Lib.java`
    */
   @Suppress("private")
+  // TODO: This is input property of the task
   var libraryOrResourceFile: String? = null
   //</editor-fold>
 
@@ -132,12 +136,19 @@ class LibdocRobotConfiguration(val project: Project) : CommonRobotConfiguration(
     } else if (pattern.contains("\\") || pattern.contains("/")) {
       // 2. we have path structure (\ | /)
       when {
-        file.isDirectory -> file.listFiles()?.filter { it.isFile }?.map { it.absolutePath }
+        file.isDirectory -> file.listFiles()?.let { files -> files.filter { it.isFile }.map { it.absolutePath } }
+
         pattern.contains(Regex("[*?]")) -> {
           project.fileTree(project.projectDir).also {
             it.include(pattern)
-          }.files.filter { it.isFile }.map { it.absolutePath }
+          }.files.flatMap { f ->
+            // here we have a directory so null can not be returned
+            if (f.isDirectory) f.listFiles()!!.filter { it.isFile }.toList()
+            // f is a file
+            else listOf(f)
+          }.map { it.absolutePath }
         }
+
         else -> null
       }
     } else {
@@ -155,15 +166,14 @@ class LibdocRobotConfiguration(val project: Project) : CommonRobotConfiguration(
       this.addNonEmptyStringToArguments(name.orNull, "--name")
     }
 
-    this.addNonEmptyStringToArguments(version, "--version")
+    this.addNonEmptyStringToArguments(version.orNull, "--version")
     this.add(fileArgument)
 
-    val normalizedName = if (multiOutput) extractFileName(fileArgument) else outputFile.name
-    this.add(joinPaths(outputDirectory.asFile.absolutePath, normalizedName))
-    if (!outputDirectory.asFile.exists()) {
-      outputDirectory.asFile.mkdirs()
+    val normalizedName = if (multiOutput) extractFileName(fileArgument) else outputFile.asFile.get().name
+    this.add(joinPaths(outputDirectory.asFile.get().absolutePath, normalizedName))
+    if (!outputDirectory.asFile.get().exists()) {
+      outputDirectory.asFile.get().mkdirs()
     }
-    println("Writing output to directory '${outputDirectory.asFile.absolutePath}'")
   }
 
   private fun extractFileName(file: String): String {

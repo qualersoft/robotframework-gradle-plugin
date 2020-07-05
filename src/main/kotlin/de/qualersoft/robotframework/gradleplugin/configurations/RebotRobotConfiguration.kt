@@ -1,7 +1,6 @@
 package de.qualersoft.robotframework.gradleplugin.configurations
 
 import de.qualersoft.robotframework.gradleplugin.utils.Arguments
-import de.qualersoft.robotframework.gradleplugin.utils.GradleNullableProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleStringListProperty
 import org.gradle.api.Project
@@ -58,7 +57,7 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
    * otherwise be `N/A`.
    */
   @Suppress("private")
-  var startTime by GradleNullableProperty(objects, String::class)
+  var startTime by GradleProperty(objects, String::class)
 
   /**
    * Same as [startTime] but for end time. If both options
@@ -68,7 +67,7 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
    * suites together.
    */
   @Suppress("private")
-  var endTime by GradleNullableProperty(objects, String::class)
+  var endTime by GradleProperty(objects, String::class)
 
   /**
    * Class to programmatically modify the result
@@ -88,16 +87,16 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
     }
   }
 
-  private fun getOutputPath(): String = File(outputDir.get().asFile.absoluteFile, outputFile).absolutePath
+  private fun getOutputPath(): String = File(outputDir.asFile.get().absoluteFile, outputFile.get()).absolutePath
 
   override fun generateArguments(): Array<String> = Arguments().apply {
     add("rebot")
     addArgs(super.generateArguments())
-    addFlagToArguments(merge, "--merge")
-    addFlagToArguments(processEmptySuite, "--processemptysuite")
+    addFlagToArguments(merge.orNull, "--merge")
+    addFlagToArguments(processEmptySuite.orNull, "--processemptysuite")
     addListToArguments(expandKeywords, "--expandkeywords")
-    addStringToArguments(startTime, "--starttime")
-    addStringToArguments(endTime, "--endtime")
+    addStringToArguments(startTime.orNull, "--starttime")
+    addStringToArguments(endTime.orNull, "--endtime")
     addListToArguments(perRobotModifier, "--perrobotmodifier")
     add(getOutputPath())
   }.toArray()
