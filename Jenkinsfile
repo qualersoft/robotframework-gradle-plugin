@@ -19,6 +19,7 @@ node {
         withCredentials([string(credentialsId: 'FOSSA_TOKEN', variable: 'FOSSA_API_KEY')]) {
           bat 'fossa analyze'
         }
+        powershell(script: 'rd ./fossaInstall.ps1')
       }
     }
     stage("Compiling") {
@@ -51,10 +52,11 @@ node {
       execGradle 'jacocoMerge'
       execGradle 'reportMerge'
       withCredentials([string(credentialsId: 'CODECOV_TOKEN', variable: 'CC_TOKEN')]) {
-        powershell(script:  '''$AllProtocols = [System.Net.SecurityProtocolType]'Tls11,Tls12'
-          [System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
-          (Invoke-WebRequest -Uri https://codecov.io/bash -UseBasicParsing).Content | Out-File -File ccScript -Force -Encoding UTF8NoBOM''')
-        sh(script: './ccScript -t $CC_TOKEN')
+        powershell(script: '''(New-Object System.Net.WebClient).DownloadFile("https://github.com/codecov/codecov-exe/releases/download/1.12.0/codecov-win7-x64.zip", (Join-Path $pwd "Codecov.zip"))
+        Expand-Archive -Force .\\Codecov.zip -DestinationPath .\\Codecov''')
+        powershell(script: '.\\Codecov\\codecov.exe -f "build\\reports\\jacoco\\**\\*.xml" -t $ENV:CC_TOKEN')
+        powershell(script: '''rd -Force -Recurse .\\Codecov\\
+        rd -Force .\\Codecov.zip''')
       }
       analyzeWithSonarQubeAndWaitForQualityGoal()
     }
