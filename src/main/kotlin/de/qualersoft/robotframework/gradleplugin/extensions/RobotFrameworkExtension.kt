@@ -10,7 +10,9 @@ import org.gradle.api.Project
 
 open class RobotFrameworkExtension(project: Project) {
 
-  val robotVersion by GradleProperty(project.objects, RobotframeworkConfiguration::class, RobotframeworkConfiguration(project))
+  val robotVersion by GradleProperty(project.objects,
+      RobotframeworkConfiguration::class,
+      RobotframeworkConfiguration(project))
   fun robotVersion(action: Action<RobotframeworkConfiguration>) {
     action.execute(robotVersion.get())
   }

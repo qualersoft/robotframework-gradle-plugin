@@ -112,9 +112,10 @@ class LibdocRobotConfiguration @Inject constructor(val project: Project) : Commo
    *
    * One may also use ant-like patterns, for example
    * `src/main/java/com/**/Lib.java`
+   *
+   * TODO: This is input property of the task
    */
   @Suppress("private")
-  // TODO: This is input property of the task
   var libraryOrResourceFile: String? = null
   //</editor-fold>
 
@@ -135,26 +136,28 @@ class LibdocRobotConfiguration @Inject constructor(val project: Project) : Commo
       listOf(file.absolutePath)
     } else if (pattern.contains("\\") || pattern.contains("/")) {
       // 2. we have path structure (\ | /)
-      when {
-        file.isDirectory -> file.listFiles()?.let { files -> files.filter { it.isFile }.map { it.absolutePath } }
-
-        pattern.contains(Regex("[*?]")) -> {
-          project.fileTree(project.projectDir).also {
-            it.include(pattern)
-          }.files.flatMap { f ->
-            // here we have a directory so null can not be returned
-            if (f.isDirectory) f.listFiles()!!.filter { it.isFile }.toList()
-            // f is a file
-            else listOf(f)
-          }.map { it.absolutePath }
-        }
-
-        else -> null
-      }
+      harvestPath(pattern, file)
     } else {
       // 3. we assume a class name
       listOf(pattern)
     } ?: throw IllegalArgumentException("The value of libraryOrResourceFile can not interpreted as path or name!")
+  }
+
+  private fun harvestPath(pattern: String, file: File) = when {
+    file.isDirectory -> file.listFiles()?.let { files -> files.filter { it.isFile }.map { it.absolutePath } }
+
+    pattern.contains(Regex("[*?]")) -> {
+      project.fileTree(project.projectDir).also {
+        it.include(pattern)
+      }.files.flatMap { f ->
+        // here we have a directory so null can not be returned
+        if (f.isDirectory) { f.listFiles()!!.filter { it.isFile }.toList() }
+        // f is a file
+        else { listOf(f) }
+      }.map { it.absolutePath }
+    }
+
+    else -> null
   }
 
   private fun generateLibdocArgumentList(fileArgument: String, multiOutput: Boolean) = Arguments().apply {

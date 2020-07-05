@@ -4,7 +4,11 @@ import de.qualersoft.robotframework.gradleplugin.configurations.RunRobotConfigur
 import org.gradle.api.Action
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 
 open class RobotTask : BasicRobotFrameworkTask() {
 
@@ -51,7 +55,8 @@ open class RobotTask : BasicRobotFrameworkTask() {
   var sources: FileCollection = project.objects.fileCollection()
 
   @Internal
-  private val robot = project.objects.property(RunRobotConfiguration::class.java).convention(RunRobotConfiguration(project))
+  private val robot = project.objects.property(RunRobotConfiguration::class.java)
+      .convention(RunRobotConfiguration(project))
   fun robot(action: Action<RunRobotConfiguration>) {
     action.execute(robot.get())
   }
