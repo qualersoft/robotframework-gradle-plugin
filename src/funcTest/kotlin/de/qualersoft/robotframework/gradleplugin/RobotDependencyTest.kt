@@ -10,7 +10,6 @@ class RobotDependencyTest : BaseRobotFrameworkFunctionalTest() {
 
   override fun rootFolder(): String? = "robotdependency"
 
-  @Disabled(BUG492)
   @Test
   @KotlinTag
   @DisplayName("Configuring a different version in Kotlin script")
@@ -27,7 +26,6 @@ class RobotDependencyTest : BaseRobotFrameworkFunctionalTest() {
     result.output shouldContain expectedVersion(version = "3.1.2")
   }
 
-  @Disabled(BUG492)
   @Test
   @KotlinTag
   @DisplayName("Configuring a different group in Kotlin script")
@@ -44,7 +42,6 @@ class RobotDependencyTest : BaseRobotFrameworkFunctionalTest() {
     result.output shouldContain expectedVersion(group = "other.robotframework")
   }
 
-  @Disabled(BUG492)
   @Test
   @KotlinTag
   @DisplayName("Configuring a different name in Kotlin script")

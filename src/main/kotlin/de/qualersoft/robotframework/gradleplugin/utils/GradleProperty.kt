@@ -96,7 +96,7 @@ internal class GradleFileProperty<T> {
   private fun createProperty(objects: ObjectFactory) = objects.fileProperty()
 
   operator fun getValue(thisRef: T, property: KProperty<*>): RegularFileProperty = this.property
-  operator fun setValue(thisRef: T, property: KProperty<*>, value: RegularFileProperty?) = this.property.set(value)
+  operator fun setValue(thisRef: T, property: KProperty<*>, value: RegularFileProperty) = this.property.set(value)
 }
 
 internal class GradleDirectoryProperty<T> {

@@ -55,7 +55,7 @@ sonarqube {
 }
 
 jacoco {
-  toolVersion = "0.8.5"
+  toolVersion = "0.8.6"
 }
 
 repositories {
@@ -69,11 +69,12 @@ dependencies {
 
   implementation(group = "org.robotframework", name = "robotframework", version = "3.2.2")
 
-  testImplementation(group="org.junit.jupiter", name="junit-jupiter", version="5.6.2")
+  testImplementation(group="org.junit.jupiter", name="junit-jupiter", version = "5.6.2")
   testImplementation(kotlin("test-junit5"))
 
-  testImplementation(group = "io.kotest", name="kotest-runner-junit5", version = "4.0.5")
-  testImplementation(group="io.kotest", name="kotest-assertions-core-jvm", version="4.0.5")
+  val kotestVer = "4.4.3"
+  testImplementation(group = "io.kotest", name="kotest-runner-junit5", version = kotestVer)
+  testImplementation(group="io.kotest", name="kotest-assertions-core-jvm", version = kotestVer)
 
   testRuntimeOnly(kotlin("script-runtime"))
 }

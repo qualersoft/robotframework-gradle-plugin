@@ -12,10 +12,6 @@ private const val EXT_KT = "$EXT_GR.kts"
 
 open class BaseRobotFrameworkFunctionalTest {
 
-  companion object {
-    const val BUG492 = "Accessing properties of extension in kotlin dsl an error is raised see https://github.com/gradle/kotlin-dsl-samples/issues/492"
-  }
-
   @Tag("groovy")
   annotation class GroovyTag
 

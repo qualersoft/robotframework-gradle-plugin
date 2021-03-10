@@ -49,13 +49,13 @@ abstract class BasicRobotFrameworkTask : JavaExec() {
     val packJar = project.tasks.getByName("jar") as Jar
     classpath(packJar.archiveFile.get())
 
-    // TODO: Create switch to choose between jar or classes
+    // TODO Create switch to choose between jar or classes
 //    val jpc = project.convention.getPlugin(JavaPluginConvention::class.java)
 //    classpath(jpc.sourceSets.getByName("main").output.classesDirs)
 //    classpath(jpc.sourceSets.getByName("main").output.resourcesDir)
 
     // adding dependencies
-    classpath(*project.configurations.getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)
+    classpath(project.configurations.getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)
       .resolvedConfiguration.resolvedArtifacts.map { it.file }.toTypedArray())
   }
 

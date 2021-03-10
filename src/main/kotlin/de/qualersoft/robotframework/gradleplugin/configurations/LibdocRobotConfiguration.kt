@@ -115,7 +115,7 @@ class LibdocRobotConfiguration @Inject constructor(val project: Project) : Commo
    * One may also use ant-like patterns, for example
    * `src/main/java/com/**/Lib.java`
    *
-   * TODO: This is input property of the task
+   * TODO This is input property of the task
    */
   @Suppress("private")
   var libraryOrResourceFile: String? = null
