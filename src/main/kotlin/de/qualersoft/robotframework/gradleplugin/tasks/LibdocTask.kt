@@ -9,6 +9,11 @@ import java.io.FileNotFoundException
 
 open class LibdocTask : BasicRobotFrameworkTask() {
 
+  init {
+    description = "Create the rf documentation of this lib"
+    group = "documentation"
+  }
+
   @Internal
   @Suppress("private")
   var libdoc = extension.libdoc

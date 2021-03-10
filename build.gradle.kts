@@ -1,5 +1,3 @@
-import io.gitlab.arturbosch.detekt.internal.configurableFileCollection
-
 plugins {
   kotlin("jvm")
   id("java-gradle-plugin")
@@ -26,13 +24,9 @@ testSets {
   }
 }
 
-jacocoTestKit {
-  applyTo("funcTestRuntimeOnly", tasks.named("funcTest"))
-}
-
 gradlePlugin {
   plugins {
-    register("robotframework") {
+    create("robotframework") {
       id = "de.qualersoft.robotframework"
       implementationClass = "de.qualersoft.robotframework.gradleplugin.RobotFrameworkPlugin"
     }
@@ -43,7 +37,7 @@ gradlePlugin {
 detekt {
   failFast = true
   config = files("$projectDir/detekt.yml")
-  input = project.configurableFileCollection().from("src/main/kotlin")
+  input = files("src/main/kotlin")
 
   reports {
     html.enabled = true
@@ -66,13 +60,14 @@ jacoco {
 
 repositories {
   jcenter()
+  mavenCentral()
 }
 
 dependencies {
   implementation(kotlin("stdlib"))
   implementation(kotlin("reflect"))
 
-  implementation(group = "org.robotframework", name = "robotframework", version = "3.2")
+  implementation(group = "org.robotframework", name = "robotframework", version = "3.2.2")
 
   testImplementation(group="org.junit.jupiter", name="junit-jupiter", version="5.6.2")
   testImplementation(kotlin("test-junit5"))
@@ -119,16 +114,15 @@ tasks.withType<JacocoReport> {
   }
 }
 
-tasks.dokka {
-  outputFormat = "html"
-  outputDirectory = "$buildDir/javadoc"
+tasks.dokkaHtml {
+  outputDirectory.set(file("$buildDir/javadoc"))
 }
 
 val dokkaJar by tasks.creating(Jar::class) {
   group = JavaBasePlugin.DOCUMENTATION_GROUP
   description = "Assembles Kotlin docs with Dokka"
   archiveClassifier.set("javadoc")
-  from(tasks.dokka)
+  from(tasks.dokkaHtml)
 }
 
 // Create sources Jar from main kotlin sources

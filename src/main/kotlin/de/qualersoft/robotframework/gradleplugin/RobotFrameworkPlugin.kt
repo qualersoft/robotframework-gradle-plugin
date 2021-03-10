@@ -6,6 +6,7 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 
 private const val EXTENSION_NAME = "robotframework"
+const val ROBOT_CONFIGURATION_NAME = "robot"
 
 class RobotFrameworkPlugin : Plugin<Project> {
 
@@ -13,12 +14,19 @@ class RobotFrameworkPlugin : Plugin<Project> {
     val extension = target.extensions.create(
       EXTENSION_NAME,
       RobotFrameworkExtension::class.java,
-      target)
+      target
+    )
+
+    applyJavaPluginIfRequired(target)
+    registerRobotConfiguration(target)
 
     target.afterEvaluate {
-      applyJavaPluginIfRequired(target)
-      registerRobotConfiguration(target)
-      it.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)?.also { rtConf ->
+      val robConf = it.configurations.findByName(ROBOT_CONFIGURATION_NAME)
+      it.configurations.findByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)?.also { cnf ->
+        cnf.extendsFrom(robConf)
+      }
+
+      it.configurations.findByName(JavaPlugin.RUNTIME_ONLY_CONFIGURATION_NAME)?.also { rtConf ->
         extension.robotVersion.get().applyTo(rtConf)
       }
     }
@@ -32,10 +40,7 @@ class RobotFrameworkPlugin : Plugin<Project> {
   }
 
   private fun registerRobotConfiguration(project: Project) {
-    val robConf = project.configurations.register("robot")
-    project.configurations.findByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)?.also {
-      it.extendsFrom(robConf.get())
-    }
+    project.configurations.create(ROBOT_CONFIGURATION_NAME)
   }
 }
 

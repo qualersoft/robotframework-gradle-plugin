@@ -27,27 +27,36 @@ node {
       execGradle 'clean classes'
       stash("build")
     }
-    stage("Test") {
-      echo "testing artifacts..."
-      try {
-        unstash("build")
-        execGradle 'test'
-        stash("test")
-      } finally {
-        junit '**/build/test-results/test/*.xml'
-      }
-    }
-    stage("Functional test") {
-      echo "executing functional tests"
-      try {
-        unstash("test")
-        execGradle 'funcTest'
-        stash("funcTest")
-      } finally {
-        junit '**/build/test-results/funcTest/*.xml'
-      }
+    stage("Testing") {
+      parallel([
+        "unitTests" : {
+          stage("Unit tests") {
+            echo "testing artifacts..."
+            try {
+              unstash("build")
+              execGradle 'test'
+              stash("test")
+            } finally {
+              junit '**/build/test-results/test/*.xml'
+            }
+          }
+        },
+        "functionalTests" : {
+          stage("Functional tests") {
+            echo "executing functional tests"
+            try {
+              unstash("build")
+              execGradle 'funcTest'
+              stash("funcTest")
+            } finally {
+              junit '**/build/test-results/funcTest/*.xml'
+            }
+          }
+        }
+      ])
     }
     stage("Report") {
+      unstash("test")
       unstash("funcTest")
       execGradle 'jacocoMerge'
       execGradle 'reportMerge'

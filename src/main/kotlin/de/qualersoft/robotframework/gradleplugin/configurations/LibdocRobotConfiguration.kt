@@ -2,7 +2,6 @@ package de.qualersoft.robotframework.gradleplugin.configurations
 
 import de.qualersoft.robotframework.gradleplugin.utils.Arguments
 import de.qualersoft.robotframework.gradleplugin.utils.GradleDirectoryProperty
-import de.qualersoft.robotframework.gradleplugin.utils.GradleFileProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import org.gradle.api.Project
 import java.io.File
@@ -76,8 +75,10 @@ class LibdocRobotConfiguration @Inject constructor(val project: Project) : Commo
    * Default-value: `${project.buildDir}/robotdoc/libdoc`
    */
   @Suppress("private")
-  var outputDirectory by GradleDirectoryProperty(objects,
-      project.layout.buildDirectory.dir(joinPaths("robotdoc", "libdoc")))
+  var outputDirectory by GradleDirectoryProperty(
+    objects,
+    project.layout.buildDirectory.dir(joinPaths("robotdoc", "libdoc"))
+  )
 
   /**
    * Specifies the filename of the created documentation. Considered to be
@@ -85,7 +86,8 @@ class LibdocRobotConfiguration @Inject constructor(val project: Project) : Commo
    * Default-value: `libdoc.html`
    */
   @Suppress("private")
-  var outputFile by GradleFileProperty(objects, outputDirectory.file("libdoc.html"))
+  var outputFile = objects.fileProperty()
+    .convention(outputDirectory.file("libdoc.html"))
 
   /**
    * Sets the version of the documented library or resource.
@@ -131,15 +133,16 @@ class LibdocRobotConfiguration @Inject constructor(val project: Project) : Commo
   @Throws(IllegalArgumentException::class)
   private fun harvestResourceOrFileCandidates(pattern: String): List<String> {
     val file = project.projectDir.resolve(pattern).normalize()
-    return if (file.isFile) {
+    return when {
       // 1. Single file specification, no patterns (try to resolve to projectDir)
-      listOf(file.absolutePath)
-    } else if (pattern.contains("\\") || pattern.contains("/")) {
+      (file.isFile) -> listOf(file.absolutePath)
+
       // 2. we have path structure (\ | /)
-      harvestPath(pattern, file)
-    } else {
+      (pattern.contains("\\")
+          || pattern.contains("/")) -> harvestPath(pattern, file)
+
       // 3. we assume a class name
-      listOf(pattern)
+      else -> listOf(pattern)
     } ?: throw IllegalArgumentException("The value of libraryOrResourceFile can not interpreted as path or name!")
   }
 
@@ -151,9 +154,13 @@ class LibdocRobotConfiguration @Inject constructor(val project: Project) : Commo
         it.include(pattern)
       }.files.flatMap { f ->
         // here we have a directory so null can not be returned
-        if (f.isDirectory) { f.listFiles()!!.filter { it.isFile }.toList() }
+        if (f.isDirectory) {
+          f.listFiles()!!.filter { it.isFile }.toList()
+        }
         // f is a file
-        else { listOf(f) }
+        else {
+          listOf(f)
+        }
       }.map { it.absolutePath }
     }
 
@@ -183,7 +190,7 @@ class LibdocRobotConfiguration @Inject constructor(val project: Project) : Commo
     val tmp = File(file)
     val ext = tmp.extension
     val name = tmp.nameWithoutExtension.replace("/|\\.|\\\\", "_")
-        .replace(Regex("_+"), "_")
+      .replace(Regex("_+"), "_")
     return "$name.$ext"
   }
 }

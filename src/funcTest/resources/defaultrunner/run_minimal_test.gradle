@@ -7,7 +7,7 @@ repositories {
   mavenCentral()
 }
 
-tasks.register("robotRun", de.qualersoft.robotframework.gradleplugin.tasks.RobotTask) {
+tasks.register("robotRun", de.qualersoft.robotframework.gradleplugin.tasks.RunRobotTask) {
   sources = fileTree("src/test") {
     include("**/*.robot")
   }

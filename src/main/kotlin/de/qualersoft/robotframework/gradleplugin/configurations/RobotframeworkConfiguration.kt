@@ -8,6 +8,15 @@ import org.gradle.api.provider.Property
 
 class RobotframeworkConfiguration(private val project: Project) {
 
+  var version: String = "3.2"
+  var group: String = "org.robotframework"
+  var name: String = "robotframework"
+  var classifier: String? = null
+  var ext: String? = null
+  var configureClosure: Closure<Any>? = null
+  var mainClass: Property<String> = project.objects.property(String::class.java)
+    .convention("org.robotframework.RobotFramework")
+
   fun applyTo(rtConf: Configuration) {
     rtConf.dependencies.add(createRobotLibDependency())
   }
@@ -22,21 +31,11 @@ class RobotframeworkConfiguration(private val project: Project) {
     }
   }
 
-  internal fun createDependencyNotation(): Map<String, String> = mutableMapOf<String, String>().also { res ->
+  private fun createDependencyNotation(): Map<String, String> = mutableMapOf<String, String>().also { res ->
     res["group"] = group
     res["name"] = name
     res["version"] = version
     classifier?.also { res["classifier"] = it }
     ext?.also { res["ext"] = it }
-  }
-
-  var version: String = "3.2"
-  var group: String = "org.robotframework"
-  var name: String = "robotframework"
-  var classifier: String? = null
-  var ext: String? = null
-  var configureClosure: Closure<Any>? = null
-  var mainClass: Property<String> = project.objects.property(String::class.java).also {
-    it.set("org.robotframework.RobotFramework")
   }
 }

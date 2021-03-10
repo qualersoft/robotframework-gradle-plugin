@@ -1,30 +1,34 @@
 package de.qualersoft.robotframework.gradleplugin.tasks
 
 import de.qualersoft.robotframework.gradleplugin.configurations.RunRobotConfiguration
+import de.qualersoft.robotframework.gradleplugin.robotframework
 import org.gradle.api.Action
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 
-open class RobotTask : BasicRobotFrameworkTask() {
+open class RunRobotTask : BasicRobotFrameworkTask() {
 
+  init {
+    description = "Runs the robot tests"
+    group = "verification"
+  }
   /**
    * Robot Framework test cases are created in
-   * [files][http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-case-files] and
-   * [directories][http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-suite-directories]
+   * [files](http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-case-files) and
+   * [directories](http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-suite-directories)
    * , and they are executed by giving the path to
    * the file or directory in question to the selected runner script.
    * The path can be absolute or, more commonly, relative to the
    * directory where tests are executed from. The given file or
    * directory creates the top-level test suite, which gets its
    * name, unless overridden with the [RunRobotConfiguration.name]&nbsp;
-   * [option][http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#setting-the-name],
-   * from the [file or directory name]
-   * [http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-suite-name-and-documentation].
+   * [option](http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#setting-the-name),
+   * from the [file or directory name](http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-suite-name-and-documentation).
+   *
    * Different execution possibilities are illustrated in the
    * examples below. Note that in these examples, as well as
    * in other examples in this section, only the robot script
@@ -54,9 +58,16 @@ open class RobotTask : BasicRobotFrameworkTask() {
   @PathSensitive(PathSensitivity.ABSOLUTE)
   var sources: FileCollection = project.objects.fileCollection()
 
-  @Internal
   private val robot = project.objects.property(RunRobotConfiguration::class.java)
-      .convention(RunRobotConfiguration(project))
+      .convention(project.robotframework().robot)
+
+  /**
+   * Directory where the output shall be put to
+   */
+  @OutputDirectory
+  val outputDir: DirectoryProperty = project.objects.directoryProperty()
+    .convention(robot.get().outputDir)
+
   fun robot(action: Action<RunRobotConfiguration>) {
     action.execute(robot.get())
   }
@@ -64,17 +75,12 @@ open class RobotTask : BasicRobotFrameworkTask() {
     robot.get().apply(config)
   }
 
-  /**
-   * Directory where the output shall be put to
-   */
-  @OutputDirectory
-  val outputDir: DirectoryProperty = project.objects.directoryProperty()
-          .convention(robot.get().outputDir)
-
 
   override fun exec() {
     val srcFile = sources.files.map { it.absolutePath }
+
     rfArgs = (robot.get().generateArguments().toList() + rfArgs) as MutableList<String>
+    println("RRT: generated arguments: $rfArgs")
     super.executeRobotCommand("run", srcFile)
   }
 }

@@ -125,8 +125,10 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * Default: `${project.buildDir}/reports/robotframework`.
    */
   @Suppress("private")
-  var outputDir: DirectoryProperty = objects.directoryProperty().fileValue(File(project.buildDir,
-    joinPaths("reports", "robotframework")))
+  var outputDir: DirectoryProperty = objects.directoryProperty()
+    .convention(
+      project.layout.buildDirectory.dir(joinPaths("reports", "robotframework"))
+    )
 
   /**
    * XML output file. Not created unless this option is
@@ -434,11 +436,11 @@ open class CommonRobotConfiguration @Inject constructor(protected val objects: O
    * e.g. src/main/java/com/test/
    */
   @Suppress("private")
-  val additionalPythonPaths: ConfigurableFileCollection = objects.fileCollection()
+  var additionalPythonPaths: ConfigurableFileCollection = objects.fileCollection()
 
   open fun generateArguments(): Array<String> = Arguments().apply {
     addStringToArguments(name.orNull, "--name")
-    val files = additionalPythonPaths.files.toList()
+    val files = additionalPythonPaths.files.toMutableList()
     addFileListToArguments(files, "--pythonpath")
   }.toArray()
 
