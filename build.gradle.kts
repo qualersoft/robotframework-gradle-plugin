@@ -98,7 +98,8 @@ tasks.withType<Test> {
 }
 
 tasks.create<JacocoMerge>("jacocoMerge") {
-  executionData(tasks.withType<Test>())
+  val reportsTasks = tasks.withType<JacocoReport>().filter { it.name != "reportMerge" }.toTypedArray()
+  executionData(*reportsTasks.map { it.executionData.singleFile }.toTypedArray())
 }
 
 tasks.create<JacocoReport>("reportMerge") {
