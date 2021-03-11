@@ -13,3 +13,5 @@ pluginManagement {
     id("io.gitlab.arturbosch.detekt") version "1.15.0"
   }
 }
+
+rootProject.name = "robotframework-gradle-plugin"
