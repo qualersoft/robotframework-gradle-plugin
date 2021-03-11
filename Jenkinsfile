@@ -86,13 +86,13 @@ node {
       }
     }
   } finally {
-    archiveArtifacts artifacts: ['build/reports/jacoco/reportMerge/**', 'build/reports/detekt/*.*'], allowEmptyArchive: true
+    archiveArtifacts artifacts: ['build/reports/jacoco/reportMerge/**', 'build/reports/detekt/*.*'].join(', '), allowEmptyArchive: true
   }
 }
 
 void analyzeWithSonarQubeAndWaitForQualityGoal() {
   withSonarQubeEnv('SQ_MeMathze') {
-    execGradle "sonarqube -D'sonar.login=${SONAR_AUTH_TOKEN}' -D'sonar.branch.name=${env.BRANCH_NAME}'"
+    execGradle "sonarqube -D'sonar.login=${SONAR_AUTH_TOKEN}' -D'sonar.branch.name=${BRANCH_NAME}'"
   }
   timeout(time: 2, unit: 'MINUTES') {
     def qg = waitForQualityGate(webhookSecretId: 'sonar_build')
