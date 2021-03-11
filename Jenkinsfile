@@ -1,8 +1,6 @@
 node {
   try {
     withCredentials([usernamePassword(credentialsId: 'NEXUS_DEPLOY', passwordVariable: 'ORG_GRADLE_PROJECT_mavenPwd', usernameVariable: 'ORG_GRADLE_PROJECT_mavenUsr')]) {
-      // some block
-
       stage("Checkout") {
         checkout scm
       }
@@ -16,11 +14,12 @@ node {
               [System.Net.ServicePointManager]::SecurityProtocol = \$AllProtocols
               (Invoke-WebRequest -Headers @{'Cache-Control' = 'no-cache'} -Uri 'https://raw.githubusercontent.com/fossas/fossa-cli/master/install.ps1' -UseBasicParsing).Content | Out-File -File fossaInstall.ps1 -Force -Encoding UTF8NoBOM""")
           powershell(script: './fossaInstall.ps1')
-          bat 'fossa init'
-          withCredentials([string(credentialsId: 'FOSSA_TOKEN', variable: 'FOSSA_API_KEY')]) {
-            bat 'fossa analyze'
-          }
+          // after installing fossa we can delete script immediately
           powershell(script: 'rd ./fossaInstall.ps1')
+          exec 'fossa init'
+          withCredentials([string(credentialsId: 'FOSSA_TOKEN', variable: 'FOSSA_API_KEY')]) {
+            exec 'fossa analyze'
+          }
         }
       }
       stage("Compiling") {
@@ -30,6 +29,11 @@ node {
       }
       stage("Testing") {
         parallel([
+          "fossaTest" : {
+            withCredentials([string(credentialsId: 'FOSSA_TOKEN', variable: 'FOSSA_API_KEY')]) {
+              exec 'fossa test'
+            }
+          },
           "unitTests" : {
             stage("Unit tests") {
               echo "testing artifacts..."
@@ -80,7 +84,7 @@ node {
       }
     }
   } finally {
-    archiveArtifacts artifacts: 'build/reports/jacoco/reportMerge/**', allowEmptyArchive: true
+    archiveArtifacts artifacts: ['build/reports/jacoco/reportMerge/**', 'build/reports/detekt/*.*'], allowEmptyArchive: true
   }
 }
 
