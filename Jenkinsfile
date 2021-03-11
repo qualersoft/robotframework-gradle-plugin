@@ -35,7 +35,7 @@ node {
             try {
               unstash("build")
               execGradle 'test'
-              stash("test")
+//               stash("test")
             } finally {
               junit '**/build/test-results/test/*.xml'
             }
@@ -47,7 +47,7 @@ node {
             try {
               unstash("build")
               execGradle 'funcTest'
-              stash("funcTest")
+//               stash("funcTest")
             } finally {
               junit '**/build/test-results/funcTest/*.xml'
             }
@@ -56,8 +56,8 @@ node {
       ])
     }
     stage("Report") {
-      unstash("test")
-      unstash("funcTest")
+//       unstash("test")
+//       unstash("funcTest")
       execGradle 'jacocoMerge'
       execGradle 'reportMerge'
       withCredentials([string(credentialsId: 'CODECOV_TOKEN', variable: 'CC_TOKEN')]) {
@@ -76,6 +76,9 @@ node {
     }
     stage("Publish") {
       echo "publish artifacts..."
+    }
+    post {
+      archiveArtifacts artifacts: 'build/reports/jacoco/reportMerge/**', allowEmptyArchive: true
     }
   }
 }
