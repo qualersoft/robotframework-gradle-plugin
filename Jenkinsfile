@@ -68,7 +68,7 @@ node {
         execGradle 'jacocoMerge'
         execGradle 'reportMerge'
         withCredentials([string(credentialsId: 'CODECOV_TOKEN', variable: 'CC_TOKEN')]) {
-          powershell(script: '''(New-Object System.Net.WebClient).DownloadFile("https://github.com/codecov/codecov-exe/releases/download/1.12.0/codecov-win7-x64.zip", (Join-Path $pwd "Codecov.zip"))
+          powershell(script: '''(New-Object System.Net.WebClient).DownloadFile("https://github.com/codecov/codecov-exe/releases/download/1.13.0/codecov-win7-x64.zip", (Join-Path $pwd "Codecov.zip"))
           Expand-Archive -Force .\\Codecov.zip -DestinationPath .\\Codecov''')
           powershell(script: '.\\Codecov\\codecov.exe -f "build\\reports\\jacoco\\**\\*.xml" -t $ENV:CC_TOKEN')
           powershell(script: '''rd -Force -Recurse .\\Codecov\\
