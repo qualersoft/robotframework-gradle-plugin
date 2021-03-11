@@ -30,8 +30,10 @@ node {
       stage("Testing") {
         parallel([
           "fossaTest" : {
-            withCredentials([string(credentialsId: 'FOSSA_TOKEN', variable: 'FOSSA_API_KEY')]) {
-              exec 'fossa test'
+            withEnv(["PATH+FOSSA=${env.ALLUSERSPROFILE}\\fossa-cli"]) {
+              withCredentials([string(credentialsId: 'FOSSA_TOKEN', variable: 'FOSSA_API_KEY')]) {
+                exec 'fossa test'
+              }
             }
           },
           "unitTests" : {
