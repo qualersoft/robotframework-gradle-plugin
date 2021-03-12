@@ -1,14 +1,18 @@
 node {
   try {
     withCredentials([usernamePassword(credentialsId: 'NEXUS_DEPLOY', passwordVariable: 'ORG_GRADLE_PROJECT_mavenPwd', usernameVariable: 'ORG_GRADLE_PROJECT_mavenUsr')]) {
-      stage("Checkout") {
+      stage('Checkout') {
         checkout scm
       }
-      stage("Static Analyse") {
-        echo "analyzing code..."
+      stage('Clean') {
+        echo 'Cleaning workspace'
+        execGradle 'clean'
+      }
+      stage('Static Analyse') {
+        echo 'analyzing code...'
         execGradle 'detekt'
 
-        echo "analyzing dependencies"
+        echo 'analyzing dependencies'
         withEnv(["PATH+FOSSA=${env.ALLUSERSPROFILE}\\fossa-cli"]) {
           powershell(script: """\$AllProtocols = [System.Net.SecurityProtocolType]'Tls11,Tls12'
               [System.Net.ServicePointManager]::SecurityProtocol = \$AllProtocols
@@ -22,25 +26,25 @@ node {
           }
         }
       }
-      stage("Compiling") {
-        echo "Compiling artifacts..."
-        execGradle 'clean classes'
-        stash("build")
+      stage('Compiling') {
+        echo 'Compiling artifacts...'
+        execGradle 'classes'
+        stash('build')
       }
-      stage("Testing") {
+      stage('Testing') {
         parallel([
-          "fossaTest" : {
+          'fossaTest' : {
             withEnv(["PATH+FOSSA=${env.ALLUSERSPROFILE}\\fossa-cli"]) {
               withCredentials([string(credentialsId: 'FOSSA_TOKEN', variable: 'FOSSA_API_KEY')]) {
                 exec 'fossa test'
               }
             }
           },
-          "unitTests" : {
-            stage("Unit tests") {
-              echo "testing artifacts..."
+          'unitTests' : {
+            stage('Unit tests') {
+              echo 'testing artifacts...'
               try {
-                unstash("build")
+                unstash('build')
                 execGradle 'test'
   //               stash("test")
               } finally {
@@ -48,11 +52,11 @@ node {
               }
             }
           },
-          "functionalTests" : {
-            stage("Functional tests") {
-              echo "executing functional tests"
+          'functionalTests' : {
+            stage('Functional tests') {
+              echo 'executing functional tests'
               try {
-                unstash("build")
+                unstash('build')
                 execGradle 'funcTest'
   //               stash("funcTest")
               } finally {
@@ -62,7 +66,7 @@ node {
           }
         ])
       }
-      stage("Report") {
+      stage('Report') {
   //       unstash("test")
   //       unstash("funcTest")
         execGradle 'jacocoMerge'
@@ -76,13 +80,13 @@ node {
         }
         analyzeWithSonarQubeAndWaitForQualityGoal()
       }
-      stage("Package") {
-        echo "Package artifacts..."
-        unstash("build")
+      stage('Package') {
+        echo 'Package artifacts...'
+        unstash('build')
         execGradle 'jar'
       }
-      stage("Publish") {
-        echo "publish artifacts..."
+      stage('Publish') {
+        echo 'publish artifacts...'
       }
     }
   } finally {
