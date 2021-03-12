@@ -5,10 +5,12 @@ import de.qualersoft.robotframework.gradleplugin.configurations.RebotRobotConfig
 import de.qualersoft.robotframework.gradleplugin.configurations.RobotframeworkConfiguration
 import de.qualersoft.robotframework.gradleplugin.configurations.RunRobotConfiguration
 import de.qualersoft.robotframework.gradleplugin.configurations.TestdocRobotConfiguration
+import de.qualersoft.robotframework.gradleplugin.configurations.TidyRobotConfiguration
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import org.gradle.api.Action
 import org.gradle.api.Project
 
+@Suppress("TooManyFunctions")
 open class RobotFrameworkExtension(project: Project) {
 
   val robotVersion by GradleProperty(
@@ -80,5 +82,19 @@ open class RobotFrameworkExtension(project: Project) {
 
   fun testdoc(config: TestdocRobotConfiguration.() -> Unit) {
     testdoc.get().apply(config)
+  }
+
+  val tidy by GradleProperty(
+    project.objects,
+    TidyRobotConfiguration::class,
+    TidyRobotConfiguration(project)
+  )
+
+  fun tidy(action: Action<TidyRobotConfiguration>) {
+    action.execute(tidy.get())
+  }
+
+  fun tidy(config: TidyRobotConfiguration.() -> Unit) {
+    tidy.get().apply(config)
   }
 }

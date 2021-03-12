@@ -13,7 +13,7 @@ import org.junit.jupiter.api.assertAll
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class RebotRobotConfigurationTest : ConfigurationTestBase() {
+internal class RebotRobotConfigurationTest : ConfigurationTestBase() {
 
   @Test
   fun `Generate default run arguments`() {

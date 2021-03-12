@@ -19,7 +19,7 @@ const val DEFAULT_GROUP = "org.robotframework"
 const val DEFAULT_NAME = "robotframework"
 const val DEFAULT_VERSION = "3.2"
 
-class RobotframeworkConfigurationTest {
+internal class RobotframeworkConfigurationTest {
 
   private val project: Project = ProjectBuilder.builder().build().also {
     it.pluginManager.apply(JavaPlugin::class.java)

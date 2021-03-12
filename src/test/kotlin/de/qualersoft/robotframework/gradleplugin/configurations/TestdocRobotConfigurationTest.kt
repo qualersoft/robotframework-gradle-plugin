@@ -11,7 +11,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 
-class TestdocRobotConfigurationTest : ConfigurationTestBase() {
+internal class TestdocRobotConfigurationTest : ConfigurationTestBase() {
 
   @Test
   fun `Generate default run arguments`() {

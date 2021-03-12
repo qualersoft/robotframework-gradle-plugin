@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import java.io.File
 
-class RunRobotConfigurationTest : ConfigurationTestBase() {
+internal class RunRobotConfigurationTest : ConfigurationTestBase() {
 
   private val project: Project = ProjectBuilder.builder().build().also {
     it.pluginManager.apply(PLUGIN_ID)

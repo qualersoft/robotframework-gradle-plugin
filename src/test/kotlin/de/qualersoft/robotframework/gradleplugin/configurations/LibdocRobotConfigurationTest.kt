@@ -18,7 +18,7 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.fail
 import java.io.File
 
-class LibdocRobotConfigurationTest : ConfigurationTestBase() {
+internal class LibdocRobotConfigurationTest : ConfigurationTestBase() {
 
   private val project: Project = ProjectBuilder.builder().build().also {
     listOf("ALibraryFile.robot", "AResourceFile.resource").forEach { res ->
