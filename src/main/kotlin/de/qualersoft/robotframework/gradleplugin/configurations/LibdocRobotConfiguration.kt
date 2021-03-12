@@ -16,8 +16,6 @@ import javax.inject.Inject
  * ## Required settings:
  * + [outputFile]              The name for the output file. Documentation output
  *                             format is deduced from the file extension.
- *                             We also support patterns like `*.html`, which indicates
- *                             to derive the output name from the original name.
  * + [libraryOrResourceFile]   Name or path of the documented library or resource file.
  *                             Supports ant-like pattern format to match multiple inputs,
  *                             such as `src/java/**/*.java`
@@ -43,37 +41,42 @@ import javax.inject.Inject
  * + [name]                  Sets the name of the documented library or resource.
  * + [version]               Sets the version of the documented library or resource.
  * + [additionalPythonPaths] Additional locations where to search for libraries
-and resources.
+ *                           and resources.
  * E.g.: `src/main/java/com/test/`
  *
  *
- * Example 1:
+ * **Example 1:**
+ *```
+ *    libdoc {
+ *      outputFile = MyLib.html
+ *      libraryOrResourceFile = "com.mylib.MyLib"
+ *    }
+ *```
  *
- *    <libdoc>
- *      <outputFile>MyLib.html</outputFile>
- *      <libraryOrResourceFile>com.mylib.MyLib</libraryOrResourceFile>
- *    </libdoc>
+ * **Example 2:**
+ *```
+ *    libdoc {
+ *      outputFile = "MyLib.xml"
+ *      libraryOrResourceFile = "src/java/**/*Lib.java"
+ *    }
+ *```
  *
- * Example 2:
- *
- *    <libdoc>
- *      <outputFile>*.html</outputFile>
- *      <libraryOrResourceFile>src/java/**/*Lib.java</libraryOrResourceFile>
- *    </libdoc>
- *
- * Example 3:
- *
- *    <libdoc>
- *      <outputFile>*.html</outputFile>
- *      <libraryOrResourceFile>com.**.*Lib</libraryOrResourceFile>
- *    </libdoc>
+ * **Example 3:**
+ *```
+ *    libdoc {
+ *      outputFile = "MyLib.libspec"
+ *      libraryOrResourceFile = "com.**.*Lib"
+ *    }
+ * ```
  */
-class LibdocRobotConfiguration @Inject constructor(private val project: Project) : CommonRobotConfiguration(project.objects) {
+class LibdocRobotConfiguration @Inject constructor(private val project: Project) :
+  CommonRobotConfiguration(project.objects) {
 
   //<editor-fold desc="Properties">
   /**
    * Specifies the directory where documentation files are written.
-   * Default-value: `${project.buildDir}/robotdoc/libdoc`
+   *
+   * *Default-value:* `${project.buildDir}/robotdoc/libdoc`
    */
   @Suppress("private")
   var outputDirectory by GradleDirectoryProperty(
@@ -84,7 +87,8 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
   /**
    * Specifies the filename of the created documentation. Considered to be
    * relative to the [outputDirectory] of the project.
-   * Default-value: `libdoc.html`
+   *
+   * *Default-value:* `libdoc.html`
    */
   @Suppress("private")
   var outputFile = objects.fileProperty()
@@ -92,7 +96,8 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
 
   /**
    * Sets the version of the documented library or resource.
-   * Default-value: project.version
+   *
+   * *Default-value:* project.version
    */
   @Suppress("private")
   var version by GradleProperty(objects, String::class, project.version.toString())
@@ -109,7 +114,7 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
    * Paths are considered relative to the location of `build.gradle` and
    * must point to a valid Python/Java source file or a resource file.
    *
-   * Examples
+   * **Examples**
    * * `src/main/java/com/test/ExampleLib.java`
    * * `${buildDir}/libs/ExampleLib.jar`
    *
@@ -142,7 +147,8 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
 
       // 3. we assume a class name
       else -> listOf(pattern)
-    } ?: throw IllegalArgumentException("The value of libraryOrResourceFile can not interpreted as path or name!")
+    } ?: throw IllegalArgumentException("The value <'$pattern'> of libraryOrResourceFile can not interpreted as path or name!" +
+        " Maybe the pattern is invalid or the specified path does not exist.")
   }
 
   private fun harvestPath(pattern: String, file: File) = when {

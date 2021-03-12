@@ -9,11 +9,13 @@ import io.kotest.matchers.nulls.beNull
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNot
+import io.kotest.matchers.string.containIgnoringCase
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.fail
 import java.io.File
 
 class LibdocRobotConfigurationTest : ConfigurationTestBase() {
@@ -67,7 +69,7 @@ class LibdocRobotConfigurationTest : ConfigurationTestBase() {
   }
 
   @Test
-  fun `generate with wildcard lib or resource file`() {
+  fun `generate with wildcard for lib or resource file`() {
     val result = applyConfig {
       it.libraryOrResourceFile = "src/test/resources/*.robot"
     }.generateRunArguments()
@@ -80,7 +82,7 @@ class LibdocRobotConfigurationTest : ConfigurationTestBase() {
   }
 
   @Test
-  fun `generate with folder wildcard lib or resource file`() {
+  fun `generate with folder wildcard for lib or resource file`() {
     val result = applyConfig {
       it.libraryOrResourceFile = "**/resources/*.robot"
     }.generateRunArguments()
@@ -93,7 +95,7 @@ class LibdocRobotConfigurationTest : ConfigurationTestBase() {
   }
 
   @Test
-  fun `generate with folder and pattern lib or resource file`() {
+  fun `generate with folder and pattern for lib or resource file`() {
     val result = applyConfig {
       it.libraryOrResourceFile = "src/test/**"
     }.generateRunArguments()
@@ -107,7 +109,37 @@ class LibdocRobotConfigurationTest : ConfigurationTestBase() {
   }
 
   @Test
-  fun `generate with class name`() {
+  fun `generate with empty folder for path lib or resource file`() {
+    val path = "src/test/empty/"
+    val emptyDir = File(project.projectDir.absoluteFile, path)
+    if(!emptyDir.mkdirs()) {
+      fail("Unable to create directories $emptyDir!")
+    }
+
+    val result = applyConfig {
+      it.libraryOrResourceFile = path
+    }.generateRunArguments()
+
+    assertAll(
+      { result shouldNot beNull() },
+      { result should beEmpty() }
+    )
+  }
+
+  @Test
+  fun `generate with with nonexisting folder for path lib or resource file should throw exception`() {
+    val path = "src/test/notexisting/"
+
+    val ex = assertThrows<IllegalArgumentException> {
+      applyConfig {
+        it.libraryOrResourceFile = path
+      }.generateRunArguments()
+    }
+    ex.message should containIgnoringCase(path)
+  }
+
+  @Test
+  fun `generate with class name for library or resource file`() {
     val result = applyConfig {
       it.libraryOrResourceFile = "de.qualersoft.robotframework.gradleplugin.tasks.LibdocTask"
     }.generateRunArguments()
