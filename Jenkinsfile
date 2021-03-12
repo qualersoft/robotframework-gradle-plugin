@@ -4,10 +4,7 @@ node {
       stage('Checkout') {
         checkout scm
       }
-      stage('Clean') {
-        echo 'Cleaning workspace'
-        execGradle 'clean'
-      }
+      // no clean required because we use jenkis + git to revert any changes to the working dir.
       stage('Static Analyse') {
         echo 'analyzing code...'
         execGradle 'detekt'
@@ -71,13 +68,13 @@ node {
   //       unstash("funcTest")
         execGradle 'jacocoMerge'
         execGradle 'reportMerge'
+        powershell(script: '''(New-Object System.Net.WebClient).DownloadFile("https://github.com/codecov/codecov-exe/releases/download/1.13.0/codecov-win7-x64.zip", (Join-Path $pwd "Codecov.zip"))
+        Expand-Archive -Force .\\Codecov.zip -DestinationPath .\\Codecov''')
         withCredentials([string(credentialsId: 'CODECOV_TOKEN', variable: 'CC_TOKEN')]) {
-          powershell(script: '''(New-Object System.Net.WebClient).DownloadFile("https://github.com/codecov/codecov-exe/releases/download/1.13.0/codecov-win7-x64.zip", (Join-Path $pwd "Codecov.zip"))
-          Expand-Archive -Force .\\Codecov.zip -DestinationPath .\\Codecov''')
-          powershell(script: '.\\Codecov\\codecov.exe -f "build\\reports\\jacoco\\**\\*.xml" -t $ENV:CC_TOKEN')
-          powershell(script: '''rd -Force -Recurse .\\Codecov\\
-          rd -Force .\\Codecov.zip''')
+          powershell(script: '.\\Codecov\\codecov.exe -f "build/reports/jacoco/**/*.xml" -t $ENV:CC_TOKEN')
         }
+        powershell(script: '''rd -Force -Recurse .\\Codecov\\
+        rd -Force .\\Codecov.zip''')
         analyzeWithSonarQubeAndWaitForQualityGoal()
       }
       stage('Package') {
