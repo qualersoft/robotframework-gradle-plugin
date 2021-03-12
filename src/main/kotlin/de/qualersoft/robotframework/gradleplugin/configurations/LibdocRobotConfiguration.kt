@@ -147,8 +147,9 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
 
       // 3. we assume a class name
       else -> listOf(pattern)
-    } ?: throw IllegalArgumentException("The value <'$pattern'> of libraryOrResourceFile can not interpreted as path or name!" +
-        " Maybe the pattern is invalid or the specified path does not exist.")
+    } ?: throw IllegalArgumentException("The value <'$pattern'> of libraryOrResourceFile" +
+        " can not interpreted as path or name! Maybe the pattern is invalid or" +
+        "the specified path does not exist.")
   }
 
   private fun harvestPath(pattern: String, file: File) = when {
