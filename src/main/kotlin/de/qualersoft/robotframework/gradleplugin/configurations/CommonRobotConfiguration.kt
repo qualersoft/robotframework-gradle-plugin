@@ -440,7 +440,7 @@ open class CommonRobotConfiguration @Inject constructor(protected val objects: O
 
   open fun generateArguments(): Array<String> = Arguments().apply {
     addStringToArguments(name.orNull, "--name")
-    val files = additionalPythonPaths.files.toMutableList()
+    val files = additionalPythonPaths.files.toList()
     addFileListToArguments(files, "--pythonpath")
   }.toArray()
 

@@ -31,17 +31,17 @@ internal class GradleProperty<T, V : Any> {
 
   private fun createProperty(objects: ObjectFactory, type: KClass<V>) = objects.property(type.java)
 
-  operator fun getValue(thisRef: T, property: KProperty<*>): Provider<V> = this.property
+  operator fun getValue(thisRef: T, property: KProperty<*>): Property<V> = this.property
   operator fun setValue(thisRef: T, property: KProperty<*>, value: V?) = this.property.set(value)
   operator fun setValue(thisRef: T, property: KProperty<*>, provider: Provider<V>) = this.property.set(provider)
 }
 
 internal class GradleStringListProperty<T>(
     objects: ObjectFactory,
-    default: List<String> = mutableListOf()
+    default: MutableList<String> = mutableListOf()
 ) {
   private val property: ListProperty<String> = objects.listProperty(String::class.java).apply {
-    set(default)
+    convention(default)
   }
 
   operator fun getValue(thisRef: T, property: KProperty<*>): MutableList<String> = this.property.get()
@@ -99,22 +99,12 @@ internal class GradleFileProperty<T> {
   operator fun setValue(thisRef: T, property: KProperty<*>, value: RegularFileProperty) = this.property.set(value)
 }
 
-internal class GradleDirectoryProperty<T> {
+internal class GradleDirectoryProperty<T>(objects: ObjectFactory, provider: Provider<out Directory>) {
 
   private val property: DirectoryProperty
 
-  constructor(objects: ObjectFactory, default: Directory? = null) {
-    property = createProperty(objects).convention(default)
-  }
-
-  constructor(objects: ObjectFactory, provider: Provider<out Directory>) {
+  init {
     property = createProperty(objects).convention(provider)
-  }
-
-  constructor(objects: ObjectFactory, default: File) {
-    property = createProperty(objects).convention(
-        objects.directoryProperty().dir(default.absolutePath)
-    )
   }
 
   private fun createProperty(objects: ObjectFactory) = objects.directoryProperty()

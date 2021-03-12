@@ -4,8 +4,8 @@ import de.qualersoft.robotframework.gradleplugin.utils.Arguments
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleStringListProperty
 import org.gradle.api.Project
+import org.gradle.api.provider.Property
 import java.io.File
-import java.io.IOException
 
 
 /**
@@ -19,7 +19,7 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
    * Default-value=`false`.
    */
   @Suppress("private")
-  var merge by GradleProperty(objects, Boolean::class, false)
+  val merge by GradleProperty(objects, Boolean::class, false)
 
   /**
    * Processes output also if the top level suite is
@@ -27,7 +27,7 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
    * is not an error that there are no matches.
    */
   @Suppress("private")
-  var processEmptySuite by GradleProperty(objects, Boolean::class, false)
+  val processEmptySuite by GradleProperty(objects, Boolean::class, false)
 
   /**
    * Syntax: name:&lt;pattern&gt;|tag:&lt;pattern&gt;
@@ -80,13 +80,6 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
   var outputFile by GradleProperty(objects, String::class, "output.xml")
   //</editor-fold>
 
-  fun ensureOutputDirectoryExists() {
-    val dir = outputDir.asFile.get()
-    if (!dir.exists() && !dir.mkdirs()) {
-      throw IOException("Target output direcotry connot be created: ${dir.absolutePath}")
-    }
-  }
-
   private fun getOutputPath(): String = File(outputDir.asFile.get().absoluteFile, outputFile.get()).absolutePath
 
   override fun generateArguments(): Array<String> = Arguments().apply {
@@ -101,5 +94,3 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
     add(getOutputPath())
   }.toArray()
 }
-
-//internal typealias RebotConfigurationContainer = ExtensiblePolymorphicDomainObjectContainer<RebotConfiguration>

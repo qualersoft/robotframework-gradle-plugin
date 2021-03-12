@@ -4,6 +4,7 @@ import de.qualersoft.robotframework.gradleplugin.utils.Arguments
 import de.qualersoft.robotframework.gradleplugin.utils.GradleDirectoryProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import org.gradle.api.Project
+import org.gradle.api.tasks.Input
 import java.io.File
 import javax.inject.Inject
 
@@ -67,7 +68,7 @@ and resources.
  *      <libraryOrResourceFile>com.**.*Lib</libraryOrResourceFile>
  *    </libdoc>
  */
-class LibdocRobotConfiguration @Inject constructor(val project: Project) : CommonRobotConfiguration(project.objects) {
+class LibdocRobotConfiguration @Inject constructor(private val project: Project) : CommonRobotConfiguration(project.objects) {
 
   //<editor-fold desc="Properties">
   /**
@@ -113,9 +114,7 @@ class LibdocRobotConfiguration @Inject constructor(val project: Project) : Commo
    * * `${buildDir}/libs/ExampleLib.jar`
    *
    * One may also use ant-like patterns, for example
-   * `src/main/java/com/**/Lib.java`
-   *
-   * TODO This is input property of the task
+   * * `src/main/java/com/**/Lib.java`
    */
   @Suppress("private")
   var libraryOrResourceFile: String? = null
@@ -152,16 +151,7 @@ class LibdocRobotConfiguration @Inject constructor(val project: Project) : Commo
     pattern.contains(Regex("[*?]")) -> {
       project.fileTree(project.projectDir).also {
         it.include(pattern)
-      }.files.flatMap { f ->
-        // here we have a directory so null can not be returned
-        if (f.isDirectory) {
-          f.listFiles()!!.filter { it.isFile }.toList()
-        }
-        // f is a file
-        else {
-          listOf(f)
-        }
-      }.map { it.absolutePath }
+      }.files.map { it.absolutePath } // REMARK: We expect `fileTree.files` to only return real files (no folders)!
     }
 
     else -> null

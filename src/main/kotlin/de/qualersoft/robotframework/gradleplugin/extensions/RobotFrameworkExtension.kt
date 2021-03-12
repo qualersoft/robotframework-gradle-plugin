@@ -4,6 +4,7 @@ import de.qualersoft.robotframework.gradleplugin.configurations.LibdocRobotConfi
 import de.qualersoft.robotframework.gradleplugin.configurations.RebotRobotConfiguration
 import de.qualersoft.robotframework.gradleplugin.configurations.RobotframeworkConfiguration
 import de.qualersoft.robotframework.gradleplugin.configurations.RunRobotConfiguration
+import de.qualersoft.robotframework.gradleplugin.configurations.TestdocRobotConfiguration
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import org.gradle.api.Action
 import org.gradle.api.Project
@@ -16,24 +17,6 @@ open class RobotFrameworkExtension(project: Project) {
     RobotframeworkConfiguration(project)
   )
 
-  val rebot by GradleProperty(
-    project.objects,
-    RebotRobotConfiguration::class,
-    RebotRobotConfiguration(project)
-  )
-
-  val libdoc by GradleProperty(
-    project.objects,
-    LibdocRobotConfiguration::class,
-    LibdocRobotConfiguration(project)
-  )
-
-  val robot by GradleProperty(
-    project.objects,
-    RunRobotConfiguration::class,
-    RunRobotConfiguration(project)
-  )
-
   fun robotVersion(action: Action<RobotframeworkConfiguration>) {
     action.execute(robotVersion.get())
   }
@@ -41,6 +24,13 @@ open class RobotFrameworkExtension(project: Project) {
   fun robotVersion(config: RobotframeworkConfiguration.() -> Unit) {
     robotVersion.get().apply(config)
   }
+
+
+  val rebot by GradleProperty(
+    project.objects,
+    RebotRobotConfiguration::class,
+    RebotRobotConfiguration(project)
+  )
 
   fun rebot(action: Action<RebotRobotConfiguration>) {
     action.execute(rebot.get())
@@ -50,6 +40,12 @@ open class RobotFrameworkExtension(project: Project) {
     rebot.get().apply(config)
   }
 
+  val libdoc by GradleProperty(
+    project.objects,
+    LibdocRobotConfiguration::class,
+    LibdocRobotConfiguration(project)
+  )
+
   fun libdoc(action: Action<LibdocRobotConfiguration>) {
     action.execute(libdoc.get())
   }
@@ -58,11 +54,31 @@ open class RobotFrameworkExtension(project: Project) {
     libdoc.get().apply(config)
   }
 
+  val robot by GradleProperty(
+    project.objects,
+    RunRobotConfiguration::class,
+    RunRobotConfiguration(project)
+  )
+
   fun robot(action: Action<RunRobotConfiguration>) {
     action.execute(robot.get())
   }
 
   fun robot(config: RunRobotConfiguration.() -> Unit) {
     robot.get().apply(config)
+  }
+
+  val testdoc by GradleProperty(
+    project.objects,
+    TestdocRobotConfiguration::class,
+    TestdocRobotConfiguration(project)
+  )
+
+  fun testdoc(action: Action<TestdocRobotConfiguration>) {
+    action.execute(testdoc.get())
+  }
+
+  fun testdoc(config: TestdocRobotConfiguration.() -> Unit) {
+    testdoc.get().apply(config)
   }
 }

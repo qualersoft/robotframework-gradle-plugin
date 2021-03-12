@@ -13,6 +13,7 @@ plugins {
   id("org.sonarqube")
 
   `maven-publish`
+  idea
 }
 
 group = "de.qualersoft"
@@ -152,4 +153,8 @@ compileKotlin.kotlinOptions {
 val compileTestKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
   jvmTarget = JavaVersion.VERSION_11.toString()
+}
+
+java {
+  targetCompatibility = JavaVersion.VERSION_11
 }

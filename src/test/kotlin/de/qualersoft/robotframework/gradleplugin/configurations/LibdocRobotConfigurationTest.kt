@@ -23,7 +23,7 @@ class LibdocRobotConfigurationTest : ConfigurationTestBase() {
       this.javaClass.getResource("/$res").openStream().use { iS ->
         var fl = File(it.projectDir, "/src/test/resources")
         fl.mkdirs()
-        fl = File(fl, "$res")
+        fl = File(fl, res)
         fl.createNewFile()
         fl.outputStream().use { os ->
           iS.copyTo(os)
@@ -86,9 +86,35 @@ class LibdocRobotConfigurationTest : ConfigurationTestBase() {
     }.generateRunArguments()
 
     assertAll(
-        { result shouldNot beNull() },
-        { result shouldNot beEmpty() },
-        { result.first().toArray().toList() should haveElementContains("ALibraryFile.robot") }
+      { result shouldNot beNull() },
+      { result shouldNot beEmpty() },
+      { result.first().toArray().toList() should haveElementContains("ALibraryFile.robot") }
+    )
+  }
+
+  @Test
+  fun `generate with folder and pattern lib or resource file`() {
+    val result = applyConfig {
+      it.libraryOrResourceFile = "src/test/**"
+    }.generateRunArguments()
+
+    assertAll(
+      { result shouldNot beNull() },
+      { result shouldNot beEmpty() },
+      { result.first().toArray().toList() should haveElementContains("ALibraryFile.robot") },
+      { result[1].toArray().toList() should haveElementContains("AResourceFile.resource") }
+    )
+  }
+
+  @Test
+  fun `generate with class name`() {
+    val result = applyConfig {
+      it.libraryOrResourceFile = "de.qualersoft.robotframework.gradleplugin.tasks.LibdocTask"
+    }.generateRunArguments()
+    assertAll(
+      { result shouldNot beNull() },
+      { result shouldNot beEmpty() },
+      { result.first().toArray().toList() should haveElementContains("")}
     )
   }
 
