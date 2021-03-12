@@ -6,3 +6,9 @@ cli:
   server: https://app.fossa.com
   fetcher: custom
   project: robotframework-gradle-plugin
+analyze:
+  modules:
+      - name: .
+        type: gradle
+        target: ':'
+        path: .
