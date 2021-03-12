@@ -42,6 +42,8 @@ class LibdocRobotConfigurationTest : ConfigurationTestBase() {
     result.size shouldBe 0
   }
 
+
+
   @Test
   fun `generate with single relative resource file`() {
     val result = applyConfig {

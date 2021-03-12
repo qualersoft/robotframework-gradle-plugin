@@ -130,7 +130,7 @@ class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConf
    * * Prefer [variableFiles]
    */
   @Suppress("private")
-  var variables: MapProperty<String, String> = objects.mapProperty(String::class.java, String::class.java)
+  val variables: MapProperty<String, String> = objects.mapProperty(String::class.java, String::class.java)
 
   /**
    * Python or YAML file to read variables from.
@@ -144,14 +144,14 @@ class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConf
    * ```
    */
   @Suppress("private")
-  var variableFiles: ListProperty<String> = objects.listProperty(String::class.java)
+  val variableFiles: ListProperty<String> = objects.listProperty(String::class.java)
 
   /**
    * Debug file written during execution. Not created
    * unless this option is specified.
    */
   @Suppress("private")
-  var debugFile: RegularFileProperty = objects.fileProperty()
+  val debugFile: RegularFileProperty = objects.fileProperty()
 
   /**
    * Maximum number of error message lines to show in
@@ -161,7 +161,7 @@ class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConf
    * __Remark__: The lower limit of `10` is not validated by the plugin!
    */
   @Suppress("private")
-  var maxErrorLines: Property<Int> = objects.property(Int::class.java).convention(MAX_ERROR_LINES)
+  val maxErrorLines: Property<Int> = objects.property(Int::class.java).convention(MAX_ERROR_LINES)
 
   /**
    * A class for monitoring test execution. Gets
@@ -176,7 +176,7 @@ class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConf
    * ```
    */
   @Suppress("private")
-  var listener: ListProperty<String> = objects.listProperty(String::class.java)
+  val listener: ListProperty<String> = objects.listProperty(String::class.java)
 
   /**
    * Verifies test data and runs tests so that library
@@ -185,7 +185,7 @@ class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConf
    * Default: `false`
    */
   @Suppress("private")
-  var dryrun: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+  val dryrun: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
   /**
    * Stops test execution if any critical test fails.
@@ -193,7 +193,7 @@ class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConf
    * Default: `false`
    */
   @Suppress("private")
-  var exitOnFailure: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+  val exitOnFailure: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
   /**
    * Stops test execution if any error occurs when parsing
@@ -202,7 +202,7 @@ class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConf
    * Default: `false`
    */
   @Suppress("private")
-  var exitOnError: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+  val exitOnError: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
   /**
    * Causes teardowns to be skipped if test execution is
@@ -211,7 +211,7 @@ class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConf
    * Default: `false`
    */
   @Suppress("private")
-  var skipTearDownOnExit: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+  val skipTearDownOnExit: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
   /**
    * Randomizes the test execution order.
@@ -231,21 +231,21 @@ class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConf
    * Default: `none`
    */
   @Suppress("private")
-  var randomize: Property<String> = objects.property(String::class.java).convention("none")
+  val randomize: Property<String> = objects.property(String::class.java).convention("none")
 
   /**
    * Class to programmatically modify the test suite
    * structure before execution.
    */
   @Suppress("private")
-  var preRunModifier: ListProperty<String> = objects.listProperty(String::class.java)
+  val preRunModifier: ListProperty<String> = objects.listProperty(String::class.java)
 
   /**
    * Class to programmatically modify the result
    * model before creating reports and logs.
    */
   @Suppress("private")
-  var preRebotModifier: ListProperty<String> = objects.listProperty(String::class.java)
+  val preRebotModifier: ListProperty<String> = objects.listProperty(String::class.java)
 
   /**
    * How to report execution on the console.
@@ -261,7 +261,7 @@ class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConf
    * Default: `verbose`
    */
   @Suppress("private")
-  var console: Property<String> = objects.property(String::class.java).convention( "verbose")
+  val console: Property<String> = objects.property(String::class.java).convention( "verbose")
 
   /**
    * Shortcut for `console = "dotted"`.
@@ -269,7 +269,7 @@ class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConf
    * Default: `false`
    */
   @Suppress("private")
-  var dotted: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+  val dotted: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
   /**
    * Shortcut for `console = "quite"`.
@@ -277,7 +277,7 @@ class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConf
    * Default: `false`
    */
   @Suppress("private")
-  var quite: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+  val quite: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
   /**
    * Width of the console output.
@@ -285,7 +285,7 @@ class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConf
    * Default: `78`.
    */
   @Suppress("private")
-  var consoleWidth: Property<Int> = objects.property(Int::class.java).convention(CONSOLE_WIDTH)
+  val consoleWidth: Property<Int> = objects.property(Int::class.java).convention(CONSOLE_WIDTH)
 
   /**
    * Use colors on console output or not.
@@ -299,7 +299,7 @@ class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConf
    * Default: `auto`
    */
   @Suppress("private")
-  var consoleMarkers: Property<String> = objects.property(String::class.java).convention("auto")
+  val consoleMarkers: Property<String> = objects.property(String::class.java).convention("auto")
   //</editor-fold>
 
   override fun generateArguments(): Array<String> = Arguments().apply {

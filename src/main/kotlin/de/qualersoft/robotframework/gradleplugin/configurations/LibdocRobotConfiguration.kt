@@ -149,11 +149,11 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
       else -> listOf(pattern)
     } ?: throw IllegalArgumentException("The value <'$pattern'> of libraryOrResourceFile" +
         " can not interpreted as path or name! Maybe the pattern is invalid or" +
-        "the specified path does not exist.")
+        " the specified path does not exist.")
   }
 
   private fun harvestPath(pattern: String, file: File) = when {
-    file.isDirectory -> file.listFiles()?.let { files -> files.filter { it.isFile }.map { it.absolutePath } }
+    file.isDirectory -> project.fileTree(file).files.map { it.absolutePath }
 
     pattern.contains(Regex("[*?]")) -> {
       project.fileTree(project.projectDir).also {

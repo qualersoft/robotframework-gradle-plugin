@@ -55,7 +55,7 @@ internal class GradleStringMapProperty<T>(
 
   private val property: MapProperty<String, String> = objects.mapProperty(
       String::class.java, String::class.java).apply {
-    set(default)
+    convention(default)
   }
 
   operator fun getValue(thisRef: T, property: KProperty<*>): Map<String, String> = this.property.get()

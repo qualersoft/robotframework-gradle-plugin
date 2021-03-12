@@ -125,7 +125,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * Default: `${project.buildDir}/reports/robotframework`.
    */
   @Suppress("private")
-  var outputDir: DirectoryProperty = objects.directoryProperty()
+  val outputDir: DirectoryProperty = objects.directoryProperty()
     .convention(
       project.layout.buildDirectory.dir(joinPaths("reports", "robotframework"))
     )

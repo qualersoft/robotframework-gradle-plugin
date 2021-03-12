@@ -3,8 +3,10 @@ package de.qualersoft.robotframework.gradleplugin.configurations
 import de.qualersoft.robotframework.gradleplugin.PLUGIN_ID
 import de.qualersoft.robotframework.gradleplugin.extensions.RobotFrameworkExtension
 import de.qualersoft.robotframework.gradleplugin.robotframework
+import io.kotest.matchers.collections.beEmpty
 import io.kotest.matchers.collections.contain
 import io.kotest.matchers.collections.containAll
+import io.kotest.matchers.collections.containsInOrder
 import io.kotest.matchers.collections.haveSize
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldNot
@@ -23,12 +25,23 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
   private val rf: RobotFrameworkExtension = project.robotframework()
 
   @Test
+  fun settingTheSuiteStatLevelOfBotRobotConfiguration() {
+    val result = applyConfig {
+      it.suiteStatLevel.set(5)
+    }.generateArguments().toList()
+
+    assertAll(
+      { result should containsInOrder(listOf("--suitestatlevel", "5")) }
+    )
+  }
+
+  @Test
   fun `generate default run arguments`() {
     val result = applyConfig { }.generateArguments().toList()
-    val expected = createDefaultsWithoutExtensionParam() + listOf( "-F", "robot")
+    val expected = createDefaultsWithoutExtensionParam() + listOf("-F", "robot")
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) }
     )
   }
 
@@ -39,9 +52,9 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     }.generateArguments().toList()
     val expected = createDefaultsWithoutExtensionParam() + listOf("-F", "newRobot")
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) },
-        { result shouldNot contain("robot") }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) },
+      { result shouldNot contain("robot") }
     )
   }
 
@@ -53,9 +66,9 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     }.generateArguments().toList()
     val expected = createDefaultsWithoutExtensionParam() + listOf("-F", "newRobot1", "-F", "newRobot2")
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) },
-        { result shouldNot contain("robot") }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) },
+      { result shouldNot contain("robot") }
     )
   }
 
@@ -67,9 +80,34 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     }.generateArguments().toList()
     val expected = createDefaultsWithoutExtensionParam()
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) },
-        { result shouldNot contain("robot") }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) },
+      { result shouldNot contain("robot") }
+    )
+  }
+
+  @Test
+  fun addSingleVariable() {
+    val result = applyConfig {
+      it.variables.put("MyVar", "42")
+    }.generateArguments().toList()
+
+    assertAll(
+      { result shouldNot beEmpty() },
+      { result should containsInOrder(listOf("-v", "MyVar:42")) }
+    )
+  }
+
+  @Test
+  fun addMultibleVariables() {
+    val result = applyConfig {
+      it.variables.putAll(mapOf("MyVar1" to "42", "MyVar2" to "0815"))
+    }.generateArguments().toList()
+
+    assertAll(
+      { result shouldNot beEmpty() },
+      { result should containsInOrder(listOf("-v", "MyVar1:42")) },
+      { result should containsInOrder(listOf("-v", "MyVar2:0815")) }
     )
   }
 
@@ -80,8 +118,8 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     }.generateArguments().toList()
     val expected = createDefaults() + listOf("-V", "./settings.property")
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) }
     )
   }
 
@@ -93,8 +131,8 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     }.generateArguments().toList()
     val expected = createDefaults() + listOf("-b", file.absolutePath)
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) }
     )
   }
 
@@ -103,13 +141,15 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     val result = applyConfig {
       it.maxErrorLines.set(-1)
     }.generateArguments().toList()
-    val expected = listOf("-d", File(project.buildDir, "\\reports\\robotframework").absolutePath,
-    "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "-F", "robot",
-    "--randomize", "none", "--console", "verbose", "-W", "78", "-K", "auto", "--maxerrorlines", "none")
+    val expected = listOf(
+      "-d", File(project.buildDir, "\\reports\\robotframework").absolutePath,
+      "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "-F", "robot",
+      "--randomize", "none", "--console", "verbose", "-W", "78", "-K", "auto", "--maxerrorlines", "none"
+    )
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) },
-        { result shouldNot contain("40") }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) },
+      { result shouldNot contain("40") }
     )
   }
 
@@ -120,8 +160,8 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     }.generateArguments().toList()
     val expected = createDefaults() + listOf("--listener", "aListener")
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) }
     )
   }
 
@@ -132,8 +172,8 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     }.generateArguments().toList()
     val expected = createDefaults() + listOf("--dryrun")
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) }
     )
   }
 
@@ -144,8 +184,8 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     }.generateArguments().toList()
     val expected = createDefaults() + listOf("-X")
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) }
     )
   }
 
@@ -156,8 +196,8 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     }.generateArguments().toList()
     val expected = createDefaults() + listOf("--exitonerror")
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) }
     )
   }
 
@@ -168,8 +208,8 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     }.generateArguments().toList()
     val expected = createDefaults() + listOf("--skipteardownonexit")
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) }
     )
   }
 
@@ -178,13 +218,15 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     val result = applyConfig {
       it.randomize.set("tests:1234")
     }.generateArguments().toList()
-    val expected = listOf("-d", File(project.buildDir, "\\reports\\robotframework").absolutePath,
-        "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "-F", "robot",
-        "--randomize", "tests:1234", "--console", "verbose", "-W", "78", "-K", "auto", "--maxerrorlines", "40")
+    val expected = listOf(
+      "-d", File(project.buildDir, "\\reports\\robotframework").absolutePath,
+      "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "-F", "robot",
+      "--randomize", "tests:1234", "--console", "verbose", "-W", "78", "-K", "auto", "--maxerrorlines", "40"
+    )
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) },
-        { result shouldNot contain("none") }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) },
+      { result shouldNot contain("none") }
     )
   }
 
@@ -195,8 +237,8 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     }.generateArguments().toList()
     val expected = createDefaults() + listOf("--prerunmodifier", "preRun")
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) }
     )
   }
 
@@ -207,8 +249,8 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     }.generateArguments().toList()
     val expected = createDefaults() + listOf("--prerebotmodifier", "preRebot")
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) }
     )
   }
 
@@ -217,13 +259,15 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     val result = applyConfig {
       it.console.set("none")
     }.generateArguments().toList()
-    val expected = listOf("-d", File(project.buildDir, "\\reports\\robotframework").absolutePath,
-        "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "-F", "robot",
-        "--randomize", "none", "--console", "none", "-W", "78", "-K", "auto", "--maxerrorlines", "40")
+    val expected = listOf(
+      "-d", File(project.buildDir, "\\reports\\robotframework").absolutePath,
+      "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "-F", "robot",
+      "--randomize", "none", "--console", "none", "-W", "78", "-K", "auto", "--maxerrorlines", "40"
+    )
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) },
-        { result shouldNot contain("verbose") }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) },
+      { result shouldNot contain("verbose") }
     )
   }
 
@@ -234,8 +278,8 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     }.generateArguments().toList()
     val expected = createDefaults() + listOf("-.")
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) }
     )
   }
 
@@ -246,8 +290,8 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     }.generateArguments().toList()
     val expected = createDefaults() + listOf("--quite")
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) }
     )
   }
 
@@ -256,13 +300,15 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     val result = applyConfig {
       it.consoleWidth.set(10)
     }.generateArguments().toList()
-    val expected = listOf("-d", File(project.buildDir, "\\reports\\robotframework").absolutePath,
-        "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "-F", "robot",
-        "--randomize", "none", "--console", "verbose", "-W", "10", "-K", "auto", "--maxerrorlines", "40")
+    val expected = listOf(
+      "-d", File(project.buildDir, "\\reports\\robotframework").absolutePath,
+      "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "-F", "robot",
+      "--randomize", "none", "--console", "verbose", "-W", "10", "-K", "auto", "--maxerrorlines", "40"
+    )
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) },
-        { result shouldNot contain("78") }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) },
+      { result shouldNot contain("78") }
     )
   }
 
@@ -271,13 +317,15 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
     val result = applyConfig {
       it.consoleMarkers.set("on")
     }.generateArguments().toList()
-    val expected = listOf("-d", File(project.buildDir, "\\reports\\robotframework").absolutePath,
-        "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "-F", "robot",
-        "--randomize", "none", "--console", "verbose", "-W", "78", "-K", "on", "--maxerrorlines", "40")
+    val expected = listOf(
+      "-d", File(project.buildDir, "\\reports\\robotframework").absolutePath,
+      "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "-F", "robot",
+      "--randomize", "none", "--console", "verbose", "-W", "78", "-K", "on", "--maxerrorlines", "40"
+    )
     assertAll(
-        { result should haveSize(expected.size) },
-        { result should containAll(expected) },
-        { result shouldNot contain("auto") }
+      { result should haveSize(expected.size) },
+      { result should containAll(expected) },
+      { result shouldNot contain("auto") }
     )
   }
 
@@ -287,12 +335,14 @@ class RunRobotConfigurationTest : ConfigurationTestBase() {
   }
 
   private fun createDefaultsWithoutExtensionParam() = listOf(
-      "-d", File(project.buildDir, "\\reports\\robotframework").absolutePath,
-      "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "--maxerrorlines", "40",
-      "--randomize", "none", "--console", "verbose", "-W", "78", "-K", "auto")
+    "-d", File(project.buildDir, "\\reports\\robotframework").absolutePath,
+    "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "--maxerrorlines", "40",
+    "--randomize", "none", "--console", "verbose", "-W", "78", "-K", "auto"
+  )
 
   private fun createDefaults() = listOf(
-      "-d", File(project.buildDir, "\\reports\\robotframework").absolutePath, "-F", "robot",
-      "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "--maxerrorlines", "40",
-      "--randomize", "none", "--console", "verbose", "-W", "78", "-K", "auto")
+    "-d", File(project.buildDir, "\\reports\\robotframework").absolutePath, "-F", "robot",
+    "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "--maxerrorlines", "40",
+    "--randomize", "none", "--console", "verbose", "-W", "78", "-K", "auto"
+  )
 }
