@@ -469,6 +469,8 @@ potential-bugs:
 
 style:
   active: true
+  ClassOrdering:
+    active: false
   CollapsibleIfStatements:
     active: false
   DataClassContainsFunctions:
@@ -489,8 +491,8 @@ style:
     includeLineWrapping: false
   ForbiddenComment:
     active: true
-    values: ['TODO:', 'FIXME:', 'STOPSHIP:']
-    allowedPatterns: ''
+    values: ['BUG:', 'FIXME:', 'STOPSHIP:']
+    allowedPatterns: '\wBUG'
   ForbiddenImport:
     active: false
     imports: []

@@ -1,12 +1,11 @@
 package de.qualersoft.robotframework.gradleplugin.configurations
 
 import de.qualersoft.robotframework.gradleplugin.utils.Arguments
-import de.qualersoft.robotframework.gradleplugin.utils.GradleNullableProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleStringListProperty
 import org.gradle.api.Project
+import org.gradle.api.provider.Property
 import java.io.File
-import java.io.IOException
 
 
 /**
@@ -20,7 +19,7 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
    * Default-value=`false`.
    */
   @Suppress("private")
-  var merge by GradleProperty(project, Boolean::class, false)
+  val merge by GradleProperty(objects, Boolean::class, false)
 
   /**
    * Processes output also if the top level suite is
@@ -28,7 +27,7 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
    * is not an error that there are no matches.
    */
   @Suppress("private")
-  var processEmptySuite by GradleProperty(project, Boolean::class, false)
+  val processEmptySuite by GradleProperty(objects, Boolean::class, false)
 
   /**
    * Syntax: name:&lt;pattern&gt;|tag:&lt;pattern&gt;
@@ -45,7 +44,7 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
    * @since RF 3.2
    */
   @Suppress("private")
-  var expandKeywords by GradleStringListProperty(project)
+  var expandKeywords by GradleStringListProperty(objects)
 
   /**
    * Set execution start time. Timestamp must be given in
@@ -58,7 +57,7 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
    * otherwise be `N/A`.
    */
   @Suppress("private")
-  var startTime by GradleNullableProperty(project, String::class)
+  var startTime by GradleProperty(objects, String::class)
 
   /**
    * Same as [startTime] but for end time. If both options
@@ -68,38 +67,30 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
    * suites together.
    */
   @Suppress("private")
-  var endTime by GradleNullableProperty(project, String::class)
+  var endTime by GradleProperty(objects, String::class)
 
   /**
    * Class to programmatically modify the result
    * model before creating outputs.
    */
   @Suppress("private")
-  var perRobotModifier by GradleStringListProperty(project)
+  var perRobotModifier by GradleStringListProperty(objects)
 
   @Suppress("private")
-  var outputFile by GradleProperty(project, String::class, "output.xml")
+  var outputFile by GradleProperty(objects, String::class, "output.xml")
   //</editor-fold>
 
-  fun ensureOutputDirectoryExists() {
-    if (!outputDir.exists() && !outputDir.mkdirs()) {
-      throw IOException("Target output direcotry connot be created: ${outputDir.absolutePath}")
-    }
-  }
-
-  private fun getOutputPath(): String = File(outputDir.absoluteFile, outputFile).absolutePath
+  private fun getOutputPath(): String = File(outputDir.asFile.get().absoluteFile, outputFile.get()).absolutePath
 
   override fun generateArguments(): Array<String> = Arguments().apply {
     add("rebot")
     addArgs(super.generateArguments())
-    addFlagToArguments(merge, "--merge")
-    addFlagToArguments(processEmptySuite, "--processemptysuite")
+    addFlagToArguments(merge.orNull, "--merge")
+    addFlagToArguments(processEmptySuite.orNull, "--processemptysuite")
     addListToArguments(expandKeywords, "--expandkeywords")
-    addStringToArguments(startTime, "--starttime")
-    addStringToArguments(endTime, "--endtime")
+    addStringToArguments(startTime.orNull, "--starttime")
+    addStringToArguments(endTime.orNull, "--endtime")
     addListToArguments(perRobotModifier, "--perrobotmodifier")
     add(getOutputPath())
   }.toArray()
 }
-
-//internal typealias RebotConfigurationContainer = ExtensiblePolymorphicDomainObjectContainer<RebotConfiguration>

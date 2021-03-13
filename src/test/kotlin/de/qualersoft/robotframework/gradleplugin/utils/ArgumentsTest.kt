@@ -104,7 +104,7 @@ class ArgumentsTest : AnnotationSpec() {
 
   @Test
   fun whenAddingMapThenItsInResult() {
-    sut.addMapToArguments(mapOf(("key" to "val")), "m")
+    sut.addMapToArguments(mapOf("key" to "val"), "m")
     assertSoftly {
       sut.shouldNotBeEmpty()
       val arr = sut.toArray()
@@ -116,7 +116,7 @@ class ArgumentsTest : AnnotationSpec() {
 
   @Test
   fun whenAddingMultiMapThenItsInResult() {
-    sut.addMapToArguments(mapOf(("key1" to "val1"), ("key2" to "val2")), "m")
+    sut.addMapToArguments(mapOf("key1" to "val1", "key2" to "val2"), "m")
     assertSoftly {
       sut.shouldNotBeEmpty()
       val arr = sut.toArray()
