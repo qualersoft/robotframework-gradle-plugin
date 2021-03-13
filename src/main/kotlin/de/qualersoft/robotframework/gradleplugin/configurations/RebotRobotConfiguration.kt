@@ -12,7 +12,7 @@ import java.io.File
  * Configuration for rebot task
  */
 open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(project) {
-  //<editor-fold desc="Properties">
+  // <editor-fold desc="Properties">
 
   /**
    * When combining results, merge outputs together instead of putting them under a new top level suite.
@@ -78,7 +78,7 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
 
   @Suppress("private")
   var outputFile by GradleProperty(objects, String::class, "output.xml")
-  //</editor-fold>
+  // </editor-fold>
 
   private fun getOutputPath(): String = File(outputDir.asFile.get().absoluteFile, outputFile.get()).absolutePath
 

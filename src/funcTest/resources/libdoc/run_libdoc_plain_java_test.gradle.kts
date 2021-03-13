@@ -1,6 +1,6 @@
 plugins {
   id("de.qualersoft.robotframework")
-  `java`
+  java
 }
 
 version = "0.0.1"
@@ -18,5 +18,5 @@ tasks.register<de.qualersoft.robotframework.gradleplugin.tasks.LibdocTask>("libd
 }
 
 dependencies {
-  implementation(group= "org.robotframework", name= "javalib-core", version= "2.0.3")
+  implementation(group = "org.robotframework", name = "javalib-core", version = "2.0.3")
 }

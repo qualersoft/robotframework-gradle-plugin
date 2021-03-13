@@ -27,7 +27,6 @@ open class RobotFrameworkExtension(project: Project) {
     robotVersion.get().apply(config)
   }
 
-
   val rebot by GradleProperty(
     project.objects,
     RebotRobotConfiguration::class,

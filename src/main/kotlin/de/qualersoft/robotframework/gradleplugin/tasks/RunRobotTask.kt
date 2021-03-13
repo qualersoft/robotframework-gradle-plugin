@@ -75,7 +75,6 @@ open class RunRobotTask : BasicRobotFrameworkTask() {
     robot.get().apply(config)
   }
 
-
   override fun exec() {
     val srcFile = sources.files.map { it.absolutePath }
 

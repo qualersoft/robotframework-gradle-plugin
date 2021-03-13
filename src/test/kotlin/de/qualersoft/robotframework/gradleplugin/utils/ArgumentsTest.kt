@@ -293,7 +293,7 @@ class ArgumentsTest : AnnotationSpec() {
     }
   }
 
-  //<editor-fold desc="Helper extensions">
+  // <editor-fold desc="Helper extensions">
   private fun beEmpty() = object : Matcher<Arguments> {
     override fun test(value: Arguments) = MatcherResult(
       value.toArray().isEmpty(),
@@ -303,5 +303,5 @@ class ArgumentsTest : AnnotationSpec() {
 
   private fun Arguments.shouldBeEmpty() = this should beEmpty()
   private fun Arguments.shouldNotBeEmpty() = this shouldNot beEmpty()
-  //</editor-fold>
+  // </editor-fold>
 }

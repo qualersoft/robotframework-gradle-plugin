@@ -42,8 +42,6 @@ internal class LibdocRobotConfigurationTest : ConfigurationTestBase() {
     result.size shouldBe 0
   }
 
-
-
   @Test
   fun `generate with single relative resource file`() {
     val result = applyConfig {
@@ -51,9 +49,9 @@ internal class LibdocRobotConfigurationTest : ConfigurationTestBase() {
     }.generateRunArguments()
 
     assertAll(
-        { result shouldNot beNull() },
-        { result shouldNot beEmpty() },
-        { result.first().toArray().toList() should haveElementContains("ALibraryFile.robot") }
+      { result shouldNot beNull() },
+      { result shouldNot beEmpty() },
+      { result.first().toArray().toList() should haveElementContains("ALibraryFile.robot") }
     )
   }
 
@@ -64,9 +62,9 @@ internal class LibdocRobotConfigurationTest : ConfigurationTestBase() {
     }.generateRunArguments()
 
     assertAll(
-        { result shouldNot beNull() },
-        { result shouldNot beEmpty() },
-        { result.first().toArray().toList() should haveElementContains("ALibraryFile.robot") }
+      { result shouldNot beNull() },
+      { result shouldNot beEmpty() },
+      { result.first().toArray().toList() should haveElementContains("ALibraryFile.robot") }
     )
   }
 
@@ -77,9 +75,9 @@ internal class LibdocRobotConfigurationTest : ConfigurationTestBase() {
     }.generateRunArguments()
 
     assertAll(
-        { result shouldNot beNull() },
-        { result shouldNot beEmpty() },
-        { result.first().toArray().toList() should haveElementContains("ALibraryFile.robot") }
+      { result shouldNot beNull() },
+      { result shouldNot beEmpty() },
+      { result.first().toArray().toList() should haveElementContains("ALibraryFile.robot") }
     )
   }
 
@@ -114,7 +112,7 @@ internal class LibdocRobotConfigurationTest : ConfigurationTestBase() {
   fun `generate with empty folder for path lib or resource file`() {
     val path = "src/test/empty/"
     val emptyDir = File(project.projectDir.absoluteFile, path)
-    if(!emptyDir.mkdirs()) {
+    if (!emptyDir.mkdirs()) {
       fail("Unable to create directories $emptyDir!")
     }
 
@@ -148,7 +146,7 @@ internal class LibdocRobotConfigurationTest : ConfigurationTestBase() {
     assertAll(
       { result shouldNot beNull() },
       { result shouldNot beEmpty() },
-      { result.first().toArray().toList() should haveElementContains("")}
+      { result.first().toArray().toList() should haveElementContains("") }
     )
   }
 
@@ -168,11 +166,11 @@ internal class LibdocRobotConfigurationTest : ConfigurationTestBase() {
     }.generateRunArguments()
 
     assertAll(
-        { result shouldNot beNull() },
-        { result shouldNot beEmpty() },
-        { result should haveSize(2) },
-        { result[0].toArray().toList() should haveElementContains("ALibraryFile.robot") },
-        { result[1].toArray().toList() should haveElementContains("AResourceFile.resource") }
+      { result shouldNot beNull() },
+      { result shouldNot beEmpty() },
+      { result should haveSize(2) },
+      { result[0].toArray().toList() should haveElementContains("ALibraryFile.robot") },
+      { result[1].toArray().toList() should haveElementContains("AResourceFile.resource") }
     )
   }
 
@@ -183,11 +181,11 @@ internal class LibdocRobotConfigurationTest : ConfigurationTestBase() {
     }.generateRunArguments()
 
     assertAll(
-        { result shouldNot beNull() },
-        { result shouldNot beEmpty() },
-        { result should haveSize(2) },
-        { result[0].toArray().toList() should haveElementContains("ALibraryFile.robot") },
-        { result[1].toArray().toList() should haveElementContains("AResourceFile.resource") }
+      { result shouldNot beNull() },
+      { result shouldNot beEmpty() },
+      { result should haveSize(2) },
+      { result[0].toArray().toList() should haveElementContains("ALibraryFile.robot") },
+      { result[1].toArray().toList() should haveElementContains("AResourceFile.resource") }
     )
   }
 

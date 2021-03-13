@@ -1,11 +1,8 @@
 package de.qualersoft.robotframework.gradleplugin.tasks
 
-import de.qualersoft.robotframework.gradleplugin.ROBOT_CONFIGURATION_NAME
-import de.qualersoft.robotframework.gradleplugin.RobotFrameworkPlugin
 import de.qualersoft.robotframework.gradleplugin.robotframework
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.JavaExec

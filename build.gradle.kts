@@ -70,12 +70,12 @@ dependencies {
 
   implementation(group = "org.robotframework", name = "robotframework", version = "3.2.2")
 
-  testImplementation(group="org.junit.jupiter", name="junit-jupiter", version = "5.6.2")
+  testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.6.2")
   testImplementation(kotlin("test-junit5"))
 
   val kotestVer = "4.4.3"
-  testImplementation(group = "io.kotest", name="kotest-runner-junit5", version = kotestVer)
-  testImplementation(group="io.kotest", name="kotest-assertions-core-jvm", version = kotestVer)
+  testImplementation(group = "io.kotest", name = "kotest-runner-junit5", version = kotestVer)
+  testImplementation(group = "io.kotest", name = "kotest-assertions-core-jvm", version = kotestVer)
 
   testRuntimeOnly(kotlin("script-runtime"))
 }
@@ -91,11 +91,13 @@ tasks.detekt {
 
 tasks.withType<Test> {
   useJUnitPlatform()
-  finalizedBy(when (name) {
-    "test" -> tasks.jacocoTestReport
-    "funcTest" -> tasks.named("jacocoFuncTestReport")
-    else -> throw IllegalArgumentException("Unknown test type '$name'")
-  })
+  finalizedBy(
+    when (name) {
+      "test" -> tasks.jacocoTestReport
+      "funcTest" -> tasks.named("jacocoFuncTestReport")
+      else -> throw IllegalArgumentException("Unknown test type '$name'")
+    }
+  )
 }
 
 tasks.create<JacocoMerge>("jacocoMerge") {

@@ -79,17 +79,27 @@ internal class RobotframeworkConfigurationTest {
     sut.classifier!! should be("myClassifier")
   }
 
-  private fun getRuntimeConfig(): Configuration = project.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)!!
+  private fun getRuntimeConfig(): Configuration = project.configurations
+    .findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)!!
 
-  private fun runtimeDependency(group: String, name: String, version: String,
-                                classifier: String? = null, ext: String? = null) = object : Matcher<Project> {
+  private fun runtimeDependency(
+    group: String,
+    name: String,
+    version: String,
+    classifier: String? = null,
+    ext: String? = null
+  ) = object : Matcher<Project> {
     override fun test(value: Project): MatcherResult {
       val rtConf = value.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)!!
       val found = null != rtConf.dependencies.withType(ExternalDependency::class.java).find {
         (it.group == group) && (it.name == name) && (it.version == version) &&
-          hasArtifact(it, name, classifier, ext)
+            hasArtifact(it, name, classifier, ext)
       }
-      return MatcherResult(found, "Project should contain RobotFramework runtime dependency", "Project should not contain RobotFramework runtime dependency")
+      return MatcherResult(
+        found,
+        "Project should contain RobotFramework runtime dependency",
+        "Project should not contain RobotFramework runtime dependency"
+      )
     }
   }
 
