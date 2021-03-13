@@ -422,7 +422,6 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
   }.toArray()
 }
 
-
 open class CommonRobotConfiguration @Inject constructor(protected val objects: ObjectFactory) {
 
   /**

@@ -1,7 +1,6 @@
 package de.qualersoft.robotframework.gradleplugin
 
 import io.kotest.matchers.string.shouldContain
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -66,7 +65,12 @@ class RobotDependencyTest : BaseRobotFrameworkFunctionalTest() {
     .withArguments("dependencies")
     .build()
 
-  fun expectedVersion(group: String = "org.robotframework", name:String = "robotframework", version: String = "3.2", ext: String? = null): String {
+  private fun expectedVersion(
+    group: String = "org.robotframework",
+    name: String = "robotframework",
+    version: String = "3.2",
+    ext: String? = null
+  ): String {
     // Remark: To those who missing the classifier check: The classifier is not printed to
     // the output of 'dependencies' task so may have to find another way to check it.
     // But atm it's ok to leaf it as is

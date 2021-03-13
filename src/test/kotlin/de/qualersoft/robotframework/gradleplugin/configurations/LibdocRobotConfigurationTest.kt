@@ -12,6 +12,7 @@ import io.kotest.matchers.shouldNot
 import io.kotest.matchers.string.containIgnoringCase
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
@@ -159,8 +160,10 @@ internal class LibdocRobotConfigurationTest : ConfigurationTestBase() {
     }
   }
 
+  @DisplayName("When libraryOrResourceFile has a pattern that" +
+      " matches multiply files, then a list of argument list is generated")
   @Test
-  fun `When libraryOrResourceFile has a pattern that matches multiply files, then a list of argument list is generated`() {
+  fun multiFilePatternReturnsList() {
     val result = applyConfig {
       it.libraryOrResourceFile = "**/test/resources/A*File.*"
     }.generateRunArguments()
@@ -193,5 +196,4 @@ internal class LibdocRobotConfigurationTest : ConfigurationTestBase() {
     rfExtension.libdoc(conf)
     return rfExtension.libdoc.get()
   }
-
 }

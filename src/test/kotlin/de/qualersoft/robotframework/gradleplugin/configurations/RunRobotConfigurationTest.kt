@@ -72,7 +72,6 @@ internal class RunRobotConfigurationTest : ConfigurationTestBase() {
     )
   }
 
-
   @Test
   fun `empty the extension should also remove default`() {
     val result = applyConfig {

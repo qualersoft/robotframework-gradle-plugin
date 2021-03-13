@@ -4,10 +4,8 @@ import groovy.lang.Closure
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
 import io.kotest.matchers.be
-import io.kotest.matchers.nulls.beNull
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldHave
-import io.kotest.matchers.shouldNot
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ExternalDependency
@@ -46,7 +44,6 @@ internal class RobotframeworkConfigurationTest {
     sut.applyTo(getRuntimeConfig())
     project shouldHave runtimeDependency(DEFAULT_GROUP, DEFAULT_NAME, DEFAULT_VERSION, classifier = "myClassifier")
   }
-
 
   @Test
   fun createDefaultDependencyWithAction() {

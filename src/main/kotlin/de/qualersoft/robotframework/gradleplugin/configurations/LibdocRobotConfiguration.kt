@@ -4,10 +4,8 @@ import de.qualersoft.robotframework.gradleplugin.utils.Arguments
 import de.qualersoft.robotframework.gradleplugin.utils.GradleDirectoryProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import org.gradle.api.Project
-import org.gradle.api.tasks.Input
 import java.io.File
 import javax.inject.Inject
-
 
 /**
  * Class that stores `libdoc` configuration and maps it to the command line arguments.
