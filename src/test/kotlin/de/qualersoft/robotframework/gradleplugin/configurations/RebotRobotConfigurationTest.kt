@@ -146,7 +146,12 @@ internal class RebotRobotConfigurationTest : ConfigurationTestBase() {
       it.perRobotModifier = mutableListOf("com.example.Modifier1", "com.example.Modifier2")
     }.generateArguments()
     assertAll(
-      { result shouldContainInOrder listOf("--perrobotmodifier", "com.example.Modifier1", "--perrobotmodifier", "com.example.Modifier2") },
+      {
+        result shouldContainInOrder listOf(
+          "--perrobotmodifier", "com.example.Modifier1",
+          "--perrobotmodifier", "com.example.Modifier2"
+        )
+      },
       {
         result shouldNotContainAnyOf listOf(
           "--merge", "--processemptysuite", "--starttime",
@@ -159,7 +164,9 @@ internal class RebotRobotConfigurationTest : ConfigurationTestBase() {
   private val project: Project = ProjectBuilder.builder().build().also {
     it.pluginManager.apply(PLUGIN_ID)
   }
+
   private val rfExtension: RobotFrameworkExtension = project.robotframework()
+
   private fun applyConfig(conf: (RebotRobotConfiguration) -> Unit): RebotRobotConfiguration {
     rfExtension.rebot(conf)
     return rfExtension.rebot.get()

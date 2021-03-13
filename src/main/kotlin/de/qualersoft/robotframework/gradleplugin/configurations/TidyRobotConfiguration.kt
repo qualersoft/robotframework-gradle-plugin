@@ -33,7 +33,7 @@ class TidyRobotConfiguration @Inject constructor(project: Project) {
    *
    * *Default-Value:* `false`
    */
-  var usepipes by  GradleProperty(objects, Boolean::class, false)
+  var usepipes by GradleProperty(objects, Boolean::class, false)
 
   /**
    * Line separator to use in outputs.

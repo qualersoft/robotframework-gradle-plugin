@@ -86,17 +86,17 @@ import javax.inject.Inject
  * $ jython /opt/robot tests.robot
  *
  * # Executing multiple test case files and using case-insensitive long options.
- * $ robot --SuiteStatLevel 2 --Metadata Version:3 tests/*.robot more/tests.robot
+ * $ robot --SuiteStatLevel 2 --Metadata Version:3 tests\*.robot more/tests.robot
  *
  * # Setting default options and syslog file before running tests.
  * $ export ROBOT_OPTIONS="--critical regression --suitestatlevel 2"
  * $ export ROBOT_SYSLOG_FILE=/tmp/syslog.txt
  * $ robot tests.robot
  * ```
- */*/
+ */
 class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConfiguration(project) {
 
-  //<editor-fold desc="run specific configuration properties">
+  // <editor-fold desc="run specific configuration properties">
   /**
    * Parse only files with this extension when executing
    * a directory. Has no effect when running individual
@@ -261,7 +261,7 @@ class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConf
    * Default: `verbose`
    */
   @Suppress("private")
-  val console: Property<String> = objects.property(String::class.java).convention( "verbose")
+  val console: Property<String> = objects.property(String::class.java).convention("verbose")
 
   /**
    * Shortcut for `console = "dotted"`.
@@ -300,7 +300,7 @@ class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConf
    */
   @Suppress("private")
   val consoleMarkers: Property<String> = objects.property(String::class.java).convention("auto")
-  //</editor-fold>
+  // </editor-fold>
 
   override fun generateArguments(): Array<String> = Arguments().apply {
     addArgs(super.generateArguments())

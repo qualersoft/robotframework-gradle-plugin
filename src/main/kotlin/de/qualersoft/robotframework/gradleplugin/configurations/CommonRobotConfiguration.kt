@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(project.objects) {
 
-  //<editor-fold desc="properties">
+  // <editor-fold desc="properties">
 
   /**
    * Turn on the generic automation mode (aka **R**obot **P**rocess **A**utomation).
@@ -381,7 +381,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
   @Suppress("private")
   var argumentFiles by GradleStringListProperty(objects)
 
-  //</editor-fold>
+  // </editor-fold>
 
   override fun generateArguments(): Array<String> = Arguments().apply {
     addArgs(super.generateArguments())
@@ -421,7 +421,6 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
     addListToArguments(argumentFiles, "--argumentfile")
   }.toArray()
 }
-
 
 open class CommonRobotConfiguration @Inject constructor(protected val objects: ObjectFactory) {
 

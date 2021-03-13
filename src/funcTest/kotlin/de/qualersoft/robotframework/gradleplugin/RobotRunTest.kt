@@ -8,7 +8,7 @@ class RobotRunTest : BaseRobotFrameworkFunctionalTest() {
 
   override fun rootFolder(): String? {
     val fa = getFolderAction
-    return if ( null == fa ) null else fa()
+    return if (null == fa) null else fa()
   }
 
   var getFolderAction: (() -> String?)? = null

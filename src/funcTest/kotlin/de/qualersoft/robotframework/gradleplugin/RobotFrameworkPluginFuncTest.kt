@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test
 @DisplayName("Minimal functional Robot Framework plugin tests")
 class RobotFrameworkPluginFuncTest : BaseRobotFrameworkFunctionalTest() {
 
-
   @Nested
   @DisplayName("Applying plain plugin should")
   inner class PlainScript {

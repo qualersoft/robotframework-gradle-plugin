@@ -4,10 +4,8 @@ import de.qualersoft.robotframework.gradleplugin.utils.Arguments
 import de.qualersoft.robotframework.gradleplugin.utils.GradleDirectoryProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import org.gradle.api.Project
-import org.gradle.api.tasks.Input
 import java.io.File
 import javax.inject.Inject
-
 
 /**
  * Class that stores `libdoc` configuration and maps it to the command line arguments.
@@ -72,7 +70,7 @@ import javax.inject.Inject
 class LibdocRobotConfiguration @Inject constructor(private val project: Project) :
   CommonRobotConfiguration(project.objects) {
 
-  //<editor-fold desc="Properties">
+  // <editor-fold desc="Properties">
   /**
    * Specifies the directory where documentation files are written.
    *
@@ -123,7 +121,7 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
    */
   @Suppress("private")
   var libraryOrResourceFile: String? = null
-  //</editor-fold>
+  // </editor-fold>
 
   @Throws(IllegalArgumentException::class)
   fun generateRunArguments(): List<Arguments> = libraryOrResourceFile?.let { libOrResFile ->
@@ -142,14 +140,16 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
       (file.isFile) -> listOf(file.absolutePath)
 
       // 2. we have path structure (\ | /)
-      (pattern.contains("\\")
-          || pattern.contains("/")) -> harvestPath(pattern, file)
+      (pattern.contains("\\") ||
+          pattern.contains("/")) -> harvestPath(pattern, file)
 
       // 3. we assume a class name
       else -> listOf(pattern)
-    } ?: throw IllegalArgumentException("The value <'$pattern'> of libraryOrResourceFile" +
-        " can not interpreted as path or name! Maybe the pattern is invalid or" +
-        " the specified path does not exist.")
+    } ?: throw IllegalArgumentException(
+      "The value <'$pattern'> of libraryOrResourceFile" +
+          " can not interpreted as path or name! Maybe the pattern is invalid or" +
+          " the specified path does not exist."
+    )
   }
 
   private fun harvestPath(pattern: String, file: File) = when {

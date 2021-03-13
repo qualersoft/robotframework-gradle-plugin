@@ -4,6 +4,5 @@ plugins {
 
 robotframework {
   rebot {
-
   }
 }

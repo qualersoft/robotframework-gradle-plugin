@@ -67,7 +67,7 @@ class TestdocRobotConfiguration @Inject constructor(private val project: Project
   fun generateArguments(): Array<String> = Arguments().apply {
     add("testdoc")
     addStringToArguments(name.orNull, "--name")
-    addStringToArguments(doc.orNull,"--doc")
+    addStringToArguments(doc.orNull, "--doc")
     addMapToArguments(metaData, "--metadata")
     addListToArguments(setTags, "--settag")
     addListToArguments(test, "--test")
