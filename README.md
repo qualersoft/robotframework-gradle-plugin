@@ -18,7 +18,7 @@ Just add the following lines to you build.gradle(.kts)
 import de.qualersoft.robotframework.gradleplugin.tasks
 
 plugins {
-  id("de.qualersoft.robotframework") version "latest"
+  id("de.qualersoft.robotframework") version "<latest>"
 }
 
 tasks.register<RunRobotTask>("robotTest") {
@@ -27,6 +27,8 @@ tasks.register<RunRobotTask>("robotTest") {
   }
 }
 ```
+_Note_: Don't forget to replace the version `"<latest>"` with the appropriate version :wink:
+
 Assuming you have some robot test suite files somewhere under your `src/test` folder, calling
 ```shell
 ./gradlew robotTest
@@ -37,11 +39,15 @@ Available tasks*
 ---------------
 <dl>
   <dt>RunRobotTask</dt>
-  <dd>same as `run` command</dd>
+  <dd>same as <code>run</code> command</dd>
   <dt>LibdocTask</dt>
-  <dd>same as `libdoc` command</dd>
+  <dd>same as <code>libdoc</code> command</dd>
   <dt>TestdocTask</dt>
-  <dd>same as `testdoc` command</dd>
+  <dd>same as <code>testdoc</code> command</dd>
+  <dt>RebotTask</dt>
+  <dd>TODO</dd>
+  <dt>TidyTask</dt>
+  <dd>TODO</dd>
 </dl>
 
 (*) All task implementations are in package `de.qualersoft.robotframework.gradleplugin.tasks`
