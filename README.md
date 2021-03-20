@@ -35,8 +35,11 @@ Assuming you have some robot test suite files somewhere under your `src/test` fo
 ```
 starts the test execution.
 
+For further configuration and examples have a look at the [test resources](src/funcTest/resources).
+
 Available tasks*
 ---------------
+For details see [robot framework tasks](http://robotframework.org/robotframework/#built-in-tools)
 <dl>
   <dt>RunRobotTask</dt>
   <dd>same as <code>run</code> command</dd>
@@ -45,9 +48,9 @@ Available tasks*
   <dt>TestdocTask</dt>
   <dd>same as <code>testdoc</code> command</dd>
   <dt>RebotTask</dt>
-  <dd>TODO</dd>
+  <dd style="color:red; font-weight:bold;">TODO</dd>
   <dt>TidyTask</dt>
-  <dd>TODO</dd>
+  <dd>same as <code>tidy</code> command</dd>
 </dl>
 
 (*) All task implementations are in package `de.qualersoft.robotframework.gradleplugin.tasks`
