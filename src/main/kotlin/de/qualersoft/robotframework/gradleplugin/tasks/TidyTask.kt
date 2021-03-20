@@ -38,7 +38,7 @@ open class TidyTask : BasicRobotFrameworkTask() {
   var outputFile by GradleProperty(project.objects, File::class)
 
   override fun exec() {
-    rfArgs = (tidy.get().generateArguments().toList() + rfArgs)
+    rfArgs = rfArgs + tidy.get().generateArguments().toList()
     val srcFiles = sources.files.joinToString(" ") { it.path }
     val args = mutableListOf(srcFiles)
     if (outputFile.isPresent) {

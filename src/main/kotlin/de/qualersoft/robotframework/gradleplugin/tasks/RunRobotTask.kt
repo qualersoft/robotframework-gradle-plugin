@@ -78,7 +78,7 @@ open class RunRobotTask : BasicRobotFrameworkTask() {
   override fun exec() {
     val srcFile = sources.files.map { it.absolutePath }
 
-    rfArgs = (robot.get().generateArguments().toList() + rfArgs) as MutableList<String>
+    rfArgs = rfArgs + robot.get().generateArguments().toList()
     println("RRT: generated arguments: $rfArgs")
     super.executeRobotCommand("run", srcFile)
   }

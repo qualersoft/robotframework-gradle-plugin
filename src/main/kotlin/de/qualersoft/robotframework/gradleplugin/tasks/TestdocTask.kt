@@ -60,7 +60,7 @@ open class TestdocTask : BasicRobotFrameworkTask() {
   var outputFile by GradleProperty(project.objects, File::class, testdoc.get().outputFile)
 
   override fun exec() {
-    rfArgs = (testdoc.get().generateArguments().toList() + rfArgs)
+    rfArgs = rfArgs + testdoc.get().generateArguments().toList()
     val srcFiles = sources.files.joinToString(" ") { it.path }
     val dest = outputDir.file(outputFile.get().toString()).get().asFile.absolutePath
     super.executeRobotCommand("testdoc", listOf(srcFiles, dest))

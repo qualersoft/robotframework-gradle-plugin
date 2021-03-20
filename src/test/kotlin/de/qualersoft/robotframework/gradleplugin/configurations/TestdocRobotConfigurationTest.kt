@@ -44,7 +44,7 @@ internal class TestdocRobotConfigurationTest : ConfigurationTestBase() {
   @Test
   fun `Generate with single metadata`() {
     val result = applyConfigToArgList {
-      it.metaData += ("mymeta" to "ThisIsAMetadata")
+      it.metaData += "mymeta" to "ThisIsAMetadata"
     }
 
     result should containsInOrder(listOf("--metadata", "mymeta:ThisIsAMetadata"))

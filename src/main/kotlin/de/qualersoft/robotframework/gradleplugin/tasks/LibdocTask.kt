@@ -31,7 +31,7 @@ open class LibdocTask : BasicRobotFrameworkTask() {
     ensureLibraries()
     val tmp = rfArgs
     libdoc.get().generateRunArguments().forEach {
-      rfArgs = (it.toArray() + tmp).toMutableList()
+      rfArgs = tmp + it.toArray()
       executeRobotCommand("libdoc")
     }
   }
