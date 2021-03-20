@@ -74,8 +74,12 @@ class TidyTest : BaseRobotFrameworkFunctionalTest() {
 
   private fun performOutputCheck(src: String, expected: String) {
     val root = testProjectDir.root
-    val cleanedContent = Paths.get(root.absolutePath, src).toFile().readText(StandardCharsets.UTF_8)
-    val expContent = Paths.get(root.absolutePath, expected).toFile().readText(StandardCharsets.UTF_8)
+    // Remark: because of operating-system/environment-setting we have to normalize new-line separator
+    // but that does not mater to the tests purposes
+    val cleanedContent = Paths.get(root.absolutePath, src).toFile()
+      .readText(StandardCharsets.UTF_8).replace("\r\n", "\n")
+    val expContent = Paths.get(root.absolutePath, expected).toFile()
+      .readText(StandardCharsets.UTF_8).replace("\r\n", "\n")
     assertEquals(expContent, cleanedContent)
   }
 }
