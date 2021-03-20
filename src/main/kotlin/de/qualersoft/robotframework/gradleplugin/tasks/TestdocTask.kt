@@ -8,7 +8,6 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import java.io.File
@@ -62,7 +61,7 @@ open class TestdocTask : BasicRobotFrameworkTask() {
 
   override fun exec() {
     rfArgs = (testdoc.get().generateArguments().toList() + rfArgs)
-    val srcFiles = sources.files.map { it.path }.joinToString(" ")
+    val srcFiles = sources.files.joinToString(" ") { it.path }
     val dest = outputDir.file(outputFile.get().toString()).get().asFile.absolutePath
     super.executeRobotCommand("testdoc", listOf(srcFiles, dest))
   }

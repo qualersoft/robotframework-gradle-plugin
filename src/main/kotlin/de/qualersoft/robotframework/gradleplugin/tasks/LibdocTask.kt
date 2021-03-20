@@ -46,7 +46,7 @@ open class LibdocTask : BasicRobotFrameworkTask() {
   private fun getLibJars(): Collection<File> {
     val files = libdoc.get().additionalPythonPaths.files.toMutableList()
 
-    project.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)?.also {
+    project.configurations.getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME).also {
       files += it.files.toList()
     }
     return files
