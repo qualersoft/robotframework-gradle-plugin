@@ -45,7 +45,7 @@ internal class GradleStringListProperty<T>(
   }
 
   operator fun getValue(thisRef: T, property: KProperty<*>): MutableList<String> = this.property.get()
-  operator fun setValue(thisRef: T, property: KProperty<*>, value: MutableList<String>) = this.property.set(value)
+  operator fun setValue(thisRef: T, property: KProperty<*>, value: Iterable<String>) = this.property.set(value)
 }
 
 internal class GradleStringMapProperty<T>(

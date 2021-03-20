@@ -1,20 +1,17 @@
 package de.qualersoft.robotframework.gradleplugin.configurations
 
 import de.qualersoft.robotframework.gradleplugin.utils.Arguments
-import de.qualersoft.robotframework.gradleplugin.utils.GradleFileProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleStringListProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleStringMapProperty
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.internal.file.DefaultFilePropertyFactory
 import org.gradle.api.provider.Property
 import java.io.File
 import java.nio.file.Paths
 import javax.inject.Inject
 
-class TestdocRobotConfiguration @Inject constructor(private val project: Project) {
+class TestdocRobotConfiguration @Inject constructor(project: Project) {
 
   private val objects = project.objects
 

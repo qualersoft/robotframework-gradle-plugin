@@ -3,8 +3,7 @@ Documentation    Suite description for test2
 
 *** Test Cases ***
 Create some more output test
-  [Documentation]  This is a simple documentation
-  [Tags]
+  [Documentation]  This is another simple documentation
   Write to out  "This is a test message"
 
 *** Keywords ***
