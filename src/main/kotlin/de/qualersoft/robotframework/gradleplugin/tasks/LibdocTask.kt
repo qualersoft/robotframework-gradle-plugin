@@ -1,9 +1,9 @@
 package de.qualersoft.robotframework.gradleplugin.tasks
 
 import de.qualersoft.robotframework.gradleplugin.configurations.LibdocRobotConfiguration
+import de.qualersoft.robotframework.gradleplugin.robotframework
 import org.gradle.api.Action
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.tasks.Internal
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -14,9 +14,9 @@ open class LibdocTask : BasicRobotFrameworkTask() {
     group = "documentation"
   }
 
-  @Internal
-  @Suppress("private")
-  var libdoc = extension.libdoc
+  private val libdoc = project.objects.property(LibdocRobotConfiguration::class.java)
+    .convention(project.robotframework().libdoc)
+
   @Suppress("Unused")
   fun libdoc(action: Action<LibdocRobotConfiguration>) {
     action.execute(libdoc.get())
@@ -38,12 +38,12 @@ open class LibdocTask : BasicRobotFrameworkTask() {
 
   private fun ensureLibraries() {
     val jars = getLibJars()
-    jars?.forEach {
+    jars.forEach {
       classpath(project.files(it))
     }
   }
 
-  private fun getLibJars(): Collection<File>? {
+  private fun getLibJars(): Collection<File> {
     val files = libdoc.get().additionalPythonPaths.files.toMutableList()
 
     project.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)?.also {
