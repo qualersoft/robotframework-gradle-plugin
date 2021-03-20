@@ -12,8 +12,6 @@ repositories {
 tasks.register<de.qualersoft.robotframework.gradleplugin.tasks.TestdocTask>("testdocRun") {
   sources = files("src/test/robot")
   testdoc {
-    println("Going to set tag")
     exclude = mutableListOf("DocTag")
-    println("Tag set")
   }
 }
