@@ -73,15 +73,9 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
    */
   @Suppress("private")
   var perRobotModifier by GradleStringListProperty(objects)
-
-  @Suppress("private")
-  var outputFile by GradleProperty(objects, String::class, "output.xml")
   // </editor-fold>
 
-  private fun getOutputPath(): String = File(outputDir.asFile.get().absoluteFile, outputFile.get()).absolutePath
-
   override fun generateArguments(): Array<String> = Arguments().apply {
-    add("rebot")
     addArgs(super.generateArguments())
     addFlagToArguments(merge.orNull, "--merge")
     addFlagToArguments(processEmptySuite.orNull, "--processemptysuite")
@@ -89,6 +83,5 @@ open class RebotRobotConfiguration(project: Project) : BotRobotConfiguration(pro
     addStringToArguments(startTime.orNull, "--starttime")
     addStringToArguments(endTime.orNull, "--endtime")
     addListToArguments(perRobotModifier, "--perrobotmodifier")
-    add(getOutputPath())
   }.toArray()
 }
