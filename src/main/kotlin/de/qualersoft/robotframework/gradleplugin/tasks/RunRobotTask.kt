@@ -1,7 +1,6 @@
 package de.qualersoft.robotframework.gradleplugin.tasks
 
 import de.qualersoft.robotframework.gradleplugin.configurations.RunRobotConfiguration
-import de.qualersoft.robotframework.gradleplugin.robotframework
 import org.gradle.api.Action
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
@@ -16,6 +15,7 @@ open class RunRobotTask : BasicRobotFrameworkTask() {
     description = "Runs the robot tests"
     group = "verification"
   }
+
   /**
    * Robot Framework test cases are created in
    * [files](http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-case-files) and
@@ -56,16 +56,16 @@ open class RunRobotTask : BasicRobotFrameworkTask() {
    */
   @InputFiles
   @PathSensitive(PathSensitivity.ABSOLUTE)
-  var sources: FileCollection = project.objects.fileCollection()
+  var sources: FileCollection = objectFactory.fileCollection()
 
-  private val robot = project.objects.property(RunRobotConfiguration::class.java)
-      .convention(project.robotframework().robot)
+  private val robot = objectFactory.property(RunRobotConfiguration::class.java)
+      .convention(rfExtension.robot)
 
   /**
    * Directory where the output shall be put to
    */
   @OutputDirectory
-  val outputDir: DirectoryProperty = project.objects.directoryProperty()
+  val outputDir: DirectoryProperty = objectFactory.directoryProperty()
     .convention(robot.get().outputDir)
 
   fun robot(action: Action<RunRobotConfiguration>) {
@@ -78,7 +78,7 @@ open class RunRobotTask : BasicRobotFrameworkTask() {
   override fun exec() {
     val srcFile = sources.files.map { it.absolutePath }
 
-    rfArgs = (robot.get().generateArguments().toList() + rfArgs) as MutableList<String>
+    rfArgs = rfArgs + robot.get().generateArguments().toList()
     println("RRT: generated arguments: $rfArgs")
     super.executeRobotCommand("run", srcFile)
   }

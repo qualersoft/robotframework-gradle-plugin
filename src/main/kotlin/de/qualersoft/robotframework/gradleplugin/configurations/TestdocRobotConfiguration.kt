@@ -5,10 +5,13 @@ import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleStringListProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleStringMapProperty
 import org.gradle.api.Project
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
+import java.io.File
+import java.nio.file.Paths
 import javax.inject.Inject
 
-class TestdocRobotConfiguration @Inject constructor(private val project: Project) {
+class TestdocRobotConfiguration @Inject constructor(project: Project) {
 
   private val objects = project.objects
 
@@ -64,8 +67,24 @@ class TestdocRobotConfiguration @Inject constructor(private val project: Project
    */
   var title by GradleProperty(objects, String::class)
 
+  /**
+   * Path where to put the documentation.
+   *
+   * *Default*: `${buildDir}/doc`
+   */
+  var outputDir: DirectoryProperty = objects.directoryProperty()
+    .convention(
+      project.layout.buildDirectory.dir(Paths.get("doc").toString())
+    )
+
+  /**
+   * Name of the documentation file.
+   *
+   * *Default*: `testdoc.html`
+   */
+  var outputFile by GradleProperty(objects, File::class, File("testdoc.html"))
+
   fun generateArguments(): Array<String> = Arguments().apply {
-    add("testdoc")
     addStringToArguments(name.orNull, "--name")
     addStringToArguments(doc.orNull, "--doc")
     addMapToArguments(metaData, "--metadata")

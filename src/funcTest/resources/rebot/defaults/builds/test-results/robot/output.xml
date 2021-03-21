@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot rpa="false" generator="Robot 3.2.2 (Jython 2.7.2 on java11.0.9)" generated="20201225 16:42:59.831">
+<suite name="Google &amp; SelLib" id="s1">
+<suite source="~/robot_framework/src/test/robot/google.robot" name="Google" id="s1-s1">
+<test name="Search for asd" id="s1-s1-t1">
+<kw name="Search for 'asd' should result title to be 'asd'">
+<kw library="GoogleRobotLib" name="Given Open A Browser">
+<doc>Opens a new browser instance to the given ``url``.</doc>
+<arguments>
+<arg>https://www.google.de</arg>
+</arguments>
+<status endtime="20201225 16:43:01.254" starttime="20201225 16:43:01.238" status="NOT_RUN"></status>
+</kw>
+<kw library="GoogleRobotLib" name="When Search for">
+<doc>Search for a term</doc>
+<arguments>
+<arg>${term}</arg>
+</arguments>
+<status endtime="20201225 16:43:01.269" starttime="20201225 16:43:01.254" status="NOT_RUN"></status>
+</kw>
+<kw library="GoogleRobotLib" name="Then title should contain">
+<doc>Verify the current page title contains ``title``.</doc>
+<arguments>
+<arg>${term}</arg>
+</arguments>
+<status endtime="20201225 16:43:01.285" starttime="20201225 16:43:01.285" status="NOT_RUN"></status>
+</kw>
+<kw library="GoogleRobotLib" name="And Close Browser">
+<doc>Closes the current browser instance.</doc>
+<status endtime="20201225 16:43:01.301" starttime="20201225 16:43:01.301" status="NOT_RUN"></status>
+</kw>
+<status endtime="20201225 16:43:01.301" starttime="20201225 16:43:01.238" status="PASS"></status>
+</kw>
+<status critical="yes" endtime="20201225 16:43:01.301" starttime="20201225 16:43:01.222" status="PASS"></status>
+</test>
+<test name="Search for usw" id="s1-s1-t2">
+<kw name="Search for 'usw' should result title to be 'usw'">
+<kw library="GoogleRobotLib" name="Given Open A Browser">
+<doc>Opens a new browser instance to the given ``url``.</doc>
+<arguments>
+<arg>https://www.google.de</arg>
+</arguments>
+<status endtime="20201225 16:43:01.316" starttime="20201225 16:43:01.316" status="NOT_RUN"></status>
+</kw>
+<kw library="GoogleRobotLib" name="When Search for">
+<doc>Search for a term</doc>
+<arguments>
+<arg>${term}</arg>
+</arguments>
+<status endtime="20201225 16:43:01.332" starttime="20201225 16:43:01.332" status="NOT_RUN"></status>
+</kw>
+<kw library="GoogleRobotLib" name="Then title should contain">
+<doc>Verify the current page title contains ``title``.</doc>
+<arguments>
+<arg>${term}</arg>
+</arguments>
+<status endtime="20201225 16:43:01.347" starttime="20201225 16:43:01.332" status="NOT_RUN"></status>
+</kw>
+<kw library="GoogleRobotLib" name="And Close Browser">
+<doc>Closes the current browser instance.</doc>
+<status endtime="20201225 16:43:01.347" starttime="20201225 16:43:01.347" status="NOT_RUN"></status>
+</kw>
+<status endtime="20201225 16:43:01.347" starttime="20201225 16:43:01.301" status="PASS"></status>
+</kw>
+<status critical="yes" endtime="20201225 16:43:01.363" starttime="20201225 16:43:01.301" status="PASS"></status>
+</test>
+<test name="Search for 1+3" id="s1-s1-t3">
+<kw name="Search for '1+3' should result title to be '1+3'">
+<kw library="GoogleRobotLib" name="Given Open A Browser">
+<doc>Opens a new browser instance to the given ``url``.</doc>
+<arguments>
+<arg>https://www.google.de</arg>
+</arguments>
+<status endtime="20201225 16:43:01.379" starttime="20201225 16:43:01.379" status="NOT_RUN"></status>
+</kw>
+<kw library="GoogleRobotLib" name="When Search for">
+<doc>Search for a term</doc>
+<arguments>
+<arg>${term}</arg>
+</arguments>
+<status endtime="20201225 16:43:01.394" starttime="20201225 16:43:01.394" status="NOT_RUN"></status>
+</kw>
+<kw library="GoogleRobotLib" name="Then title should contain">
+<doc>Verify the current page title contains ``title``.</doc>
+<arguments>
+<arg>${term}</arg>
+</arguments>
+<status endtime="20201225 16:43:01.420" starttime="20201225 16:43:01.394" status="NOT_RUN"></status>
+</kw>
+<kw library="GoogleRobotLib" name="And Close Browser">
+<doc>Closes the current browser instance.</doc>
+<status endtime="20201225 16:43:01.426" starttime="20201225 16:43:01.423" status="NOT_RUN"></status>
+</kw>
+<status endtime="20201225 16:43:01.426" starttime="20201225 16:43:01.363" status="PASS"></status>
+</kw>
+<status critical="yes" endtime="20201225 16:43:01.426" starttime="20201225 16:43:01.363" status="PASS"></status>
+</test>
+<test name="Test with direct accessor call from lib" id="s1-s1-t4">
+<kw library="GoogleRobotLib" name="Given Open A Browser">
+<doc>Opens a new browser instance to the given ``url``.</doc>
+<arguments>
+<arg>https://www.google.de</arg>
+</arguments>
+<status endtime="20201225 16:43:01.458" starttime="20201225 16:43:01.442" status="NOT_RUN"></status>
+</kw>
+<kw name="When Test with vars">
+<arguments>
+<arg>uztr</arg>
+</arguments>
+<kw library="GoogleRobotLib" name="Get Search Field">
+<doc>Get search field</doc>
+<assign>
+<var>${elem}</var>
+</assign>
+<status endtime="20201225 16:43:01.459" starttime="20201225 16:43:01.459" status="NOT_RUN"></status>
+</kw>
+<kw library="BuiltIn" name="When Call Method">
+<doc>Calls the named method of the given object with the provided arguments.</doc>
+<arguments>
+<arg>${elem}</arg>
+<arg>sendKeys</arg>
+<arg>${term}</arg>
+</arguments>
+<status endtime="20201225 16:43:01.491" starttime="20201225 16:43:01.459" status="NOT_RUN"></status>
+</kw>
+<kw library="BuiltIn" name="Call Method">
+<doc>Calls the named method of the given object with the provided arguments.</doc>
+<arguments>
+<arg>${elem}</arg>
+<arg>sendKeys</arg>
+<arg>\t</arg>
+</arguments>
+<status endtime="20201225 16:43:01.522" starttime="20201225 16:43:01.491" status="NOT_RUN"></status>
+</kw>
+<kw library="GoogleRobotLib" name="Get Search Button">
+<doc>Get search button</doc>
+<assign>
+<var>${elem}</var>
+</assign>
+<status endtime="20201225 16:43:01.522" starttime="20201225 16:43:01.522" status="NOT_RUN"></status>
+</kw>
+<kw library="BuiltIn" name="Call Method">
+<doc>Calls the named method of the given object with the provided arguments.</doc>
+<arguments>
+<arg>${elem}</arg>
+<arg>click</arg>
+</arguments>
+<status endtime="20201225 16:43:01.538" starttime="20201225 16:43:01.522" status="NOT_RUN"></status>
+</kw>
+<status endtime="20201225 16:43:01.538" starttime="20201225 16:43:01.459" status="PASS"></status>
+</kw>
+<kw library="GoogleRobotLib" name="Then title should contain">
+<doc>Verify the current page title contains ``title``.</doc>
+<arguments>
+<arg>uztr</arg>
+</arguments>
+<status endtime="20201225 16:43:01.553" starttime="20201225 16:43:01.553" status="NOT_RUN"></status>
+</kw>
+<kw library="GoogleRobotLib" name="And Close Browser">
+<doc>Closes the current browser instance.</doc>
+<status endtime="20201225 16:43:01.569" starttime="20201225 16:43:01.569" status="NOT_RUN"></status>
+</kw>
+<status critical="yes" endtime="20201225 16:43:01.569" starttime="20201225 16:43:01.426" status="PASS"></status>
+</test>
+<doc>Suite for tests with own library</doc>
+<status endtime="20201225 16:43:01.569" starttime="20201225 16:43:00.440" status="PASS"></status>
+</suite>
+<suite source="~/robot_framework/src/test/robot/SelLib.robot" name="SelLib" id="s1-s2">
+<test name="Open Browser with Selenium Library" id="s1-s2-t1">
+<kw library="SeleniumLibrary" name="Open Browser">
+<doc>Opens a new browser instance to the given ``url``.</doc>
+<arguments>
+<arg>${URL}</arg>
+<arg>edge</arg>
+</arguments>
+<status endtime="20201225 16:43:02.052" starttime="20201225 16:43:02.021" status="NOT_RUN"></status>
+</kw>
+<kw library="SeleniumLibrary" name="Close Browser">
+<doc>Closes the current browser instance.</doc>
+<status endtime="20201225 16:43:02.052" starttime="20201225 16:43:02.052" status="NOT_RUN"></status>
+</kw>
+<doc>Open a browser</doc>
+<tags>
+<tag>DEBUG</tag>
+</tags>
+<status critical="yes" endtime="20201225 16:43:02.052" starttime="20201225 16:43:02.021" status="PASS"></status>
+</test>
+<doc>Suite for tests with SeleniumLibrary</doc>
+<status endtime="20201225 16:43:02.052" starttime="20201225 16:43:01.600" status="PASS"></status>
+</suite>
+<status endtime="20201225 16:43:02.069" starttime="20201225 16:42:59.875" status="PASS"></status>
+</suite>
+<statistics>
+<total>
+<stat pass="5" fail="0">Critical Tests</stat>
+<stat pass="5" fail="0">All Tests</stat>
+</total>
+<tag>
+<stat pass="1" fail="0">DEBUG</stat>
+</tag>
+<suite>
+<stat pass="5" fail="0" name="Google &amp; SelLib" id="s1">Google &amp; SelLib</stat>
+<stat pass="4" fail="0" name="Google" id="s1-s1">Google &amp; SelLib.Google</stat>
+<stat pass="1" fail="0" name="SelLib" id="s1-s2">Google &amp; SelLib.SelLib</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

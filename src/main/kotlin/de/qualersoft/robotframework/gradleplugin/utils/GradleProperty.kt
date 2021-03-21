@@ -2,8 +2,6 @@ package de.qualersoft.robotframework.gradleplugin.utils
 
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.RegularFile
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
@@ -45,7 +43,7 @@ internal class GradleStringListProperty<T>(
   }
 
   operator fun getValue(thisRef: T, property: KProperty<*>): MutableList<String> = this.property.get()
-  operator fun setValue(thisRef: T, property: KProperty<*>, value: MutableList<String>) = this.property.set(value)
+  operator fun setValue(thisRef: T, property: KProperty<*>, value: Iterable<String>) = this.property.set(value)
 }
 
 internal class GradleStringMapProperty<T>(
@@ -73,30 +71,6 @@ internal class GradleFileNullableProperty<T>(
 
   operator fun getValue(thisRef: T, property: KProperty<*>): File? = this.property.orNull
   operator fun setValue(thisRef: T, property: KProperty<*>, value: File?) = this.property.set(value)
-}
-
-internal class GradleFileProperty<T> {
-
-  private val property: RegularFileProperty
-
-  constructor(objects: ObjectFactory, default: RegularFile? = null) {
-    property = createProperty(objects).convention(default)
-  }
-
-  constructor(objects: ObjectFactory, provider: Provider<out RegularFile>) {
-    property = createProperty(objects).convention(provider)
-  }
-
-  constructor(objects: ObjectFactory, default: File) {
-    property = createProperty(objects).convention(
-        objects.directoryProperty().file(default.absolutePath)
-    )
-  }
-
-  private fun createProperty(objects: ObjectFactory) = objects.fileProperty()
-
-  operator fun getValue(thisRef: T, property: KProperty<*>): RegularFileProperty = this.property
-  operator fun setValue(thisRef: T, property: KProperty<*>, value: RegularFileProperty) = this.property.set(value)
 }
 
 internal class GradleDirectoryProperty<T>(objects: ObjectFactory, provider: Provider<out Directory>) {

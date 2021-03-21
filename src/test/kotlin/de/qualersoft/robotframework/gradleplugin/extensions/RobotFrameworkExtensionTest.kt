@@ -5,7 +5,10 @@ import de.qualersoft.robotframework.gradleplugin.configurations.LibdocRobotConfi
 import de.qualersoft.robotframework.gradleplugin.configurations.RebotRobotConfiguration
 import de.qualersoft.robotframework.gradleplugin.configurations.RobotframeworkConfiguration
 import de.qualersoft.robotframework.gradleplugin.configurations.RunRobotConfiguration
+import de.qualersoft.robotframework.gradleplugin.configurations.TestdocRobotConfiguration
+import de.qualersoft.robotframework.gradleplugin.configurations.TidyRobotConfiguration
 import de.qualersoft.robotframework.gradleplugin.robotframework
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import org.gradle.api.Action
 import org.gradle.api.Project
@@ -13,6 +16,11 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
 
+/**
+ * Remark: This is just a simple technical test class.
+ * Real testing of extension and configuration of it's
+ * configurations will be done in functional tests.
+ */
 class RobotFrameworkExtensionTest {
 
   private val project: Project = ProjectBuilder.builder().build().also {
@@ -97,5 +105,42 @@ class RobotFrameworkExtensionTest {
     sut.rebot(action)
 
     sut.rebot.get().name.get() shouldBe "rebot action name"
+  }
+
+  @Test
+  fun `testdoc configuration can be done by lambda`() {
+    sut.testdoc {
+      setTags = mutableListOf("testTag")
+    }
+
+    sut.testdoc.get().setTags shouldContain "testTag"
+  }
+
+  @Test
+  fun `testdoc configuration can be done by action`() {
+    val action = Action<TestdocRobotConfiguration> {
+      it.setTags = mutableListOf("aTestTag")
+    }
+    sut.testdoc(action)
+
+    sut.testdoc.get().setTags shouldContain "aTestTag"
+  }
+
+  @Test
+  fun `tidy configuration can be done by lambda`() {
+    sut.tidy {
+      spacecount.set(100)
+    }
+
+    sut.tidy.get().spacecount.get() shouldBe 100
+  }
+  @Test
+  fun `tidy configuration can be done by action`() {
+    val action = Action<TidyRobotConfiguration> {
+      it.spacecount.set(200)
+    }
+    sut.tidy(action)
+
+    sut.tidy.get().spacecount.get() shouldBe 200
   }
 }

@@ -88,12 +88,15 @@ internal class RobotframeworkConfigurationTest {
   ) = object : Matcher<Project> {
     override fun test(value: Project): MatcherResult {
       val rtConf = value.configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)!!
-      val found = null != rtConf.dependencies.withType(ExternalDependency::class.java).find {
-        (it.group == group) && (it.name == name) && (it.version == version) &&
-            hasArtifact(it, name, classifier, ext)
+      val extDeps = rtConf.dependencies.withType(ExternalDependency::class.java)
+      val found = extDeps.find {
+        it.group == group &&
+        it.name == name &&
+        it.version == version &&
+        hasArtifact(it, name, classifier, ext)
       }
       return MatcherResult(
-        found,
+        null != found,
         "Project should contain RobotFramework runtime dependency",
         "Project should not contain RobotFramework runtime dependency"
       )
@@ -104,11 +107,11 @@ internal class RobotframeworkConfigurationTest {
     return if (null != classifier || null != ext) {
       // only if one is set, an artifact entry will be generated
       null != dependency.artifacts.find {
-        (it.name == name) && if (null != ext) {
+        it.name == name && if (null != ext) {
           it.extension == ext
         } else { // if no extension was set it defaults to jar
           it.extension == "jar"
-        } && (it.classifier == classifier)
+        } && it.classifier == classifier
       }
     } else {
       true // we return true because if no classifier and no extension are set -> no artifact will be created

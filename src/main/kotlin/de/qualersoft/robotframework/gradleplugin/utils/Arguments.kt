@@ -35,7 +35,7 @@ open class Arguments {
   }
 
   fun addFlagToArguments(flag: Boolean?, argument: String) {
-    if ((null != flag) && flag) {
+    if (null != flag && flag) {
       add(argument)
     }
   }

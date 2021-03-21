@@ -1,8 +1,9 @@
 package de.qualersoft.robotframework.gradleplugin
 
+import io.kotest.matchers.string.shouldContain
 import org.gradle.internal.impldep.org.junit.rules.TemporaryFolder
+import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Tag
 import java.io.File
 import java.io.InputStream
@@ -18,12 +19,7 @@ open class BaseRobotFrameworkFunctionalTest {
   @Tag("kotlin")
   annotation class KotlinTag
 
-  protected val testProjectDir = TemporaryFolder()
-
-  @AfterEach
-  fun cleanup() {
-    testProjectDir.delete()
-  }
+  protected val testProjectDir: TemporaryFolder = TemporaryFolder.builder().assureDeletion().build()
 
   /**
    * Meant to be overridden if required.
@@ -41,6 +37,10 @@ open class BaseRobotFrameworkFunctionalTest {
   protected fun setupGroovyTest(baseFileName: String): GradleRunner {
     copyTestFileToTemp(baseFileName, EXT_GR)
     return createRunner()
+  }
+
+  protected fun runShouldSucceed(result: BuildResult) {
+    result.output shouldContain "BUILD SUCCESSFUL"
   }
 
   private fun createRunner() = GradleRunner.create().withProjectDir(testProjectDir.root)

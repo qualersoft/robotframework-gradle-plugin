@@ -1,0 +1,17 @@
+plugins {
+    id 'de.qualersoft.robotframework'
+}
+
+version = '0.0.1'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+tasks.register('testdocRun', de.qualersoft.robotframework.gradleplugin.tasks.TestdocTask) {
+    sources = files("src/test/robot")
+    testdoc {
+        exclude = ["DocTag"]
+    }
+}

@@ -5,8 +5,6 @@ import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import org.gradle.api.Project
 import javax.inject.Inject
 
-private const val DEFAULT_SPACES = 4
-
 class TidyRobotConfiguration @Inject constructor(project: Project) {
   private val objects = project.objects
 
@@ -59,4 +57,8 @@ class TidyRobotConfiguration @Inject constructor(project: Project) {
     addStringToArguments(lineseparator.get(), "--lineseparator")
     addStringToArguments(spacecount.get().toString(), "--spacecount")
   }.toArray()
+
+  private companion object {
+    const val DEFAULT_SPACES = 4
+  }
 }

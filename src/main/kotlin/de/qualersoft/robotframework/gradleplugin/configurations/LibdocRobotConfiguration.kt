@@ -137,11 +137,11 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
     val file = project.projectDir.resolve(pattern).normalize()
     return when {
       // 1. Single file specification, no patterns (try to resolve to projectDir)
-      (file.isFile) -> listOf(file.absolutePath)
+      file.isFile -> listOf(file.absolutePath)
 
       // 2. we have path structure (\ | /)
-      (pattern.contains("\\") ||
-          pattern.contains("/")) -> harvestPath(pattern, file)
+      pattern.contains("\\") ||
+          pattern.contains("/") -> harvestPath(pattern, file)
 
       // 3. we assume a class name
       else -> listOf(pattern)
