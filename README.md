@@ -42,15 +42,15 @@ Available tasks*
 For details see [robot framework tasks](http://robotframework.org/robotframework/#built-in-tools)
 <dl>
   <dt>RunRobotTask</dt>
-  <dd>same as <code>run</code> command</dd>
+  <dd>same as <code>robot</code> command</dd>
   <dt>LibdocTask</dt>
-  <dd>same as <code>libdoc</code> command</dd>
+  <dd>same as <code>robot.libdoc</code> command</dd>
   <dt>TestdocTask</dt>
-  <dd>same as <code>testdoc</code> command</dd>
+  <dd>same as <code>robot.testdoc</code> command</dd>
   <dt>RebotTask</dt>
-  <dd style="color:red; font-weight:bold;">TODO</dd>
+  <dd>same as <code>robot.rebot</code> command</dd>
   <dt>TidyTask</dt>
-  <dd>same as <code>tidy</code> command</dd>
+  <dd>same as <code>robot.tidy</code> command</dd>
 </dl>
 
 (*) All task implementations are in package `de.qualersoft.robotframework.gradleplugin.tasks`
