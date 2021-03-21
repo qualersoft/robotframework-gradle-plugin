@@ -4,7 +4,6 @@ import de.qualersoft.robotframework.gradleplugin.utils.Arguments
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleStringListProperty
 import org.gradle.api.Project
-import java.io.File
 
 /**
  * Configuration for rebot task
