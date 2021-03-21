@@ -1,11 +1,14 @@
 package de.qualersoft.robotframework.gradleplugin
 
 import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.file.haveExtension
+import io.kotest.matchers.shouldNot
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertAll
 import java.nio.file.Paths
 
-class RebotTest: BaseRobotFrameworkFunctionalTest() {
+class RebotTest : BaseRobotFrameworkFunctionalTest() {
 
   override fun rootFolder(): String = "rebot/$subDir"
 
@@ -21,7 +24,10 @@ class RebotTest: BaseRobotFrameworkFunctionalTest() {
       .build()
 
     runShouldSucceed(result)
-    assertOutputWasCreated("/build/reports/robotframework", listOf("log.html", "report.html", "robot-xunit-results.xml"))
+    assertOutputWasCreated(
+      "/build/reports/robotframework",
+      listOf("log.html", "report.html", "robot-xunit-results.xml")
+    )
   }
 
   @Test
@@ -34,10 +40,59 @@ class RebotTest: BaseRobotFrameworkFunctionalTest() {
       .build()
 
     runShouldSucceed(result)
-    assertOutputWasCreated("/build/reports/robotframework", listOf("log.html", "report.html", "robot-xunit-results.xml"))
+    assertOutputWasCreated(
+      "/build/reports/robotframework",
+      listOf("log.html", "report.html", "robot-xunit-results.xml")
+    )
   }
 
-  private fun assertOutputWasCreated(outDir: String, expectedFiles:List<String>) {
+  @Test
+  @GroovyTag
+  @DisplayName("Run rebot with supplied config from groovy build script.")
+  fun testConfigRunGroovy() {
+    subDir = "config"
+    val result = setupGroovyTest("build_rebot_config")
+      .withArguments("rebot")
+      .build()
+
+    runShouldSucceed(result)
+    assertAll(
+      { assertOutputWasCreated("/build/reports/robot", listOf("rfLog.html", "rfReport.html")) },
+      // This time we do not expect an x-unit-file
+      {
+        assertAll(
+          (testProjectDir.root.listFiles()?.toList() ?: emptyList()).map {
+            { it shouldNot haveExtension("xml") }
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  @KotlinTag
+  @DisplayName("Run rebot with supplied config from kotlin build script.")
+  fun testConfigRunKotlin() {
+    subDir = "config"
+    val result = setupKotlinTest("build_rebot_config")
+      .withArguments("rebot")
+      .build()
+
+    runShouldSucceed(result)
+    assertAll(
+      { assertOutputWasCreated("/build/reports/robot", listOf("rfLog.html", "rfReport.html")) },
+      // This time we do not expect an x-unit-file
+      {
+        assertAll(
+          (testProjectDir.root.listFiles()?.toList() ?: emptyList()).map {
+            { it shouldNot haveExtension("xml") }
+          }
+        )
+      }
+    )
+  }
+
+  private fun assertOutputWasCreated(outDir: String, expectedFiles: List<String>) {
     val root = Paths.get(testProjectDir.root.absolutePath, outDir)
     val files = root.toFile().listFiles()?.map { it.name } ?: listOf()
     files shouldContainAll expectedFiles
