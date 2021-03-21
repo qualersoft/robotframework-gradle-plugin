@@ -1,7 +1,6 @@
 package de.qualersoft.robotframework.gradleplugin.tasks
 
 import de.qualersoft.robotframework.gradleplugin.configurations.TestdocRobotConfiguration
-import de.qualersoft.robotframework.gradleplugin.robotframework
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import org.gradle.api.Action
 import org.gradle.api.file.DirectoryProperty
@@ -28,8 +27,8 @@ open class TestdocTask : BasicRobotFrameworkTask() {
     group = "documentation"
   }
 
-  private val testdoc = project.objects.property(TestdocRobotConfiguration::class.java)
-    .convention(project.robotframework().testdoc)
+  private val testdoc = objectFactory.property(TestdocRobotConfiguration::class.java)
+    .convention(rfExtension.testdoc)
 
   fun testdoc(action: Action<TestdocRobotConfiguration>) {
     action.execute(testdoc.get())
@@ -41,7 +40,7 @@ open class TestdocTask : BasicRobotFrameworkTask() {
 
   @InputFiles
   @PathSensitive(PathSensitivity.ABSOLUTE)
-  var sources: FileCollection = project.objects.fileCollection()
+  var sources: FileCollection = objectFactory.fileCollection()
 
   /**
    * Directory to which to put the generated documentation.
@@ -49,7 +48,7 @@ open class TestdocTask : BasicRobotFrameworkTask() {
    * *Default*: `${buildDir}/doc`
    */
   @OutputDirectory
-  val outputDir: DirectoryProperty = project.objects.directoryProperty()
+  val outputDir: DirectoryProperty = objectFactory.directoryProperty()
     .convention(testdoc.get().outputDir)
 
   /**
@@ -57,7 +56,7 @@ open class TestdocTask : BasicRobotFrameworkTask() {
    *
    * *Default*: `testdoc.html`
    */
-  var outputFile by GradleProperty(project.objects, File::class, testdoc.get().outputFile)
+  var outputFile by GradleProperty(objectFactory, File::class, testdoc.get().outputFile)
 
   override fun exec() {
     rfArgs = rfArgs + testdoc.get().generateArguments().toList()

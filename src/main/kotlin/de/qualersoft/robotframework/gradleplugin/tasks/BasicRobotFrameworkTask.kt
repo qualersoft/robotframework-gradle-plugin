@@ -1,5 +1,6 @@
 package de.qualersoft.robotframework.gradleplugin.tasks
 
+import de.qualersoft.robotframework.gradleplugin.extensions.RobotFrameworkExtension
 import de.qualersoft.robotframework.gradleplugin.robotframework
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.plugins.JavaPlugin
@@ -10,11 +11,6 @@ import org.gradle.api.tasks.bundling.Jar
 import java.io.File
 
 abstract class BasicRobotFrameworkTask : JavaExec() {
-
-  init {
-    val rfVersion = project.robotframework().robotVersion
-    mainClass.set(rfVersion.get().mainClass)
-  }
 
   /**
    * Additional properties that will be append to end of the configuration arguments.
@@ -27,7 +23,12 @@ abstract class BasicRobotFrameworkTask : JavaExec() {
    * Provide access to the `RobotFrameworkExtension`
    */
   @Internal
-  protected val extension = project.robotframework()
+  protected val rfExtension: RobotFrameworkExtension = project.robotframework()
+
+  init {
+    val rfVersion = rfExtension.robotVersion
+    mainClass.set(rfVersion.get().mainClass)
+  }
 
   internal fun executeRobotCommand(cmd: String, additionalArgs: Collection<String>? = null) {
     val robotArgs = listOf(cmd) + rfArgs + (additionalArgs ?: listOf())
@@ -39,7 +40,6 @@ abstract class BasicRobotFrameworkTask : JavaExec() {
 
   private fun ensureLibraries() {
     val jar = getRobotLib()
-    println("Found robot-jar: ${jar?.absoluteFile}")
     classpath(project.files(jar))
 
     // adding packed jar
@@ -52,22 +52,23 @@ abstract class BasicRobotFrameworkTask : JavaExec() {
 //    classpath(jpc.sourceSets.getByName("main").output.resourcesDir)
 
     // adding dependencies
-    classpath(project.configurations.getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)
-      .resolvedConfiguration.resolvedArtifacts.map { it.file }.toTypedArray()
+    classpath(
+      project.configurations.getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)
+        .resolvedConfiguration.resolvedArtifacts.map { it.file }.toTypedArray()
     )
   }
 
   private fun getRobotLib(): File? {
-    val rfVersion = extension.robotVersion.get()
-    val artifacts: Set<ResolvedArtifact>? = project.configurations
-      .findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)
-      ?.resolvedConfiguration?.resolvedArtifacts
-    return artifacts?.find {
+    val rfVersion = rfExtension.robotVersion.get()
+    val artifacts: Set<ResolvedArtifact> = project.configurations
+      .getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)
+      .resolvedConfiguration.resolvedArtifacts
+    return artifacts.find {
       val id = it.moduleVersion.id
       // TODO make version-comparison more flexible e.g. allow >=
       id.version == rfVersion.version &&
-          id.group == rfVersion.group &&
-          id.name == rfVersion.name
+      id.group == rfVersion.group &&
+      id.name == rfVersion.name
     }?.file
   }
 }

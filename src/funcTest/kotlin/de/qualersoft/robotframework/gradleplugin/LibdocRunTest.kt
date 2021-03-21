@@ -11,8 +11,6 @@ import org.junit.jupiter.api.assertAll
 import java.io.File
 import java.nio.charset.StandardCharsets
 
-const val BUILD_SUCCESSFUL = "BUILD SUCCESSFUL"
-
 open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
 
   override fun rootFolder(): String? {
@@ -30,8 +28,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
     val result = setupKotlinTest("run_minimal_libdoc_robot_test")
         .withArguments("libdocRun")
         .build()
-    println(result.output)
-    result.output should contain(BUILD_SUCCESSFUL)
+
+    runShouldSucceed(result)
     checkForHtmlDoc(::checkRobotLib)
   }
 
@@ -43,8 +41,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
     val result = setupGroovyTest("run_minimal_libdoc_robot_test")
         .withArguments("libdocRun")
         .build()
-    println(result.output)
-    result.output should contain(BUILD_SUCCESSFUL)
+
+    runShouldSucceed(result)
     checkForHtmlDoc(::checkRobotLib)
   }
 
@@ -64,8 +62,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
     val result = setupKotlinTest("run_libdoc_plain_java_test")
         .withArguments("libdocRun")
         .build()
-    println(result.output)
-    result.output should contain(BUILD_SUCCESSFUL)
+
+    runShouldSucceed(result)
     checkForHtmlDoc(::checkJavaClass)
   }
 
@@ -77,8 +75,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
     val result = setupGroovyTest("run_libdoc_plain_java_test")
         .withArguments("libdocRun")
         .build()
-    println(result.output)
-    result.output should contain(BUILD_SUCCESSFUL)
+
+    runShouldSucceed(result)
     checkForHtmlDoc(::checkJavaClass)
   }
 
@@ -98,8 +96,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
     val result = setupKotlinTest("run_libdoc_java_lib_test")
         .withArguments("assemble", "libdocRun")
         .build()
-    println(result.output)
-    result.output should contain(BUILD_SUCCESSFUL)
+
+    runShouldSucceed(result)
     checkForHtmlDoc(::checkJavaLib)
   }
 
@@ -112,8 +110,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
         .withArguments("assemble", "libdocRun")
         .withDebug(true)
         .build()
-    println(result.output)
-    result.output should contain(BUILD_SUCCESSFUL)
+
+    runShouldSucceed(result)
     checkForHtmlDoc(::checkJavaLib)
   }
 

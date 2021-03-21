@@ -2,7 +2,6 @@ package de.qualersoft.robotframework.gradleplugin
 
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
-import org.gradle.testkit.runner.BuildResult
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
@@ -91,10 +90,6 @@ class TestdocTest : BaseRobotFrameworkFunctionalTest() {
         { actual shouldContain "This is another simple documentation" }
       )
     }
-  }
-
-  private fun runShouldSucceed(result: BuildResult) {
-    result.output shouldContain "BUILD SUCCESSFUL"
   }
 
   private fun performOutputCheck(test: (String) -> Unit) {

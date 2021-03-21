@@ -1,7 +1,6 @@
 package de.qualersoft.robotframework.gradleplugin.tasks
 
 import de.qualersoft.robotframework.gradleplugin.configurations.LibdocRobotConfiguration
-import de.qualersoft.robotframework.gradleplugin.robotframework
 import org.gradle.api.Action
 import org.gradle.api.plugins.JavaPlugin
 import java.io.File
@@ -14,13 +13,14 @@ open class LibdocTask : BasicRobotFrameworkTask() {
     group = "documentation"
   }
 
-  private val libdoc = project.objects.property(LibdocRobotConfiguration::class.java)
-    .convention(project.robotframework().libdoc)
+  private val libdoc = objectFactory.property(LibdocRobotConfiguration::class.java)
+    .convention(rfExtension.libdoc)
 
   @Suppress("Unused")
   fun libdoc(action: Action<LibdocRobotConfiguration>) {
     action.execute(libdoc.get())
   }
+
   @Suppress("Unused")
   fun libdoc(config: LibdocRobotConfiguration.() -> Unit) {
     libdoc.get().apply(config)

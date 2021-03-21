@@ -1,7 +1,5 @@
 package de.qualersoft.robotframework.gradleplugin
 
-import io.kotest.matchers.string.shouldContain
-import org.gradle.testkit.runner.BuildResult
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.nio.charset.StandardCharsets
@@ -66,10 +64,6 @@ class TidyTest : BaseRobotFrameworkFunctionalTest() {
     runShouldSucceed(result)
     val base = "src/test/robot/pipeTidy.robot"
     performOutputCheck(base, "$base.clean")
-  }
-
-  private fun runShouldSucceed(result: BuildResult) {
-    result.output shouldContain "BUILD SUCCESSFUL"
   }
 
   private fun performOutputCheck(src: String, expected: String) {

@@ -23,6 +23,8 @@ class RobotRunTest : BaseRobotFrameworkFunctionalTest() {
     val result = setupGroovyTest("run_minimal_test")
       .withArguments("robotRun")
       .build()
+
+    runShouldSucceed(result)
     result.output shouldContain "Hello world"
   }
 
@@ -34,6 +36,8 @@ class RobotRunTest : BaseRobotFrameworkFunctionalTest() {
     val result = setupKotlinTest("run_minimal_test")
       .withArguments("robotRun")
       .build()
+
+    runShouldSucceed(result)
     result.output shouldContain "Hello world"
   }
 
@@ -46,6 +50,7 @@ class RobotRunTest : BaseRobotFrameworkFunctionalTest() {
       .withArguments("robotRun")
       .build()
 
+    runShouldSucceed(result)
     assertAll(
       { result.output shouldContain "Goodbye" },
       { result.output shouldNotContain "Hello world" }
@@ -60,6 +65,8 @@ class RobotRunTest : BaseRobotFrameworkFunctionalTest() {
     val result = setupKotlinTest("run_config")
       .withArguments("robotRun")
       .build()
+
+    runShouldSucceed(result)
     assertAll(
       { result.output shouldContain "Goodbye" },
       { result.output shouldNotContain "Hello world" }
