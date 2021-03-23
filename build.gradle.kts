@@ -1,16 +1,19 @@
 plugins {
+  // realization
   kotlin("jvm")
   id("java-gradle-plugin")
 
-  id("org.jetbrains.dokka")
-
-  id("org.unbroken-dome.test-sets") version "3.0.1"
+  // quality
   jacoco
+  id("org.unbroken-dome.test-sets") version "3.0.1"
   // workaround to integrate jacoco coverage into integration tests. (See https://github.com/gradle/gradle/issues/1465)
   id("pl.droidsonroids.jacoco.testkit") version "1.0.7"
-
   id("io.gitlab.arturbosch.detekt")
   id("org.sonarqube")
+
+  // documentation
+  id("org.jetbrains.dokka")
+  id("org.asciidoctor.jvm.convert")
 
   `maven-publish`
   idea
@@ -36,7 +39,8 @@ gradlePlugin {
 }
 
 detekt {
-  failFast = true
+  allRules = false
+  buildUponDefaultConfig = true
   config = files("$projectDir/detekt.yml")
   input = files("src/main/kotlin")
 
@@ -62,6 +66,9 @@ jacoco {
 repositories {
   jcenter()
   mavenCentral()
+  maven {
+    url = uri("https://nexus.memathze.de/repository/maven-public/")
+  }
 }
 
 dependencies {
@@ -138,12 +145,32 @@ val sourcesJar by tasks.creating(Jar::class) {
   from(project.the<SourceSetContainer>()["main"].allSource)
 }
 
+val mavenUsr: String by project
+val mavenPwd: String by project
+
 publishing {
   publications {
-    create<MavenPublication>("default") {
-      from(components["java"])
+    create<MavenPublication>("pluginMaven") {
+      // customize main publications here
       artifact(sourcesJar)
       artifact(dokkaJar)
+
+    }
+  }
+
+  repositories {
+    maven {
+      name = "Nexus"
+      credentials {
+        username = mavenUsr
+        password = mavenPwd
+      }
+
+      url = if ("${project.version}".endsWith("-SNAPSHOT")) {
+        uri("https://nexus.memathze.de/repository/maven-snapshots/")
+      } else {
+        uri("https://nexus.memathze.de/repository/maven-releases/")
+      }
     }
   }
 }

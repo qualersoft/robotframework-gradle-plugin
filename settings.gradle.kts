@@ -7,10 +7,15 @@ pluginManagement {
     mavenCentral()
   }
   plugins {
+    // realization
     kotlin("jvm") version kotlinVersion
-    id("org.jetbrains.dokka") version "1.4.10.2"
+
+    // quality
     id("org.sonarqube") version "3.0"
-    id("io.gitlab.arturbosch.detekt") version "1.15.0"
+    id("io.gitlab.arturbosch.detekt") version "1.16.0"
+
+    // documentation
+    id("org.jetbrains.dokka") version "1.4.10.2"
   }
 }
 
