@@ -94,7 +94,7 @@ node {
           string(credentialsId: 'gradle_publish_key', variable: 'ORG_GRADLE_PROJECT_gradle.publish.key'),
           string(credentialsId: 'gradle_publish_secret', variable: 'ORG_GRADLE_PROJECT_gradle.publish.secret')
         ]) {
-          echo 'publish artifact to gradle-plugins-repo...'
+          execGradle 'publishPlugins'
         }
       }
     }

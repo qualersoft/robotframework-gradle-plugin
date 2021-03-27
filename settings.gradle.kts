@@ -16,6 +16,9 @@ pluginManagement {
     // documentation
     id("org.jetbrains.dokka") version "1.4.10.2"
     id("org.asciidoctor.jvm.convert") version "3.3.2"
+
+    // publishing
+    id("com.gradle.plugin-publish") version "0.13.0"
   }
 }
 
