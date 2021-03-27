@@ -70,11 +70,13 @@ open class BaseRobotFrameworkFunctionalTest {
         // only get those files not starting with the build-script resource name
         !(f.isFile && f.name.startsWith(resource))
       }?.forEach { f ->
-        f.copyRecursively(if (f.isFile) {
-          File(testProjectDir.root, f.name)
-        } else {
-          File(testProjectDir.root, f.name).also { folder -> folder.mkdir() }
-        })
+        f.copyRecursively(
+          if (f.isFile) {
+            File(testProjectDir.root, f.name)
+          } else {
+            File(testProjectDir.root, f.name).also { folder -> folder.mkdir() }
+          }
+        )
       }
     }
     return result

@@ -26,8 +26,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
   fun testGenerateDocForRobotWithKotlin() {
     getFolderAction = { "libdoc" }
     val result = setupKotlinTest("run_minimal_libdoc_robot_test")
-        .withArguments("libdocRun")
-        .build()
+      .withArguments("libdocRun")
+      .build()
 
     runShouldSucceed(result)
     checkForHtmlDoc(::checkRobotLib)
@@ -39,8 +39,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
   fun testGenerateDocForRobotWithGroovy() {
     getFolderAction = { "libdoc" }
     val result = setupGroovyTest("run_minimal_libdoc_robot_test")
-        .withArguments("libdocRun")
-        .build()
+      .withArguments("libdocRun")
+      .build()
 
     runShouldSucceed(result)
     checkForHtmlDoc(::checkRobotLib)
@@ -49,8 +49,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
   private fun checkRobotLib(file: File) {
     val content = file.readText(StandardCharsets.UTF_8)
     assertAll(
-        { content should contain("Suite description") },
-        { content should contain("Write stuff to the output") }
+      { content should contain("Suite description") },
+      { content should contain("Write stuff to the output") }
     )
   }
 
@@ -60,8 +60,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
   fun testGenerateDocForJavaClassWithKotlin() {
     getFolderAction = { "libdoc" }
     val result = setupKotlinTest("run_libdoc_plain_java_test")
-        .withArguments("libdocRun")
-        .build()
+      .withArguments("libdocRun")
+      .build()
 
     runShouldSucceed(result)
     checkForHtmlDoc(::checkJavaClass)
@@ -73,8 +73,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
   fun testGenerateDocForJavaClassWithGroovy() {
     getFolderAction = { "libdoc" }
     val result = setupGroovyTest("run_libdoc_plain_java_test")
-        .withArguments("libdocRun")
-        .build()
+      .withArguments("libdocRun")
+      .build()
 
     runShouldSucceed(result)
     checkForHtmlDoc(::checkJavaClass)
@@ -83,8 +83,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
   private fun checkJavaClass(file: File) {
     val content = file.readText(StandardCharsets.UTF_8)
     assertAll(
-        { content should contain("Get Keyword Documentation") },
-        { content should contain("This is a dummy keyword") }
+      { content should contain("Get Keyword Documentation") },
+      { content should contain("This is a dummy keyword") }
     )
   }
 
@@ -94,8 +94,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
   fun testLibdocForJavaLibWithKotlin() {
     getFolderAction = { "libdoc" }
     val result = setupKotlinTest("run_libdoc_java_lib_test")
-        .withArguments("assemble", "libdocRun")
-        .build()
+      .withArguments("assemble", "libdocRun")
+      .build()
 
     runShouldSucceed(result)
     checkForHtmlDoc(::checkJavaLib)
@@ -107,9 +107,9 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
   fun testLibdocForJavaLibWithGroovy() {
     getFolderAction = { "libdoc" }
     val result = setupGroovyTest("run_libdoc_java_lib_test")
-        .withArguments("assemble", "libdocRun")
-        .withDebug(true)
-        .build()
+      .withArguments("assemble", "libdocRun")
+      .withDebug(true)
+      .build()
 
     runShouldSucceed(result)
     checkForHtmlDoc(::checkJavaLib)
@@ -118,9 +118,9 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
   private fun checkJavaLib(file: File) {
     val content = file.readText(StandardCharsets.UTF_8)
     assertAll(
-        { content should contain("This is the general library documentation of ALib.") },
-        { content should contain("Say hello") },
-        { content should contain("greeting") }
+      { content should contain("This is the general library documentation of ALib.") },
+      { content should contain("Say hello") },
+      { content should contain("greeting") }
     )
   }
 
@@ -128,19 +128,19 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
     val files = testProjectDir.root.walkBottomUp().filter {
       it.isFile && it.path.let { path ->
         path.contains("robotdoc") &&
-            path.contains("libdoc") &&
-            path.contains("libdoc.html")
+          path.contains("libdoc") &&
+          path.contains("libdoc.html")
       }
     }
 
     files shouldNot beNull()
     files.also {
       assertAll(
-          { files shouldHaveSize 1 },
-          {
-            val file = files.first()
-            contentChecker(file)
-          }
+        { files shouldHaveSize 1 },
+        {
+          val file = files.first()
+          contentChecker(file)
+        }
       )
     }
   }

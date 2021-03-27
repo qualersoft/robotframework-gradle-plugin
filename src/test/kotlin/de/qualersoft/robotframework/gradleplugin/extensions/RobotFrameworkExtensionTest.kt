@@ -134,6 +134,7 @@ class RobotFrameworkExtensionTest {
 
     sut.tidy.get().spacecount.get() shouldBe 100
   }
+
   @Test
   fun `tidy configuration can be done by action`() {
     val action = Action<TidyRobotConfiguration> {

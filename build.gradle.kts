@@ -1,16 +1,23 @@
+val repoUsr: String? by project
+val repoPwd: String? by project
+val repoUrl: String? by project
+
 plugins {
+  // realization
   kotlin("jvm")
   id("java-gradle-plugin")
 
-  id("org.jetbrains.dokka")
-
-  id("org.unbroken-dome.test-sets") version "3.0.1"
+  // quality
   jacoco
+  id("org.unbroken-dome.test-sets") version "3.0.1"
   // workaround to integrate jacoco coverage into integration tests. (See https://github.com/gradle/gradle/issues/1465)
   id("pl.droidsonroids.jacoco.testkit") version "1.0.7"
-
   id("io.gitlab.arturbosch.detekt")
   id("org.sonarqube")
+
+  // documentation
+  id("org.jetbrains.dokka")
+  id("org.asciidoctor.jvm.convert")
 
   `maven-publish`
   idea
@@ -30,13 +37,16 @@ gradlePlugin {
     create("robotframework") {
       id = "de.qualersoft.robotframework"
       implementationClass = "de.qualersoft.robotframework.gradleplugin.RobotFrameworkPlugin"
+      displayName = "robot framework gradle plugin"
+      description = "Plugin to integrate robot framework into gradle."
     }
   }
   testSourceSets(*sourceSets.filter { it.name.contains("test", true) }.toTypedArray())
 }
 
 detekt {
-  failFast = true
+  allRules = false
+  buildUponDefaultConfig = true
   config = files("$projectDir/detekt.yml")
   input = files("src/main/kotlin")
 
@@ -62,6 +72,9 @@ jacoco {
 repositories {
   jcenter()
   mavenCentral()
+  maven {
+    url = uri("$repoUrl/maven-public/")
+  }
 }
 
 dependencies {
@@ -140,10 +153,26 @@ val sourcesJar by tasks.creating(Jar::class) {
 
 publishing {
   publications {
-    create<MavenPublication>("default") {
-      from(components["java"])
+    create<MavenPublication>("pluginMaven") {
+      // customize main publications here
       artifact(sourcesJar)
       artifact(dokkaJar)
+    }
+  }
+
+  repositories {
+    maven {
+      name = "Nexus"
+      credentials {
+        username = repoUsr
+        password = repoPwd
+      }
+
+      url = if ("${project.version}".endsWith("-SNAPSHOT")) {
+        uri("$repoUrl/maven-snapshots/")
+      } else {
+        uri("$repoUrl/maven-releases/")
+      }
     }
   }
 }

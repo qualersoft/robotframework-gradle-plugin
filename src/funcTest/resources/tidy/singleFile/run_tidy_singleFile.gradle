@@ -1,15 +1,15 @@
 plugins {
-    id 'de.qualersoft.robotframework'
+  id 'de.qualersoft.robotframework'
 }
 
 version = '0.0.1'
 
 repositories {
-    mavenLocal()
-    mavenCentral()
+  mavenLocal()
+  mavenCentral()
 }
 
 tasks.register('tidyRun', de.qualersoft.robotframework.gradleplugin.tasks.TidyTask) {
-    sources = files("src/test/robot/single2Tidy.robot")
-    outputFile = file("cleaned.robot")
+  sources = files("src/test/robot/single2Tidy.robot")
+  outputFile = file("cleaned.robot")
 }

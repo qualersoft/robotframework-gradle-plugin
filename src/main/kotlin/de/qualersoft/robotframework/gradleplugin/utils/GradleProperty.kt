@@ -35,8 +35,8 @@ internal class GradleProperty<T, V : Any> {
 }
 
 internal class GradleStringListProperty<T>(
-    objects: ObjectFactory,
-    default: MutableList<String> = mutableListOf()
+  objects: ObjectFactory,
+  default: MutableList<String> = mutableListOf()
 ) {
   private val property: ListProperty<String> = objects.listProperty(String::class.java).apply {
     convention(default)
@@ -47,12 +47,13 @@ internal class GradleStringListProperty<T>(
 }
 
 internal class GradleStringMapProperty<T>(
-    objects: ObjectFactory,
-    default: Map<String, String> = mapOf()
+  objects: ObjectFactory,
+  default: Map<String, String> = mapOf()
 ) {
 
   private val property: MapProperty<String, String> = objects.mapProperty(
-      String::class.java, String::class.java).apply {
+    String::class.java, String::class.java
+  ).apply {
     convention(default)
   }
 
@@ -61,8 +62,8 @@ internal class GradleStringMapProperty<T>(
 }
 
 internal class GradleFileNullableProperty<T>(
-    objects: ObjectFactory,
-    default: File? = null
+  objects: ObjectFactory,
+  default: File? = null
 ) {
 
   private val property = objects.property(File::class.java).apply {

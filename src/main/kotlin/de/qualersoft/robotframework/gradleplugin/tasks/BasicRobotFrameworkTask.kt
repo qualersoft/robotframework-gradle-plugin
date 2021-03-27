@@ -67,8 +67,8 @@ abstract class BasicRobotFrameworkTask : JavaExec() {
       val id = it.moduleVersion.id
       // TODO make version-comparison more flexible e.g. allow >=
       id.version == rfVersion.version &&
-      id.group == rfVersion.group &&
-      id.name == rfVersion.name
+        id.group == rfVersion.group &&
+        id.name == rfVersion.name
     }?.file
   }
 }
