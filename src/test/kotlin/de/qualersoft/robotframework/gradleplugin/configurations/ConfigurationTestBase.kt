@@ -11,7 +11,7 @@ open class ConfigurationTestBase {
       value.any { it.contains(expected) },
       {
         "Collection should have element which contains ${expected.show().value};" +
-        " listing some elements ${value.take(5)}"
+          " listing some elements ${value.take(5)}"
       },
       { "Collection should not have element which contains ${expected.show().value}" }
     )

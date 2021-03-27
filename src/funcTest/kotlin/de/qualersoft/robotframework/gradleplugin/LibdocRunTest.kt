@@ -128,8 +128,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
     val files = testProjectDir.root.walkBottomUp().filter {
       it.isFile && it.path.let { path ->
         path.contains("robotdoc") &&
-        path.contains("libdoc") &&
-        path.contains("libdoc.html")
+          path.contains("libdoc") &&
+          path.contains("libdoc.html")
       }
     }
 

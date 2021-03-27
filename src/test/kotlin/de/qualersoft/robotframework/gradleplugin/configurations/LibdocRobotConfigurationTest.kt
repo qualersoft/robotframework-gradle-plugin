@@ -162,7 +162,7 @@ internal class LibdocRobotConfigurationTest : ConfigurationTestBase() {
 
   @DisplayName(
     "When libraryOrResourceFile has a pattern that" +
-    " matches multiply files, then a list of argument list is generated"
+      " matches multiply files, then a list of argument list is generated"
   )
   @Test
   fun multiFilePatternReturnsList() {

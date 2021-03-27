@@ -68,7 +68,7 @@ import javax.inject.Inject
  * ```
  */
 class LibdocRobotConfiguration @Inject constructor(private val project: Project) :
-    CommonRobotConfiguration(project.objects) {
+  CommonRobotConfiguration(project.objects) {
 
   // <editor-fold desc="Properties">
   /**
@@ -141,14 +141,14 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
 
       // 2. we have path structure (\ | /)
       pattern.contains("\\") ||
-      pattern.contains("/") -> harvestPath(pattern, file)
+        pattern.contains("/") -> harvestPath(pattern, file)
 
       // 3. we assume a class name
       else -> listOf(pattern)
     } ?: throw IllegalArgumentException(
       "The value <'$pattern'> of libraryOrResourceFile" +
-      " can not interpreted as path or name! Maybe the pattern is invalid or" +
-      " the specified path does not exist."
+        " can not interpreted as path or name! Maybe the pattern is invalid or" +
+        " the specified path does not exist."
     )
   }
 

@@ -91,9 +91,9 @@ internal class RobotframeworkConfigurationTest {
       val extDeps = rtConf.dependencies.withType(ExternalDependency::class.java)
       val found = extDeps.find {
         it.group == group &&
-        it.name == name &&
-        it.version == version &&
-        hasArtifact(it, name, classifier, ext)
+          it.name == name &&
+          it.version == version &&
+          hasArtifact(it, name, classifier, ext)
       }
       return MatcherResult(
         null != found,
