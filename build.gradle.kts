@@ -19,7 +19,10 @@ plugins {
   id("org.jetbrains.dokka")
   id("org.asciidoctor.jvm.convert")
 
+  // publishing
   `maven-publish`
+  id("com.gradle.plugin-publish")
+
   idea
 }
 
@@ -60,8 +63,8 @@ detekt {
 sonarqube {
   properties {
     property("sonar.projectName", project.name)
-    property("sonar.projectKey", project.name)
     property("sonar.version", project.version)
+    property("sonar.projectKey", "qualersoft_robotframework-gradle-plugin")
   }
 }
 
@@ -149,6 +152,12 @@ val sourcesJar by tasks.creating(Jar::class) {
   description = "Assembles sources JAR"
   archiveClassifier.set("sources")
   from(project.the<SourceSetContainer>()["main"].allSource)
+}
+
+pluginBundle {
+  website = "https://github.com/qualersoft/robotframework-gradle-plugin"
+  vcsUrl = "https://github.com/qualersoft/robotframework-gradle-plugin"
+  tags = listOf("robotframework", "test", "integration test", "e2e testing")
 }
 
 publishing {

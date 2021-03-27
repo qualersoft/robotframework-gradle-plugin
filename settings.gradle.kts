@@ -10,12 +10,15 @@ pluginManagement {
     kotlin("jvm") version kotlinVersion
 
     // quality
-    id("org.sonarqube") version "3.0"
+    id("org.sonarqube") version "3.1.1"
     id("io.gitlab.arturbosch.detekt") version "1.16.0"
 
     // documentation
     id("org.jetbrains.dokka") version "1.4.10.2"
     id("org.asciidoctor.jvm.convert") version "3.3.2"
+
+    // publishing
+    id("com.gradle.plugin-publish") version "0.13.0"
   }
 }
 
