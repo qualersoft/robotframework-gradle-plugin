@@ -84,11 +84,11 @@ node {
       }
     }
     stage('Publish') {
-      when (env.BRANCH_NAME == 'master') {
+      when (env.BRANCH_NAME in ['master', 'develop'] ) {
         withCredentials([
           usernamePassword(credentialsId: 'ARTIFACT_REPO_DEPLOY', passwordVariable: 'ORG_GRADLE_PROJECT_repoPwd', usernameVariable: 'ORG_GRADLE_PROJECT_repoUsr')
         ]) {
-          echo 'publish artifacts to private repository...'
+          execGradle 'publish'
         }
         withCredentials([
           string(credentialsId: 'gradle_publish_key', variable: 'ORG_GRADLE_PROJECT_gradle.publish.key'),
