@@ -60,8 +60,8 @@ detekt {
 sonarqube {
   properties {
     property("sonar.projectName", project.name)
-    property("sonar.projectKey", project.name)
     property("sonar.version", project.version)
+    property("sonar.projectKey", "qualersoft_robotframework-gradle-plugin")
   }
 }
 
