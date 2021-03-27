@@ -1,6 +1,6 @@
-val repoUsr: String by project
-val repoPwd: String by project
-val repoUrl: String by project
+val repoUsr: String? by project
+val repoPwd: String? by project
+val repoUrl: String? by project
 
 plugins {
   // realization
