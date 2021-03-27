@@ -59,7 +59,7 @@ open class RunRobotTask : BasicRobotFrameworkTask() {
   var sources: FileCollection = objectFactory.fileCollection()
 
   private val robot = objectFactory.property(RunRobotConfiguration::class.java)
-      .convention(rfExtension.robot)
+    .convention(rfExtension.robot)
 
   /**
    * Directory where the output shall be put to
@@ -71,6 +71,7 @@ open class RunRobotTask : BasicRobotFrameworkTask() {
   fun robot(action: Action<RunRobotConfiguration>) {
     action.execute(robot.get())
   }
+
   fun robot(config: RunRobotConfiguration.() -> Unit) {
     robot.get().apply(config)
   }

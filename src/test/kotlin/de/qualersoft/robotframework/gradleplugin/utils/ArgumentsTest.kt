@@ -298,7 +298,8 @@ class ArgumentsTest : AnnotationSpec() {
     override fun test(value: Arguments) = MatcherResult(
       value.toArray().isEmpty(),
       "Arguments $value should be empty",
-      "String $value should not be empty")
+      "String $value should not be empty"
+    )
   }
 
   private fun Arguments.shouldBeEmpty() = this should beEmpty()
