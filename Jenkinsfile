@@ -86,8 +86,7 @@ node {
     stage('Publish') {
       when (env.BRANCH_NAME == 'master') {
         withCredentials([
-          usernamePassword(credentialsId: 'ARTIFACT_REPO_DEPLOY', passwordVariable: 'ORG_GRADLE_PROJECT_repoPwd', usernameVariable: 'ORG_GRADLE_PROJECT_repoUsr'),
-          string(credentialsId: 'ARTIFACT_REPO_URL', variable: 'ORG_GRADLE_PROJECT_repoUrl')
+          usernamePassword(credentialsId: 'ARTIFACT_REPO_DEPLOY', passwordVariable: 'ORG_GRADLE_PROJECT_repoPwd', usernameVariable: 'ORG_GRADLE_PROJECT_repoUsr')
         ]) {
           echo 'publish artifacts to private repository...'
         }
@@ -117,7 +116,9 @@ void analyzeWithSonarQubeAndWaitForQualityGoal() {
 }
 
 def execGradle(args) {
-  exec "./gradlew $args"
+  withEnv(["ORG_GRADLE_PROJECT_repoUrl=${env.ARTIFACT_REPO_URL}"]){
+    exec "./gradlew $args"
+  }
 }
 
 def exec(cmd) {
