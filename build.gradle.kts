@@ -1,3 +1,7 @@
+val repoUsr: String by project
+val repoPwd: String by project
+val repoUrl: String by project
+
 plugins {
   // realization
   kotlin("jvm")
@@ -33,6 +37,8 @@ gradlePlugin {
     create("robotframework") {
       id = "de.qualersoft.robotframework"
       implementationClass = "de.qualersoft.robotframework.gradleplugin.RobotFrameworkPlugin"
+      displayName = "robot framework gradle plugin"
+      description = "Plugin to integrate robot framework into gradle."
     }
   }
   testSourceSets(*sourceSets.filter { it.name.contains("test", true) }.toTypedArray())
@@ -67,7 +73,7 @@ repositories {
   jcenter()
   mavenCentral()
   maven {
-    url = uri("https://nexus.memathze.de/repository/maven-public/")
+    url = uri("$repoUrl/maven-public/")
   }
 }
 
@@ -145,16 +151,12 @@ val sourcesJar by tasks.creating(Jar::class) {
   from(project.the<SourceSetContainer>()["main"].allSource)
 }
 
-val mavenUsr: String by project
-val mavenPwd: String by project
-
 publishing {
   publications {
     create<MavenPublication>("pluginMaven") {
       // customize main publications here
       artifact(sourcesJar)
       artifact(dokkaJar)
-
     }
   }
 
@@ -162,14 +164,14 @@ publishing {
     maven {
       name = "Nexus"
       credentials {
-        username = mavenUsr
-        password = mavenPwd
+        username = repoUsr
+        password = repoPwd
       }
 
       url = if ("${project.version}".endsWith("-SNAPSHOT")) {
-        uri("https://nexus.memathze.de/repository/maven-snapshots/")
+        uri("$repoUrl/maven-snapshots/")
       } else {
-        uri("https://nexus.memathze.de/repository/maven-releases/")
+        uri("$repoUrl/maven-releases/")
       }
     }
   }
