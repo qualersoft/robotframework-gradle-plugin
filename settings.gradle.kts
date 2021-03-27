@@ -10,7 +10,7 @@ pluginManagement {
     kotlin("jvm") version kotlinVersion
 
     // quality
-    id("org.sonarqube") version "3.0"
+    id("org.sonarqube") version "3.1.1"
     id("io.gitlab.arturbosch.detekt") version "1.16.0"
 
     // documentation
