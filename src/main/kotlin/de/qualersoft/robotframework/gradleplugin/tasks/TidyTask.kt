@@ -1,13 +1,13 @@
 package de.qualersoft.robotframework.gradleplugin.tasks
 
 import de.qualersoft.robotframework.gradleplugin.configurations.TidyRobotConfiguration
-import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import org.gradle.api.Action
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
-import java.io.File
 
 open class TidyTask : BasicRobotFrameworkTask() {
   init {
@@ -34,14 +34,16 @@ open class TidyTask : BasicRobotFrameworkTask() {
    * Filename of the cleaned file.
    * Only appropriate if single file is processed.
    */
-  var outputFile by GradleProperty(objectFactory, File::class)
+  @OutputFile
+  @Optional
+  val outputFile = objectFactory.fileProperty()
 
   override fun exec() {
     rfArgs = rfArgs + tidy.get().generateArguments().toList()
     val srcFiles = sources.files.joinToString(" ") { it.path }
     val args = mutableListOf(srcFiles)
     if (outputFile.isPresent) {
-      args.add(outputFile.get().absolutePath)
+      args.add(outputFile.asFile.get().absolutePath)
     }
     super.executeRobotCommand("tidy", args)
   }
