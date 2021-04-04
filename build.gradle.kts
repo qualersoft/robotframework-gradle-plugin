@@ -24,6 +24,7 @@ plugins {
   id("com.gradle.plugin-publish")
 
   idea
+  id("com.github.ben-manes.versions") version "0.38.0"
 }
 
 group = "de.qualersoft"

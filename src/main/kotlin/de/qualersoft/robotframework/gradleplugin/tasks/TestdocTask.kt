@@ -1,15 +1,15 @@
 package de.qualersoft.robotframework.gradleplugin.tasks
 
 import de.qualersoft.robotframework.gradleplugin.configurations.TestdocRobotConfiguration
-import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import org.gradle.api.Action
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
-import java.io.File
 
 /**
  * Testdoc generates a high level test documentation based on Robot Framework
@@ -56,12 +56,13 @@ open class TestdocTask : BasicRobotFrameworkTask() {
    *
    * *Default*: `testdoc.html`
    */
-  var outputFile by GradleProperty(objectFactory, File::class, testdoc.get().outputFile)
+  @OutputFile
+  val outputFile: RegularFileProperty = objectFactory.fileProperty().convention(testdoc.get().outputFile)
 
   override fun exec() {
     rfArgs = rfArgs + testdoc.get().generateArguments().toList()
     val srcFiles = sources.files.joinToString(" ") { it.path }
-    val dest = outputDir.file(outputFile.get().toString()).get().asFile.absolutePath
+    val dest = outputDir.file(outputFile.get().asFile.name).get().asFile.absolutePath
     super.executeRobotCommand("testdoc", listOf(srcFiles, dest))
   }
 }

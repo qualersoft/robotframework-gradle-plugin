@@ -11,5 +11,5 @@ repositories {
 
 tasks.register('tidyRun', de.qualersoft.robotframework.gradleplugin.tasks.TidyTask) {
   sources = files("src/test/robot/single2Tidy.robot")
-  outputFile = file("cleaned.robot")
+  outputFile.set(file("cleaned.robot"))
 }

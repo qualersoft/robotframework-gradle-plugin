@@ -82,7 +82,7 @@ class TestdocRobotConfiguration @Inject constructor(project: Project) {
    *
    * *Default*: `testdoc.html`
    */
-  var outputFile by GradleProperty(objects, File::class, File("testdoc.html"))
+  var outputFile = objects.fileProperty().convention { File("testdoc.html") }
 
   fun generateArguments(): Array<String> = Arguments().apply {
     addStringToArguments(name.orNull, "--name")

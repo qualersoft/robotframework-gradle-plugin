@@ -7,7 +7,7 @@ robotframework-gradle-plugin
 [![codecov](https://codecov.io/gh/qualersoft/robotframework-gradle-plugin/branch/master/graph/badge.svg?token=Z5CT2C7LN1)](https://codecov.io/gh/qualersoft/robotframework-gradle-plugin)
 
 Gradle plugin for using the [Robot Framework](https://robotframework.org/).
-This project is inspired by the [maven robotframework plugin](https://github.com/robotframework/MavenPlugin).
+This project is inspired by the [robotframework maven plugin](https://github.com/robotframework/MavenPlugin).
 Its goal is to enable you to use the Robot Framework in a gradle project without the need to install anything extra
 (e.g. Robotframework, Jython, etc.).
 
@@ -42,7 +42,7 @@ Available tasks*
 For details see [robot framework tasks](http://robotframework.org/robotframework/#built-in-tools)
 <dl>
   <dt>RunRobotTask</dt>
-  <dd>same as <code>robot</code> command</dd>
+  <dd>same as <code>robot.run</code> command</dd>
   <dt>LibdocTask</dt>
   <dd>same as <code>robot.libdoc</code> command</dd>
   <dt>TestdocTask</dt>
