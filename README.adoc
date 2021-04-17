@@ -1,5 +1,10 @@
 = robotframework-gradle-plugin
+ifdef::env-github[]
+:note-caption: ℹ
+endif::[]
+ifndef::env-github[]
 :icons: font
+endif::[]
 
 Gradle plugin for using the https://robotframework.org/[Robot Framework].
 This project is inspired by the https://github.com/robotframework/MavenPlugin[robotframework maven plugin].
@@ -23,7 +28,7 @@ image:https://codecov.io/gh/qualersoft/robotframework-gradle-plugin/branch/devel
 
 == Quickstart
 Just add the following lines to you build.gradle(.kts)
-[source,groovy]
+[source,kotlin]
 ----
 import de.qualersoft.robotframework.gradleplugin.tasks
 
