@@ -1,20 +1,30 @@
-robotframework-gradle-plugin
-============================
+= robotframework-gradle-plugin
+:icons: font
 
-[![GitHub](https://img.shields.io/github/license/qualersoft/robotframework-gradle-plugin)](https://github.com/qualersoft/robotframework-gradle-plugin/blob/master/LICENSE)
-[![CodeFactor](https://www.codefactor.io/repository/github/qualersoft/robotframework-gradle-plugin/badge?s=2996b4322bfcdca3d8e6250191d67a1410cf3a16)](https://www.codefactor.io/repository/github/qualersoft/robotframework-gradle-plugin)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fqualersoft%2Frobot-gradle-plugin.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fqualersoft%2Frobot-gradle-plugin?ref=badge_shield)
-[![codecov](https://codecov.io/gh/qualersoft/robotframework-gradle-plugin/branch/master/graph/badge.svg?token=Z5CT2C7LN1)](https://codecov.io/gh/qualersoft/robotframework-gradle-plugin)
-
-Gradle plugin for using the [Robot Framework](https://robotframework.org/).
-This project is inspired by the [robotframework maven plugin](https://github.com/robotframework/MavenPlugin).
+Gradle plugin for using the https://robotframework.org/[Robot Framework].
+This project is inspired by the https://github.com/robotframework/MavenPlugin[robotframework maven plugin].
 Its goal is to enable you to use the Robot Framework in a gradle project without the need to install anything extra
 (e.g. Robotframework, Jython, etc.).
 
-Quickstart
-----------
+[cols="1,~", frame=none, grid=none]
+|===
+|General
+|image:https://img.shields.io/github/license/qualersoft/robotframework-gradle-plugin[https://github.com/qualersoft/robotframework-gradle-plugin/blob/master/LICENSE]
+image:https://app.fossa.com/api/projects/git%2Bgithub.com%2Fqualersoft%2Frobot-gradle-plugin.svg?type=shield[https://app.fossa.com/projects/custom%2B17788%2Frobotframework-gradle-plugin/refs/branch/master/]
+
+|Master
+|image:https://www.codefactor.io/repository/github/qualersoft/robotframework-gradle-plugin/badge/master?s=2996b4322bfcdca3d8e6250191d67a1410cf3a16[https://www.codefactor.io/repository/github/qualersoft/robotframework-gradle-plugin/overview/master]
+image:https://codecov.io/gh/qualersoft/robotframework-gradle-plugin/branch/master/graph/badge.svg?token=Z5CT2C7LN1[https://codecov.io/gh/qualersoft/robotframework-gradle-plugin]
+
+|Develop
+|image:https://www.codefactor.io/repository/github/qualersoft/robotframework-gradle-plugin/badge/develop?s=2996b4322bfcdca3d8e6250191d67a1410cf3a16[https://www.codefactor.io/repository/github/qualersoft/robotframework-gradle-plugin/overview/develop]
+image:https://codecov.io/gh/qualersoft/robotframework-gradle-plugin/branch/develop/graph/badge.svg?token=Z5CT2C7LN1[https://codecov.io/gh/qualersoft/robotframework-gradle-plugin]
+|===
+
+== Quickstart
 Just add the following lines to you build.gradle(.kts)
-```groovy
+[source,groovy]
+----
 import de.qualersoft.robotframework.gradleplugin.tasks
 
 plugins {
@@ -26,31 +36,29 @@ tasks.register<RunRobotTask>("robotTest") {
     include("**/*.robot")
   }
 }
-```
-_Note_: Don't forget to replace the version `"<latest>"` with the appropriate version :wink:
+----
+
+[NOTE]
+Don't forget to replace the version `"<latest>"` with the appropriate version😉
 
 Assuming you have some robot test suite files somewhere under your `src/test` folder, calling
-```shell
+
+[source,shell]
+----
 ./gradlew robotTest
-```
+----
 starts the test execution.
 
-For further configuration and examples have a look at the [test resources](src/funcTest/resources).
+For further configuration and examples have a look at the file://./src/funcTest/resources[test resources].
 
-Available tasks*
----------------
-For details see [robot framework tasks](http://robotframework.org/robotframework/#built-in-tools)
-<dl>
-  <dt>RunRobotTask</dt>
-  <dd>same as <code>robot.run</code> command</dd>
-  <dt>LibdocTask</dt>
-  <dd>same as <code>robot.libdoc</code> command</dd>
-  <dt>TestdocTask</dt>
-  <dd>same as <code>robot.testdoc</code> command</dd>
-  <dt>RebotTask</dt>
-  <dd>same as <code>robot.rebot</code> command</dd>
-  <dt>TidyTask</dt>
-  <dd>same as <code>robot.tidy</code> command</dd>
-</dl>
+== Available tasks ^(<<package-note,*>>)^
+For details see http://robotframework.org/robotframework/#built-in-tools[robot framework tasks]
 
+RunRobotTask:: same as `robot.run` command
+LibdocTask:: same as `robot.libdoc` command
+TestdocTask:: same as `robot.testdoc` command
+RebotTask:: same as `robot.rebot` command
+TidyTask:: same as `robot.tidy` command
+
+[[package-note]]
 (*) All task implementations are in package `de.qualersoft.robotframework.gradleplugin.tasks`
