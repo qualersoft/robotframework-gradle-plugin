@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 
 const val DEFAULT_GROUP = "org.robotframework"
 const val DEFAULT_NAME = "robotframework"
-const val DEFAULT_VERSION = "3.2"
+const val DEFAULT_VERSION = "4.0.1"
 
 internal class RobotframeworkConfigurationTest {
 

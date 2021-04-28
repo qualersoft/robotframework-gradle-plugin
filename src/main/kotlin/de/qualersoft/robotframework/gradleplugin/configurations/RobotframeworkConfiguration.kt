@@ -8,7 +8,7 @@ import org.gradle.api.provider.Property
 
 class RobotframeworkConfiguration(private val project: Project) {
 
-  var version: String = "3.2"
+  var version: String = "4.0.1"
   var group: String = "org.robotframework"
   var name: String = "robotframework"
   var classifier: String? = null

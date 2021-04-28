@@ -42,7 +42,7 @@ class RobotFrameworkPluginFuncTest : BaseRobotFrameworkFunctionalTest() {
       val result = setupGroovyTest("build_minimal_test")
         .withArguments("dependencies")
         .build()
-      result.output shouldContain "org.robotframework:robotframework:3.2"
+      result.output shouldContain "org.robotframework:robotframework:4.0.1"
     }
 
     @Test
@@ -52,7 +52,7 @@ class RobotFrameworkPluginFuncTest : BaseRobotFrameworkFunctionalTest() {
       val result = setupKotlinTest("build_minimal_test")
         .withArguments("dependencies")
         .build()
-      result.output shouldContain "org.robotframework:robotframework:3.2"
+      result.output shouldContain "org.robotframework:robotframework:4.0.1"
     }
   }
 
