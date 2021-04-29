@@ -68,7 +68,7 @@ class RobotDependencyTest : BaseRobotFrameworkFunctionalTest() {
   private fun expectedVersion(
     group: String = "org.robotframework",
     name: String = "robotframework",
-    version: String = "3.2",
+    version: String = "4.0.1",
     ext: String? = null
   ): String {
     // Remark: To those who missing the classifier check: The classifier is not printed to

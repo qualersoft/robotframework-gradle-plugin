@@ -85,7 +85,7 @@ dependencies {
   implementation(kotlin("stdlib"))
   implementation(kotlin("reflect"))
 
-  implementation(group = "org.robotframework", name = "robotframework", version = "3.2.2")
+  implementation(group = "org.robotframework", name = "robotframework", version = "4.0.1")
 
   testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.6.2")
   testImplementation(kotlin("test-junit5"))
