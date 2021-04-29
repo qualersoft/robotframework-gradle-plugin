@@ -11,7 +11,7 @@ git:
 
 jobs:
   include:
-    - stage: init
+    - stage: Init
       workspaces:
         create:
           name: base
@@ -22,7 +22,7 @@ jobs:
         - "curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh > install.sh"
         - "sudo bash install.sh -b ."
 
-    - stage: "Static Analyse"
+    - stage: Static Analyse
       name: "Detekt"
       workspaces:
         use: base
@@ -72,7 +72,7 @@ jobs:
         - cd $TRAVIS_BUILD_DIR
         - ./gradlew funcTest
 
-    - stage: report
+    - stage: Report
       name: "Codecov"
       workspaces:
         use:
