@@ -8,15 +8,7 @@ jdk: openjdk11
 
 git:
   quiet: true
-
-before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-
-cache:
-  directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
+  clone: false
 
 jobs:
   include:
@@ -25,22 +17,24 @@ jobs:
         - create:
             name: base
             paths: .
+      git:
+        clone: true
       script:
         - "curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh > install.sh"
         - "sudo bash install.sh -b ."
-      git:
-        clone: true
-    - stage: Static Analyse
+
+    - stage: "Static Analyse"
       name: "Detekt"
       workspaces:
         use: base
-      git:
-        clone: false
       script:
         - cd $TRAVIS_BUILD_DIR
         - ./gradlew detekt
     - name: "Fossa - Trigger analyze"
+      workspaces:
+        use: base
       script:
+        - cd $TRAVIS_BUILD_DIR
         - ./fossa analyze --branch "$TRAVIS_BRANCH"
 
     - stage: Compile
@@ -48,10 +42,7 @@ jobs:
         use: base
         create:
           name: compiled
-          paths:
-            - .
-      git:
-        clone: false
+          paths: .
       script:
         - cd $TRAVIS_BUILD_DIR
         - ./gradlew classes
@@ -59,36 +50,25 @@ jobs:
     - stage: Test
       name: "Unit tests"
       workspaces:
-        use:
-          compiled
+        use: compiled
         create:
           name: utests
-          paths:
-            - "./build/test-results/test/*.xml"
-      git:
-        clone: false
+          paths: "./build/test-results/test/*.xml"
       script:
         - cd $TRAVIS_BUILD_DIR
         - ./gradlew test
     - name: "Fossa test"
       workspaces:
-        use:
-          compiled
-      git:
-        clone: false
+        use: compiled
       script:
         - cd $TRAVIS_BUILD_DIR
         - ./fossa test
     - name: "Functional tests"
       workspaces:
-        use:
-          compiled
+        use: compiled
         create:
           name: ftests
-          paths:
-            - "./build/test-results/test/*.xml"
-      git:
-        clone: false
+          paths: "./build/test-results/test/*.xml"
       script:
         - cd $TRAVIS_BUILD_DIR
         - ./gradlew funcTest
@@ -97,11 +77,9 @@ jobs:
       name: "Codecov"
       workspaces:
         use:
-          - compile
+          - compiled
           - utests
           - ftests
-      git:
-        clone: false
       script:
         - cd $TRAVIS_BUILD_DIR
         - ./gradlew jacocoMerge reportMerge
