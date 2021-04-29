@@ -1,5 +1,5 @@
 pluginManagement {
-  val kotlinVersion = "1.4.30"
+  val kotlinVersion = "1.4.32"
   repositories {
     gradlePluginPortal()
     jcenter()
@@ -14,7 +14,7 @@ pluginManagement {
     id("io.gitlab.arturbosch.detekt") version "1.16.0"
 
     // documentation
-    id("org.jetbrains.dokka") version "1.4.30"
+    id("org.jetbrains.dokka") version "1.4.32"
     id("org.asciidoctor.jvm.convert") version "3.3.2"
 
     // publishing

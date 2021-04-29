@@ -1,3 +1,4 @@
+import java.util.Properties
 val repoUsr: String? by project
 val repoPwd: String? by project
 val repoUrl: String? by project
@@ -28,7 +29,6 @@ plugins {
 }
 
 group = "de.qualersoft"
-version = "0.0.1-SNAPSHOT"
 
 testSets {
   "funcTest" {
@@ -165,23 +165,19 @@ publishing {
   publications {
     create<MavenPublication>("pluginMaven") {
       // customize main publications here
-      artifact(sourcesJar)
+      artifact(tasks.kotlinSourcesJar)
       artifact(dokkaJar)
+      artifact(tasks.jar)
     }
   }
 
   repositories {
     maven {
-      name = "Nexus"
+      name = "GitHubPackages"
+      url = uri("https://maven.pkg.github.com/qualersoft/robotframework-gradle-plugin")
       credentials {
-        username = repoUsr
-        password = repoPwd
-      }
-
-      url = if ("${project.version}".endsWith("-SNAPSHOT")) {
-        uri("$repoUrl/maven-snapshots/")
-      } else {
-        uri("$repoUrl/maven-releases/")
+        username = project.findProperty("publish.gh.mathze.gpr.usr") as String? ?: System.getenv("USERNAME")
+        password = project.findProperty("publish.gh.mathze.gpr.key") as String? ?: System.getenv("TOKEN")
       }
     }
   }
@@ -198,4 +194,52 @@ compileTestKotlin.kotlinOptions {
 
 java {
   targetCompatibility = JavaVersion.VERSION_11
+}
+
+tasks.register("updateVersion") {
+  description = """ONLY FOR CI/CD purposes!
+    |
+    |This task is meant to be used by CI/CD to generate new release versions.
+    |Prerequists: a `gradle.properties` next to this build-script must exist.
+    |   version must follow semver-schema (<number>.<number.<number>*)
+    |Usage:
+    |  > ./gradlew updateVersion -PnewVersion="the new version"
+  """.trimMargin()
+
+  doLast {
+    var newVersion = project.findProperty("newVersion") as String?
+      ?: throw IllegalArgumentException(
+        "No `newVersion` specified!" +
+            " Usage: ./gradlew updateVersion -PnewVersion=<version>"
+      )
+
+    if (newVersion.contains("snapshot", true)) {
+      val props = Properties()
+      props.load(getGradlePropsFile().inputStream())
+      val currVersion = (props["version"] as String?)!!.split('.').toMutableList()
+      val next = currVersion.last()
+        .replace(Regex("[^\\d]+"), "").toInt() + 1
+      currVersion[currVersion.lastIndex] = "$next-SNAPSHOT"
+      newVersion = currVersion.joinToString(".")
+    }
+
+    persistVersion(newVersion)
+  }
+}
+
+fun getGradlePropsFile(): File {
+  val propsFile = files("./gradle.properties").singleFile
+  if (!propsFile.exists()) {
+    val msg = "This task requires version to be stored in gradle.properties file, which does not exist!"
+    throw UnsupportedOperationException(msg)
+  }
+  return propsFile
+}
+
+fun persistVersion(newVersion: String) {
+  val propsFile = getGradlePropsFile()
+  val props = Properties()
+  props.load(propsFile.inputStream())
+  props.setProperty("version", newVersion)
+  props.store(propsFile.outputStream(), null)
 }
