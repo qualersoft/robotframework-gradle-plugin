@@ -1,4 +1,3 @@
----
 language: java
 install: skip
 
@@ -12,75 +11,75 @@ git:
 
 jobs:
   include:
-    - stage: Init
+    - stage: init
       workspaces:
-        - create:
-            name: base
-            paths: .
+        create:
+          name: base
+          paths: .
       git:
         clone: true
       script:
         - "curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh > install.sh"
         - "sudo bash install.sh -b ."
 
-#    - stage: "Static Analyse"
-#      name: "Detekt"
-#      workspaces:
-#        use: base
-#      script:
-#        - cd $TRAVIS_BUILD_DIR
-#        - ./gradlew detekt
-#    - name: "Fossa - Trigger analyze"
-#      workspaces:
-#        use: base
-#      script:
-#        - cd $TRAVIS_BUILD_DIR
-#        - ./fossa analyze --branch "$TRAVIS_BRANCH"
-#
-#    - stage: Compile
-#      workspaces:
-#        use: base
-#        create:
-#          name: compiled
-#          paths: .
-#      script:
-#        - cd $TRAVIS_BUILD_DIR
-#        - ./gradlew classes
-#
-#    - stage: Test
-#      name: "Unit tests"
-#      workspaces:
-#        use: compiled
-#        create:
-#          name: utests
-#          paths: "./build/test-results/test/*.xml"
-#      script:
-#        - cd $TRAVIS_BUILD_DIR
-#        - ./gradlew test
-#    - name: "Fossa test"
-#      workspaces:
-#        use: compiled
-#      script:
-#        - cd $TRAVIS_BUILD_DIR
-#        - ./fossa test
-#    - name: "Functional tests"
-#      workspaces:
-#        use: compiled
-#        create:
-#          name: ftests
-#          paths: "./build/test-results/test/*.xml"
-#      script:
-#        - cd $TRAVIS_BUILD_DIR
-#        - ./gradlew funcTest
-#
-#    - stage: report
-#      name: "Codecov"
-#      workspaces:
-#        use:
-#          - compiled
-#          - utests
-#          - ftests
-#      script:
-#        - cd $TRAVIS_BUILD_DIR
-#        - ./gradlew jacocoMerge reportMerge
-#        - bash <(curl -s https://codecov.io/bash) -B "$TRAVIS_BRANCH"
+    - stage: "Static Analyse"
+      name: "Detekt"
+      workspaces:
+        use: base
+      script:
+        - cd $TRAVIS_BUILD_DIR
+        - ./gradlew detekt
+    - name: "Fossa - Trigger analyze"
+      workspaces:
+        use: base
+      script:
+        - cd $TRAVIS_BUILD_DIR
+        - ./fossa analyze --branch "$TRAVIS_BRANCH"
+
+    - stage: Compile
+      workspaces:
+        use: base
+        create:
+          name: compiled
+          paths: .
+      script:
+        - cd $TRAVIS_BUILD_DIR
+        - ./gradlew classes
+
+    - stage: Test
+      name: "Unit tests"
+      workspaces:
+        use: compiled
+        create:
+          name: utests
+          paths: "./build/test-results/test/*.xml"
+      script:
+        - cd $TRAVIS_BUILD_DIR
+        - ./gradlew test
+    - name: "Fossa test"
+      workspaces:
+        use: compiled
+      script:
+        - cd $TRAVIS_BUILD_DIR
+        - ./fossa test
+    - name: "Functional tests"
+      workspaces:
+        use: compiled
+        create:
+          name: ftests
+          paths: "./build/test-results/test/*.xml"
+      script:
+        - cd $TRAVIS_BUILD_DIR
+        - ./gradlew funcTest
+
+    - stage: report
+      name: "Codecov"
+      workspaces:
+        use:
+          - compiled
+          - utests
+          - ftests
+      script:
+        - cd $TRAVIS_BUILD_DIR
+        - ./gradlew jacocoMerge reportMerge
+        - bash <(curl -s https://codecov.io/bash) -B "$TRAVIS_BRANCH"
