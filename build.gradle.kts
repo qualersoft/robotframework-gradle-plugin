@@ -1,7 +1,6 @@
 import java.util.Properties
-val repoUsr: String? by project
-val repoPwd: String? by project
-val repoUrl: String? by project
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
   // realization
@@ -76,9 +75,6 @@ jacoco {
 repositories {
   jcenter()
   mavenCentral()
-  maven {
-    url = uri("$repoUrl/maven-public/")
-  }
 }
 
 dependencies {
@@ -108,6 +104,28 @@ tasks.detekt {
 
 tasks.withType<Test> {
   useJUnitPlatform()
+
+  testLogging {
+    events = mutableSetOf(TestLogEvent.FAILED)
+    exceptionFormat = TestExceptionFormat.FULL
+  }
+
+  addTestListener(object : TestListener {
+    override fun beforeSuite(suite: TestDescriptor) {}
+    override fun beforeTest(testDescriptor: TestDescriptor) {}
+    override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
+    override fun afterSuite(suite: TestDescriptor, result: TestResult) {
+      if (null == suite.parent) { // root suite
+        logger.lifecycle("----")
+        logger.lifecycle("Test result: ${result.resultType}")
+        logger.lifecycle("Test summary: ${result.testCount} tests, " +
+            "${result.successfulTestCount} succeeded, " +
+            "${result.failedTestCount} failed, " +
+            "${result.skippedTestCount} skipped")
+      }
+    }
+  })
+
   finalizedBy(
     when (name) {
       "test" -> tasks.jacocoTestReport

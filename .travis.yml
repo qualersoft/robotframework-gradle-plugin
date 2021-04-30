@@ -70,7 +70,7 @@ jobs:
           paths: "./build/test-results/test/*.xml"
       script:
         - cd $TRAVIS_BUILD_DIR
-        - ./gradlew funcTest
+        - travis_wait 40 ./gradlew funcTest
 
     - stage: Report
       name: "Codecov"

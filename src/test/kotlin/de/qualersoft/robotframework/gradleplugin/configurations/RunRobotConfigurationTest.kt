@@ -15,6 +15,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import java.io.File
+import java.nio.file.Paths
 
 internal class RunRobotConfigurationTest : ConfigurationTestBase() {
 
@@ -124,7 +125,12 @@ internal class RunRobotConfigurationTest : ConfigurationTestBase() {
 
   @Test
   fun addDebugFile() {
-    val file = File("C:/temp")
+    val file = if(System.getProperty("os.name").contains("win")) {
+      File("C:\\temp")
+    } else {
+      File("/temp")
+    }
+
     val result = applyConfig {
       it.debugFile.fileValue(file)
     }.generateArguments().toList()
@@ -141,7 +147,7 @@ internal class RunRobotConfigurationTest : ConfigurationTestBase() {
       it.maxErrorLines.set(-1)
     }.generateArguments().toList()
     val expected = listOf(
-      "-d", File(project.buildDir, "\\reports\\robotframework").absolutePath,
+      "-d", Paths.get(project.buildDir.absolutePath, "reports", "robotframework").toFile().absolutePath,
       "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "-F", "robot",
       "--randomize", "none", "--console", "verbose", "-W", "78", "-K", "auto", "--maxerrorlines", "none"
     )
@@ -218,7 +224,7 @@ internal class RunRobotConfigurationTest : ConfigurationTestBase() {
       it.randomize.set("tests:1234")
     }.generateArguments().toList()
     val expected = listOf(
-      "-d", File(project.buildDir, "\\reports\\robotframework").absolutePath,
+      "-d", Paths.get(project.buildDir.absolutePath, "reports", "robotframework").toFile().absolutePath,
       "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "-F", "robot",
       "--randomize", "tests:1234", "--console", "verbose", "-W", "78", "-K", "auto", "--maxerrorlines", "40"
     )
@@ -259,7 +265,7 @@ internal class RunRobotConfigurationTest : ConfigurationTestBase() {
       it.console.set("none")
     }.generateArguments().toList()
     val expected = listOf(
-      "-d", File(project.buildDir, "\\reports\\robotframework").absolutePath,
+      "-d", Paths.get(project.buildDir.absolutePath, "reports", "robotframework").toFile().absolutePath,
       "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "-F", "robot",
       "--randomize", "none", "--console", "none", "-W", "78", "-K", "auto", "--maxerrorlines", "40"
     )
@@ -300,7 +306,7 @@ internal class RunRobotConfigurationTest : ConfigurationTestBase() {
       it.consoleWidth.set(10)
     }.generateArguments().toList()
     val expected = listOf(
-      "-d", File(project.buildDir, "\\reports\\robotframework").absolutePath,
+      "-d", Paths.get(project.buildDir.absolutePath, "reports", "robotframework").toFile().absolutePath,
       "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "-F", "robot",
       "--randomize", "none", "--console", "verbose", "-W", "10", "-K", "auto", "--maxerrorlines", "40"
     )
@@ -317,7 +323,7 @@ internal class RunRobotConfigurationTest : ConfigurationTestBase() {
       it.consoleMarkers.set("on")
     }.generateArguments().toList()
     val expected = listOf(
-      "-d", File(project.buildDir, "\\reports\\robotframework").absolutePath,
+      "-d", Paths.get(project.buildDir.absolutePath, "reports", "robotframework").toFile().absolutePath,
       "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "-F", "robot",
       "--randomize", "none", "--console", "verbose", "-W", "78", "-K", "on", "--maxerrorlines", "40"
     )
@@ -334,13 +340,13 @@ internal class RunRobotConfigurationTest : ConfigurationTestBase() {
   }
 
   private fun createDefaultsWithoutExtensionParam() = listOf(
-    "-d", File(project.buildDir, "\\reports\\robotframework").absolutePath,
+    "-d", Paths.get(project.buildDir.absolutePath, "reports", "robotframework").toFile().absolutePath,
     "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "--maxerrorlines", "40",
     "--randomize", "none", "--console", "verbose", "-W", "78", "-K", "auto"
   )
 
   private fun createDefaults() = listOf(
-    "-d", File(project.buildDir, "\\reports\\robotframework").absolutePath, "-F", "robot",
+    "-d", Paths.get(project.buildDir.absolutePath, "reports", "robotframework").toFile().absolutePath, "-F", "robot",
     "-l", "log.html", "-r", "report.html", "-x", "robot-xunit-results.xml", "--maxerrorlines", "40",
     "--randomize", "none", "--console", "verbose", "-W", "78", "-K", "auto"
   )
