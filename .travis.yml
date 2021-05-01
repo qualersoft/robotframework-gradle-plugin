@@ -53,9 +53,9 @@ jobs:
         create:
           name: utests
           paths:
-            - "./build/test-results/test/**"
+            - "./build/test-results/test/"
             - "./build/jacoco/*.exec"
-            - "./build/reports/jacoco/**"
+            - "./build/reports/jacoco/"
       script:
         - cd $TRAVIS_BUILD_DIR
         - ./gradlew test
@@ -71,9 +71,9 @@ jobs:
         create:
           name: ftests
           paths:
-            - "./build/test-results/funcTest/**"
+            - "./build/test-results/funcTest/"
             - "./build/jacoco/*.exec"
-            - "./build/reports/jacoco/**"
+            - "./build/reports/jacoco/"
       script:
         - cd $TRAVIS_BUILD_DIR
         - travis_wait 40 ./gradlew funcTest
