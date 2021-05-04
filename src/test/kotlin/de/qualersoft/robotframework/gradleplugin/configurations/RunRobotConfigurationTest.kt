@@ -125,7 +125,7 @@ internal class RunRobotConfigurationTest : ConfigurationTestBase() {
 
   @Test
   fun addDebugFile() {
-    val file = if(System.getProperty("os.name").contains("wind", true)) {
+    val file = if (System.getProperty("os.name").contains("wind", true)) {
       File("C:\\temp")
     } else {
       File("/temp")

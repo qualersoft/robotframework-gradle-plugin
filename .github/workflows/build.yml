@@ -114,7 +114,8 @@ jobs:
             ~/.gradle/wrapper/dists/**
           key: ${{ runner.os }}-gradle-${{ secrets.GRADLE_CACHE_VERSION }}-${{ hashFiles('./*.gradle', './*.gradle.kts', './gradle.properties') }}
           restore-keys: ${{ runner.os }}-gradle-${{ secrets.GRADLE_CACHE_VERSION }}-
-      - uses: actions/cache@v2
+      - name: "Unit test cache"
+        uses: actions/cache@v2
         with:
           path: ${{ github.workspace }}/**
           key: ${{ runner.os }}-test-${{ github.run_id }}
