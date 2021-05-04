@@ -142,7 +142,7 @@ jobs:
         with:
           path: ${{ github.workspace }}/**
           key: ${{ runner.os }}-funcTest-${{ github.run_id }}
-      - name: "Unit test"
+      - name: "Functional tests"
         run: ${{ github.workspace }}/gradlew funcTest jacocoFuncTestReport
 
   licenceCheck:
