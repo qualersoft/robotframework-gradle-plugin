@@ -18,12 +18,14 @@ Its goal is to enable you to use the Robot Framework in a gradle project without
 image:https://app.fossa.com/api/projects/git%2Bgithub.com%2Fqualersoft%2Frobot-gradle-plugin.svg?type=shield[link=https://app.fossa.com/projects/custom%2B17788%2Frobotframework-gradle-plugin/refs/branch/master/]
 
 |Master
-|image:https://www.codefactor.io/repository/github/qualersoft/robotframework-gradle-plugin/badge/master?s=2996b4322bfcdca3d8e6250191d67a1410cf3a16[link=https://www.codefactor.io/repository/github/qualersoft/robotframework-gradle-plugin/overview/master]
-image:https://codecov.io/gh/qualersoft/robotframework-gradle-plugin/branch/master/graph/badge.svg?token=Z5CT2C7LN1[link=https://codecov.io/gh/qualersoft/robotframework-gradle-plugin]
+|image:https://github.com/qualersoft/robotframework-gradle-plugin/actions/workflows/build.yml/badge.svg?branch=master[title="Build status", link=https://github.com/qualersoft/robotframework-gradle-plugin/blob/master/.github/workflows/build.yml]
+image:https://www.codefactor.io/repository/github/qualersoft/robotframework-gradle-plugin/badge/master?s=2996b4322bfcdca3d8e6250191d67a1410cf3a16[title="Code quality", link=https://www.codefactor.io/repository/github/qualersoft/robotframework-gradle-plugin/overview/master]
+image:https://codecov.io/gh/qualersoft/robotframework-gradle-plugin/branch/master/graph/badge.svg?token=Z5CT2C7LN1[title="Coverage", link=https://codecov.io/gh/qualersoft/robotframework-gradle-plugin]
 
 |Develop
-|image:https://www.codefactor.io/repository/github/qualersoft/robotframework-gradle-plugin/badge/develop?s=2996b4322bfcdca3d8e6250191d67a1410cf3a16[link=https://www.codefactor.io/repository/github/qualersoft/robotframework-gradle-plugin/overview/develop]
-image:https://codecov.io/gh/qualersoft/robotframework-gradle-plugin/branch/develop/graph/badge.svg?token=Z5CT2C7LN1[link=https://codecov.io/gh/qualersoft/robotframework-gradle-plugin]
+|image:https://github.com/qualersoft/robotframework-gradle-plugin/actions/workflows/build.yml/badge.svg?branch=develop[title="Build status", link=https://github.com/qualersoft/robotframework-gradle-plugin/blob/develop/.github/workflows/build.yml]
+image:https://www.codefactor.io/repository/github/qualersoft/robotframework-gradle-plugin/badge/develop?s=2996b4322bfcdca3d8e6250191d67a1410cf3a16[title="Code quality", link=https://www.codefactor.io/repository/github/qualersoft/robotframework-gradle-plugin/overview/develop]
+image:https://codecov.io/gh/qualersoft/robotframework-gradle-plugin/branch/develop/graph/badge.svg?token=Z5CT2C7LN1[title="Coverage", link=https://codecov.io/gh/qualersoft/robotframework-gradle-plugin]
 |===
 
 == Quickstart
