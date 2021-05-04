@@ -23,10 +23,10 @@ class TestdocTest : BaseRobotFrameworkFunctionalTest() {
     runShouldSucceed(result)
     performOutputCheck { actual ->
       assertAll(
-        { actual shouldContain "Suite description for test1" },
-        { actual shouldContain "Create some output test" },
-        { actual shouldContain "Suite description for test2" },
-        { actual shouldContain "Create some more output test" }
+        { actual shouldContain SUITE_DESC_T1 },
+        { actual shouldContain OUTPUT_T1 },
+        { actual shouldContain SUITE_DESC_T2 },
+        { actual shouldContain OUTPUT_T2 }
       )
     }
   }
@@ -42,10 +42,10 @@ class TestdocTest : BaseRobotFrameworkFunctionalTest() {
     runShouldSucceed(result)
     performOutputCheck { actual ->
       assertAll(
-        { actual shouldContain "Suite description for test1" },
-        { actual shouldContain "Create some output test" },
-        { actual shouldContain "Suite description for test2" },
-        { actual shouldContain "Create some more output test" }
+        { actual shouldContain SUITE_DESC_T1 },
+        { actual shouldContain OUTPUT_T1 },
+        { actual shouldContain SUITE_DESC_T2 },
+        { actual shouldContain OUTPUT_T2 }
       )
     }
   }
@@ -61,12 +61,12 @@ class TestdocTest : BaseRobotFrameworkFunctionalTest() {
     runShouldSucceed(result)
     performOutputCheck { actual ->
       assertAll(
-        { actual shouldNotContain "Suite description for test1" },
-        { actual shouldNotContain "Create some output test" },
-        { actual shouldNotContain "This is a simple documentation" },
-        { actual shouldContain "Suite description for test2" },
-        { actual shouldContain "Create some more output test" },
-        { actual shouldContain "This is another simple documentation" }
+        { actual shouldNotContain SUITE_DESC_T1 },
+        { actual shouldNotContain OUTPUT_T1 },
+        { actual shouldNotContain DESC_T1 },
+        { actual shouldContain SUITE_DESC_T2 },
+        { actual shouldContain OUTPUT_T2 },
+        { actual shouldContain DESC_T2 }
       )
     }
   }
@@ -82,12 +82,12 @@ class TestdocTest : BaseRobotFrameworkFunctionalTest() {
     runShouldSucceed(result)
     performOutputCheck { actual ->
       assertAll(
-        { actual shouldNotContain "Suite description for test1" },
-        { actual shouldNotContain "Create some output test" },
-        { actual shouldNotContain "This is a simple documentation" },
-        { actual shouldContain "Suite description for test2" },
-        { actual shouldContain "Create some more output test" },
-        { actual shouldContain "This is another simple documentation" }
+        { actual shouldNotContain SUITE_DESC_T1 },
+        { actual shouldNotContain OUTPUT_T1 },
+        { actual shouldNotContain DESC_T1 },
+        { actual shouldContain SUITE_DESC_T2 },
+        { actual shouldContain OUTPUT_T2 },
+        { actual shouldContain DESC_T2 }
       )
     }
   }
@@ -96,5 +96,15 @@ class TestdocTest : BaseRobotFrameworkFunctionalTest() {
     val path = Paths.get(testProjectDir.root.path, "build", "doc", "testdoc.html")
     val content = path.toFile().readText(StandardCharsets.UTF_8)
     test(content)
+  }
+
+  companion object {
+    const val SUITE_DESC_T1 = "Suite description for test1"
+    const val OUTPUT_T1 = "Create some output test"
+    const val DESC_T1 = "This is a simple documentation"
+
+    const val SUITE_DESC_T2 = "Suite description for test2"
+    const val OUTPUT_T2 = "Create some more output test"
+    const val DESC_T2 = "This is another simple documentation"
   }
 }

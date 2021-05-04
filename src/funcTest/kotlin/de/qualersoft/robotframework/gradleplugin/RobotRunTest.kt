@@ -8,52 +8,49 @@ import org.junit.jupiter.api.assertAll
 
 class RobotRunTest : BaseRobotFrameworkFunctionalTest() {
 
-  override fun rootFolder(): String? {
-    val fa = getFolderAction
-    return if (null == fa) null else "run/" + fa()
-  }
+  override fun rootFolder(): String? = subFolder?.let { "run/$it" }
 
-  var getFolderAction: (() -> String?)? = null
+  var subFolder: String? = null
 
   @Test
   @GroovyTag
   @DisplayName("When run with minimal groovy settings, 'hello world' should be printed")
   fun testMinimalRunGroovy() {
-    getFolderAction = { "defaultrunner" }
+    subFolder = "defaultrunner"
     val result = setupGroovyTest("run_minimal_test")
       .withArguments("robotRun")
       .build()
 
     runShouldSucceed(result)
-    result.output shouldContain "Hello world"
+    result.output shouldContain HI
   }
 
   @Test
   @KotlinTag
   @DisplayName("When run with minimal kotlin settings, 'hello world' should be printed")
   fun testMinimalRunKotlin() {
-    getFolderAction = { "defaultrunner" }
+    subFolder = "defaultrunner"
     val result = setupKotlinTest("run_minimal_test")
       .withArguments("robotRun")
       .build()
 
     runShouldSucceed(result)
-    result.output shouldContain "Hello world"
+    result.output shouldContain HI
   }
 
   @Test
   @GroovyTag
   @DisplayName("When run with exclude config with groovy, 'goodbye' should be printed")
   fun testApplyConfigRunGroovy() {
-    getFolderAction = { "config" }
+    subFolder = "config"
     val result = setupGroovyTest("run_config")
       .withArguments("robotRun")
       .build()
 
     runShouldSucceed(result)
     assertAll(
-      { result.output shouldContain "Goodbye" },
-      { result.output shouldNotContain "Hello world" }
+      { result.output shouldContain BYE },
+      { result.output shouldNotContain HI }
     )
   }
 
@@ -61,15 +58,20 @@ class RobotRunTest : BaseRobotFrameworkFunctionalTest() {
   @KotlinTag
   @DisplayName("When run with exclude config with kotlin, 'goodbye' should be printed")
   fun testApplyConfigRunKotlin() {
-    getFolderAction = { "config" }
+    subFolder = "config"
     val result = setupKotlinTest("run_config")
       .withArguments("robotRun")
       .build()
 
     runShouldSucceed(result)
     assertAll(
-      { result.output shouldContain "Goodbye" },
-      { result.output shouldNotContain "Hello world" }
+      { result.output shouldContain BYE },
+      { result.output shouldNotContain HI }
     )
+  }
+
+  companion object {
+    const val HI = "Hello world"
+    const val BYE = "Goodbye"
   }
 }

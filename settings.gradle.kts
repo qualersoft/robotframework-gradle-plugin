@@ -2,7 +2,6 @@ pluginManagement {
   val kotlinVersion = "1.4.32"
   repositories {
     gradlePluginPortal()
-    jcenter()
     mavenCentral()
   }
   plugins {

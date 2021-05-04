@@ -11,7 +11,7 @@ plugins {
   jacoco
   id("org.unbroken-dome.test-sets") version "3.0.1"
   // workaround to integrate jacoco coverage into integration tests. (See https://github.com/gradle/gradle/issues/1465)
-  id("pl.droidsonroids.jacoco.testkit") version "1.0.7"
+  id("pl.droidsonroids.jacoco.testkit") version "1.0.8"
   id("io.gitlab.arturbosch.detekt")
   id("org.sonarqube")
 
@@ -28,11 +28,36 @@ plugins {
 }
 
 group = "de.qualersoft"
+val funcTest by sourceSets.creating {
+  compileClasspath += sourceSets.main.get().output
+  runtimeClasspath += sourceSets.main.get().output
+}
 
-testSets {
-  "funcTest" {
-    description = "Runs the functional tests"
-  }
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  implementation(kotlin("stdlib"))
+  implementation(kotlin("reflect"))
+
+  implementation(group = "org.robotframework", name = "robotframework", version = "4.0.1")
+
+  testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.6.2")
+  testImplementation(kotlin("test-junit5"))
+
+  val kotestVer = "4.4.3"
+  testImplementation(group = "io.kotest", name = "kotest-runner-junit5", version = kotestVer)
+  testImplementation(group = "io.kotest", name = "kotest-assertions-core-jvm", version = kotestVer)
+
+  testRuntimeOnly(kotlin("script-runtime"))
+
+  "funcTestImplementation"(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.6.2")
+  "funcTestImplementation"(kotlin("test-junit5"))
+  "funcTestImplementation"(group = "io.kotest", name = "kotest-runner-junit5", version = kotestVer)
+  "funcTestImplementation"(group = "io.kotest", name = "kotest-assertions-core-jvm", version = kotestVer)
+
+  "funcTestImplementation"(kotlin("script-runtime"))
 }
 
 gradlePlugin {
@@ -68,31 +93,6 @@ sonarqube {
   }
 }
 
-jacoco {
-  toolVersion = "0.8.6"
-}
-
-repositories {
-  jcenter()
-  mavenCentral()
-}
-
-dependencies {
-  implementation(kotlin("stdlib"))
-  implementation(kotlin("reflect"))
-
-  implementation(group = "org.robotframework", name = "robotframework", version = "4.0.1")
-
-  testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.6.2")
-  testImplementation(kotlin("test-junit5"))
-
-  val kotestVer = "4.4.3"
-  testImplementation(group = "io.kotest", name = "kotest-runner-junit5", version = kotestVer)
-  testImplementation(group = "io.kotest", name = "kotest-assertions-core-jvm", version = kotestVer)
-
-  testRuntimeOnly(kotlin("script-runtime"))
-}
-
 tasks.validatePlugins {
   enableStricterValidation.set(true)
 }
@@ -100,6 +100,24 @@ tasks.validatePlugins {
 tasks.detekt {
   // Target version of the generated JVM bytecode. It is used for type resolution.
   this.jvmTarget = JavaVersion.VERSION_11.toString()
+}
+
+val funcTestTask = tasks.register<Test>("funcTest") {
+  description = "Runs the functional tests."
+  group = "verification"
+  testClassesDirs = funcTest.output.classesDirs
+  classpath = funcTest.runtimeClasspath
+}
+
+val jacocoFuncTestReport = tasks.create<JacocoReport>("jacocoFuncTestReport") {
+  group = tasks.jacocoTestReport.get().group
+  sourceDirectories.from(sourceSets.main.get().allSource.srcDirs)
+  classDirectories.from(sourceSets.main.get().output.classesDirs)
+  executionData(funcTestTask.get())
+}
+
+tasks.check {
+  dependsOn(funcTestTask)
 }
 
 tasks.withType<Test> {
@@ -127,20 +145,22 @@ tasks.withType<Test> {
   })
 
   finalizedBy(
-    when (name) {
-      "test" -> tasks.jacocoTestReport
-      "funcTest" -> tasks.named("jacocoFuncTestReport")
-      else -> throw IllegalArgumentException("Unknown test type '$name'")
+    when(name) {
+      tasks.test.name -> tasks.jacocoTestReport
+      funcTestTask.name -> jacocoFuncTestReport
+      else -> throw IllegalArgumentException("Unknown test task '$name' don't know which jacoco report to apply")
     }
   )
 }
 
-tasks.create<JacocoMerge>("jacocoMerge") {
+val jacocoMerge = tasks.create<JacocoMerge>("jacocoMerge") {
+  mustRunAfter(tasks.jacocoTestReport, jacocoFuncTestReport)
   val reportsTasks = tasks.withType<JacocoReport>().filter { it.name != "reportMerge" }.toTypedArray()
-  executionData(*reportsTasks.map { it.executionData.singleFile }.toTypedArray())
+  executionData(*reportsTasks.flatMap { it.executionData.files }.toTypedArray())
 }
 
 tasks.create<JacocoReport>("reportMerge") {
+  mustRunAfter(jacocoMerge)
   sourceDirectories.from(sourceSets.main.get().allSource.srcDirs)
   classDirectories.from(sourceSets.main.get().output.classesDirs)
   executionData(tasks.getByName<JacocoMerge>("jacocoMerge").destinationFile)
@@ -165,14 +185,6 @@ val dokkaJar by tasks.creating(Jar::class) {
   from(tasks.dokkaHtml)
 }
 
-// Create sources Jar from main kotlin sources
-val sourcesJar by tasks.creating(Jar::class) {
-  group = JavaBasePlugin.DOCUMENTATION_GROUP
-  description = "Assembles sources JAR"
-  archiveClassifier.set("sources")
-  from(project.the<SourceSetContainer>()["main"].allSource)
-}
-
 pluginBundle {
   website = "https://github.com/qualersoft/robotframework-gradle-plugin"
   vcsUrl = "https://github.com/qualersoft/robotframework-gradle-plugin"
@@ -185,7 +197,6 @@ publishing {
       // customize main publications here
       artifact(tasks.kotlinSourcesJar)
       artifact(dokkaJar)
-      artifact(tasks.jar)
     }
   }
 

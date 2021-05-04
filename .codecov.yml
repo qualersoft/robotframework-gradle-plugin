@@ -14,3 +14,11 @@ coverage:
         target: 80%
         # Only post a patch status to pull requests
         only_pulls: true
+
+parsers:
+  gcov:
+    branch_detection:
+      conditional: yes
+      loop: yes
+      method: no
+      macro: no
