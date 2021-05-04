@@ -35,6 +35,7 @@ val funcTest by sourceSets.creating {
 
 repositories {
   mavenCentral()
+  jcenter()
 }
 
 dependencies {
