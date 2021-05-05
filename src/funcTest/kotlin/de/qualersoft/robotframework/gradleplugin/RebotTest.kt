@@ -20,7 +20,7 @@ class RebotTest : BaseRobotFrameworkFunctionalTest() {
   fun testDefaultRunGroovy() {
     subDir = "defaults"
     val result = setupGroovyTest("build_rebot_defaults")
-      .withArguments("rebot")
+      .withArguments("rebotRun")
       .build()
 
     runShouldSucceed(result)
@@ -36,7 +36,7 @@ class RebotTest : BaseRobotFrameworkFunctionalTest() {
   fun testDefaultRunKotlin() {
     subDir = "defaults"
     val result = setupKotlinTest("build_rebot_defaults")
-      .withArguments("rebot")
+      .withArguments("rebotRun")
       .build()
 
     runShouldSucceed(result)
@@ -52,7 +52,7 @@ class RebotTest : BaseRobotFrameworkFunctionalTest() {
   fun testConfigRunGroovy() {
     subDir = "config"
     val result = setupGroovyTest("build_rebot_config")
-      .withArguments("rebot")
+      .withArguments("rebotRun")
       .build()
 
     runShouldSucceed(result)
@@ -75,7 +75,7 @@ class RebotTest : BaseRobotFrameworkFunctionalTest() {
   fun testConfigRunKotlin() {
     subDir = "config"
     val result = setupKotlinTest("build_rebot_config")
-      .withArguments("rebot")
+      .withArguments("rebotRun")
       .build()
 
     runShouldSucceed(result)

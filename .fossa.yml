@@ -12,3 +12,5 @@ analyze:
         type: gradle
         target: ':'
         path: .
+        options:
+          online: true

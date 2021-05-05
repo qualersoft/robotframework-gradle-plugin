@@ -22,7 +22,7 @@ class RobotFrameworkPluginFuncTest : BaseRobotFrameworkFunctionalTest() {
       val result = setupKotlinTest("build_minimal_test")
         .withArguments("tasks")
         .build()
-      result.output.lines() shouldContain "Applying java plugin"
+      result.output.lines() shouldContain APPLY_JAVA
     }
 
     @Test
@@ -32,7 +32,7 @@ class RobotFrameworkPluginFuncTest : BaseRobotFrameworkFunctionalTest() {
       val result = setupGroovyTest("build_minimal_test")
         .withArguments("tasks")
         .build()
-      result.output.lines() shouldContain "Applying java plugin"
+      result.output.lines() shouldContain APPLY_JAVA
     }
 
     @Test
@@ -63,7 +63,7 @@ class RobotFrameworkPluginFuncTest : BaseRobotFrameworkFunctionalTest() {
     val result = setupGroovyTest("build_minimal_withjava_test")
       .withArguments("tasks")
       .build()
-    result.output.lines() shouldNotContain "Applying java plugin"
+    result.output.lines() shouldNotContain APPLY_JAVA
   }
 
   @Test
@@ -73,6 +73,10 @@ class RobotFrameworkPluginFuncTest : BaseRobotFrameworkFunctionalTest() {
     val result = setupKotlinTest("build_minimal_withjava_test")
       .withArguments("tasks")
       .build()
-    result.output.lines() shouldNotContain "Applying java plugin"
+    result.output.lines() shouldNotContain APPLY_JAVA
+  }
+
+  companion object {
+    const val APPLY_JAVA = "Applying java plugin"
   }
 }

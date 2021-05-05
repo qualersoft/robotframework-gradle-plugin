@@ -1,6 +1,6 @@
-val repoUsr: String? by project
-val repoPwd: String? by project
-val repoUrl: String? by project
+import java.util.Properties
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
   // realization
@@ -11,7 +11,7 @@ plugins {
   jacoco
   id("org.unbroken-dome.test-sets") version "3.0.1"
   // workaround to integrate jacoco coverage into integration tests. (See https://github.com/gradle/gradle/issues/1465)
-  id("pl.droidsonroids.jacoco.testkit") version "1.0.7"
+  id("pl.droidsonroids.jacoco.testkit") version "1.0.8"
   id("io.gitlab.arturbosch.detekt")
   id("org.sonarqube")
 
@@ -28,12 +28,37 @@ plugins {
 }
 
 group = "de.qualersoft"
-version = "0.0.1-SNAPSHOT"
+val funcTest by sourceSets.creating {
+  compileClasspath += sourceSets.main.get().output
+  runtimeClasspath += sourceSets.main.get().output
+}
 
-testSets {
-  "funcTest" {
-    description = "Runs the functional tests"
-  }
+repositories {
+  mavenCentral()
+  jcenter()
+}
+
+dependencies {
+  implementation(kotlin("stdlib"))
+  implementation(kotlin("reflect"))
+
+  implementation(group = "org.robotframework", name = "robotframework", version = "4.0.1")
+
+  testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.6.2")
+  testImplementation(kotlin("test-junit5"))
+
+  val kotestVer = "4.4.3"
+  testImplementation(group = "io.kotest", name = "kotest-runner-junit5", version = kotestVer)
+  testImplementation(group = "io.kotest", name = "kotest-assertions-core-jvm", version = kotestVer)
+
+  testRuntimeOnly(kotlin("script-runtime"))
+
+  "funcTestImplementation"(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.6.2")
+  "funcTestImplementation"(kotlin("test-junit5"))
+  "funcTestImplementation"(group = "io.kotest", name = "kotest-runner-junit5", version = kotestVer)
+  "funcTestImplementation"(group = "io.kotest", name = "kotest-assertions-core-jvm", version = kotestVer)
+
+  "funcTestImplementation"(kotlin("script-runtime"))
 }
 
 gradlePlugin {
@@ -69,34 +94,6 @@ sonarqube {
   }
 }
 
-jacoco {
-  toolVersion = "0.8.6"
-}
-
-repositories {
-  jcenter()
-  mavenCentral()
-  maven {
-    url = uri("$repoUrl/maven-public/")
-  }
-}
-
-dependencies {
-  implementation(kotlin("stdlib"))
-  implementation(kotlin("reflect"))
-
-  implementation(group = "org.robotframework", name = "robotframework", version = "4.0.1")
-
-  testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.6.2")
-  testImplementation(kotlin("test-junit5"))
-
-  val kotestVer = "4.4.3"
-  testImplementation(group = "io.kotest", name = "kotest-runner-junit5", version = kotestVer)
-  testImplementation(group = "io.kotest", name = "kotest-assertions-core-jvm", version = kotestVer)
-
-  testRuntimeOnly(kotlin("script-runtime"))
-}
-
 tasks.validatePlugins {
   enableStricterValidation.set(true)
 }
@@ -106,23 +103,65 @@ tasks.detekt {
   this.jvmTarget = JavaVersion.VERSION_11.toString()
 }
 
+val funcTestTask = tasks.register<Test>("funcTest") {
+  description = "Runs the functional tests."
+  group = "verification"
+  testClassesDirs = funcTest.output.classesDirs
+  classpath = funcTest.runtimeClasspath
+}
+
+val jacocoFuncTestReport = tasks.create<JacocoReport>("jacocoFuncTestReport") {
+  group = tasks.jacocoTestReport.get().group
+  sourceDirectories.from(sourceSets.main.get().allSource.srcDirs)
+  classDirectories.from(sourceSets.main.get().output.classesDirs)
+  executionData(funcTestTask.get())
+}
+
+tasks.check {
+  dependsOn(funcTestTask)
+}
+
 tasks.withType<Test> {
   useJUnitPlatform()
+
+  testLogging {
+    events = mutableSetOf(TestLogEvent.FAILED)
+    exceptionFormat = TestExceptionFormat.FULL
+  }
+
+  addTestListener(object : TestListener {
+    override fun beforeSuite(suite: TestDescriptor) {}
+    override fun beforeTest(testDescriptor: TestDescriptor) {}
+    override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
+    override fun afterSuite(suite: TestDescriptor, result: TestResult) {
+      if (null == suite.parent) { // root suite
+        logger.lifecycle("----")
+        logger.lifecycle("Test result: ${result.resultType}")
+        logger.lifecycle("Test summary: ${result.testCount} tests, " +
+            "${result.successfulTestCount} succeeded, " +
+            "${result.failedTestCount} failed, " +
+            "${result.skippedTestCount} skipped")
+      }
+    }
+  })
+
   finalizedBy(
-    when (name) {
-      "test" -> tasks.jacocoTestReport
-      "funcTest" -> tasks.named("jacocoFuncTestReport")
-      else -> throw IllegalArgumentException("Unknown test type '$name'")
+    when(name) {
+      tasks.test.name -> tasks.jacocoTestReport
+      funcTestTask.name -> jacocoFuncTestReport
+      else -> throw IllegalArgumentException("Unknown test task '$name' don't know which jacoco report to apply")
     }
   )
 }
 
-tasks.create<JacocoMerge>("jacocoMerge") {
+val jacocoMerge = tasks.create<JacocoMerge>("jacocoMerge") {
+  mustRunAfter(tasks.jacocoTestReport, jacocoFuncTestReport)
   val reportsTasks = tasks.withType<JacocoReport>().filter { it.name != "reportMerge" }.toTypedArray()
-  executionData(*reportsTasks.map { it.executionData.singleFile }.toTypedArray())
+  executionData(*reportsTasks.flatMap { it.executionData.files }.toTypedArray())
 }
 
 tasks.create<JacocoReport>("reportMerge") {
+  mustRunAfter(jacocoMerge)
   sourceDirectories.from(sourceSets.main.get().allSource.srcDirs)
   classDirectories.from(sourceSets.main.get().output.classesDirs)
   executionData(tasks.getByName<JacocoMerge>("jacocoMerge").destinationFile)
@@ -147,14 +186,6 @@ val dokkaJar by tasks.creating(Jar::class) {
   from(tasks.dokkaHtml)
 }
 
-// Create sources Jar from main kotlin sources
-val sourcesJar by tasks.creating(Jar::class) {
-  group = JavaBasePlugin.DOCUMENTATION_GROUP
-  description = "Assembles sources JAR"
-  archiveClassifier.set("sources")
-  from(project.the<SourceSetContainer>()["main"].allSource)
-}
-
 pluginBundle {
   website = "https://github.com/qualersoft/robotframework-gradle-plugin"
   vcsUrl = "https://github.com/qualersoft/robotframework-gradle-plugin"
@@ -165,23 +196,18 @@ publishing {
   publications {
     create<MavenPublication>("pluginMaven") {
       // customize main publications here
-      artifact(sourcesJar)
+      artifact(tasks.kotlinSourcesJar)
       artifact(dokkaJar)
     }
   }
 
   repositories {
     maven {
-      name = "Nexus"
+      name = "GitHubPackages"
+      url = uri("https://maven.pkg.github.com/qualersoft/robotframework-gradle-plugin")
       credentials {
-        username = repoUsr
-        password = repoPwd
-      }
-
-      url = if ("${project.version}".endsWith("-SNAPSHOT")) {
-        uri("$repoUrl/maven-snapshots/")
-      } else {
-        uri("$repoUrl/maven-releases/")
+        username = project.findProperty("publish.gh.mathze.gpr.usr") as String? ?: System.getenv("USERNAME")
+        password = project.findProperty("publish.gh.mathze.gpr.key") as String? ?: System.getenv("TOKEN")
       }
     }
   }
@@ -198,4 +224,52 @@ compileTestKotlin.kotlinOptions {
 
 java {
   targetCompatibility = JavaVersion.VERSION_11
+}
+
+tasks.register("updateVersion") {
+  description = """ONLY FOR CI/CD purposes!
+    |
+    |This task is meant to be used by CI/CD to generate new release versions.
+    |Prerequists: a `gradle.properties` next to this build-script must exist.
+    |   version must follow semver-schema (<number>.<number.<number>*)
+    |Usage:
+    |  > ./gradlew updateVersion -PnewVersion="the new version"
+  """.trimMargin()
+
+  doLast {
+    var newVersion = project.findProperty("newVersion") as String?
+      ?: throw IllegalArgumentException(
+        "No `newVersion` specified!" +
+            " Usage: ./gradlew updateVersion -PnewVersion=<version>"
+      )
+
+    if (newVersion.contains("snapshot", true)) {
+      val props = Properties()
+      props.load(getGradlePropsFile().inputStream())
+      val currVersion = (props["version"] as String?)!!.split('.').toMutableList()
+      val next = currVersion.last()
+        .replace(Regex("[^\\d]+"), "").toInt() + 1
+      currVersion[currVersion.lastIndex] = "$next-SNAPSHOT"
+      newVersion = currVersion.joinToString(".")
+    }
+
+    persistVersion(newVersion)
+  }
+}
+
+fun getGradlePropsFile(): File {
+  val propsFile = files("./gradle.properties").singleFile
+  if (!propsFile.exists()) {
+    val msg = "This task requires version to be stored in gradle.properties file, which does not exist!"
+    throw UnsupportedOperationException(msg)
+  }
+  return propsFile
+}
+
+fun persistVersion(newVersion: String) {
+  val propsFile = getGradlePropsFile()
+  val props = Properties()
+  props.load(propsFile.inputStream())
+  props.setProperty("version", newVersion)
+  props.store(propsFile.outputStream(), null)
 }

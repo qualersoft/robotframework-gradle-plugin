@@ -104,8 +104,9 @@ internal class LibdocRobotConfigurationTest : ConfigurationTestBase() {
     assertAll(
       { result shouldNot beNull() },
       { result shouldNot beEmpty() },
-      { result.first().toArray().toList() should haveElementContains("ALibraryFile.robot") },
-      { result[1].toArray().toList() should haveElementContains("AResourceFile.resource") }
+      { result should haveSize(2) },
+      { result[0].toArray().union(result[1].toArray().toList()) should haveElementContains("ALibraryFile.robot") },
+      { result[1].toArray().union(result[0].toArray().toList()) should haveElementContains("AResourceFile.resource") }
     )
   }
 
@@ -174,8 +175,8 @@ internal class LibdocRobotConfigurationTest : ConfigurationTestBase() {
       { result shouldNot beNull() },
       { result shouldNot beEmpty() },
       { result should haveSize(2) },
-      { result[0].toArray().toList() should haveElementContains("ALibraryFile.robot") },
-      { result[1].toArray().toList() should haveElementContains("AResourceFile.resource") }
+      { result[0].toArray().union(result[1].toArray().toList()) should haveElementContains("ALibraryFile.robot") },
+      { result[1].toArray().union(result[0].toArray().toList()) should haveElementContains("AResourceFile.resource") }
     )
   }
 
@@ -189,8 +190,8 @@ internal class LibdocRobotConfigurationTest : ConfigurationTestBase() {
       { result shouldNot beNull() },
       { result shouldNot beEmpty() },
       { result should haveSize(2) },
-      { result[0].toArray().toList() should haveElementContains("ALibraryFile.robot") },
-      { result[1].toArray().toList() should haveElementContains("AResourceFile.resource") }
+      { result[0].toArray().union(result[1].toArray().toList()) should haveElementContains("ALibraryFile.robot") },
+      { result[1].toArray().union(result[0].toArray().toList()) should haveElementContains("AResourceFile.resource") }
     )
   }
 
