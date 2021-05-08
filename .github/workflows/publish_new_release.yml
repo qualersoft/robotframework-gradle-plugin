@@ -63,6 +63,8 @@ jobs:
 
       - name: prepare merge
         run: |
+          git config user.name "${{ github.actor }} action"
+          git config user.email "noreply@github.com"
           git fetch --all --recurse-submodules=no --progress --prune
           git checkout -b develop origin/develop
           git merge main --allow-unrelated-histories --strategy=recursive -Xtheirs --no-commit
