@@ -1,95 +1,89 @@
 package de.qualersoft.robotframework.gradleplugin.utils
 
-import org.gradle.api.Project
+import org.gradle.api.file.Directory
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import java.io.File
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
-internal class GradleProperty<T, V:Any>(
-  project: Project,
-  type: KClass<V>,
-  default: V
-) {
-  private val property: Property<V> = project.objects.property(type.java).apply {
-    set(default)
+internal class GradleProperty<T, V : Any> {
+
+  private val property: Property<V>
+
+  constructor(objects: ObjectFactory, type: KClass<V>, default: V? = null) {
+    property = createProperty(objects, type).apply {
+      convention(default)
+    }
   }
 
-  operator fun getValue(thisRef: T, property: KProperty<*>): V = this.property.get()
-  operator fun setValue(thisRef: T, property: KProperty<*>, value: V) = this.property.set(value)
-}
-
-internal class GradleNullableProperty<T, V:Any>(
-  project: Project,
-  type: KClass<V>,
-  default: V? = null
-) {
-  private val property: Property<V?> = project.objects.property(type.java).apply {
-    set(default)
+  constructor(objects: ObjectFactory, type: KClass<V>, provider: Provider<V>) {
+    property = createProperty(objects, type).apply {
+      convention(provider)
+    }
   }
 
-  operator fun getValue(thisRef: T, property: KProperty<*>): V? = this.property.orNull
+  private fun createProperty(objects: ObjectFactory, type: KClass<V>) = objects.property(type.java)
+
+  operator fun getValue(thisRef: T, property: KProperty<*>): Property<V> = this.property
   operator fun setValue(thisRef: T, property: KProperty<*>, value: V?) = this.property.set(value)
-}
-
-internal class GradleListProperty<T, V:Any>(
-  project: Project,
-  type: KClass<V>,
-  default: List<V> = mutableListOf()
-){
-  private val property: ListProperty<V> = project.objects.listProperty(type.java).apply {
-    set(default)
-  }
-  operator fun getValue(thisRef: T, property: KProperty<*>): MutableList<V> = this.property.get()
-  operator fun setValue(thisRef: T, property: KProperty<*>, value: MutableList<V>) = this.property.set(value)
+  operator fun setValue(thisRef: T, property: KProperty<*>, provider: Provider<V>) = this.property.set(provider)
 }
 
 internal class GradleStringListProperty<T>(
-  project: Project,
-  default: List<String> = mutableListOf()
+  objects: ObjectFactory,
+  default: MutableList<String> = mutableListOf()
 ) {
-  private val property: ListProperty<String> = project.objects.listProperty(String::class.java).apply {
-    set(default)
+  private val property: ListProperty<String> = objects.listProperty(String::class.java).apply {
+    convention(default)
   }
+
   operator fun getValue(thisRef: T, property: KProperty<*>): MutableList<String> = this.property.get()
-  operator fun setValue(thisRef: T, property: KProperty<*>, value: MutableList<String>) = this.property.set(value)
+  operator fun setValue(thisRef: T, property: KProperty<*>, value: Iterable<String>) = this.property.set(value)
 }
 
 internal class GradleStringMapProperty<T>(
-  project: Project,
+  objects: ObjectFactory,
   default: Map<String, String> = mapOf()
 ) {
 
-  private val property: MapProperty<String, String> = project.objects.mapProperty(
-    String::class.java, String::class.java).apply {
-    set(default)
+  private val property: MapProperty<String, String> = objects.mapProperty(
+    String::class.java, String::class.java
+  ).apply {
+    convention(default)
   }
+
   operator fun getValue(thisRef: T, property: KProperty<*>): Map<String, String> = this.property.get()
   operator fun setValue(thisRef: T, property: KProperty<*>, value: Map<String, String>) = this.property.set(value)
 }
 
 internal class GradleFileNullableProperty<T>(
-  project: Project,
+  objects: ObjectFactory,
   default: File? = null
 ) {
 
-  private val property = project.objects.property(File::class.java).apply {
+  private val property = objects.property(File::class.java).apply {
     set(default)
   }
+
   operator fun getValue(thisRef: T, property: KProperty<*>): File? = this.property.orNull
   operator fun setValue(thisRef: T, property: KProperty<*>, value: File?) = this.property.set(value)
 }
 
-internal class GradleFileProperty<T>(
-  project: Project,
-  default: File
-) {
+internal class GradleDirectoryProperty<T>(objects: ObjectFactory, provider: Provider<out Directory>) {
 
-  private val property: Property<File> = project.objects.property(File::class.java).apply {
-    set(default)
+  private val property: DirectoryProperty
+
+  init {
+    property = createProperty(objects).convention(provider)
   }
-  operator fun getValue(thisRef: T, property: KProperty<*>): File = this.property.get()
-  operator fun setValue(thisRef: T, property: KProperty<*>, value: File) = this.property.set(value)
+
+  private fun createProperty(objects: ObjectFactory) = objects.directoryProperty()
+
+  operator fun getValue(thisRef: T, property: KProperty<*>): DirectoryProperty = this.property
+  operator fun setValue(thisRef: T, property: KProperty<*>, value: DirectoryProperty) = this.property.set(value)
 }

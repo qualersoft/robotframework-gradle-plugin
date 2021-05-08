@@ -7,7 +7,7 @@ open class Arguments {
   private val args: MutableList<String> = arrayListOf()
 
   fun addOptionalFile(file: File?, flag: String) {
-    if(null != file) {
+    if (null != file) {
       add(flag, file.path)
     }
   }
@@ -29,13 +29,13 @@ open class Arguments {
   }
 
   fun addMapToArguments(valToAdd: Map<String, String>, flag: String) {
-    for((key, value) in valToAdd) {
+    for ((key, value) in valToAdd) {
       addStringToArguments("$key:$value", flag)
     }
   }
 
   fun addFlagToArguments(flag: Boolean?, argument: String) {
-    if ((null != flag) && flag) {
+    if (null != flag && flag) {
       add(argument)
     }
   }
@@ -49,8 +49,8 @@ open class Arguments {
   fun addListToArguments(variablesToAdd: String?, flag: String) {
     if (null != variablesToAdd) {
       addListToArguments(
-        variablesToAdd.split(",").map { it.trim() }
-        , flag)
+        variablesToAdd.split(",").map { it.trim() }, flag
+      )
     }
   }
 

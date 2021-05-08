@@ -1,0 +1,14 @@
+plugins {
+    id 'de.qualersoft.robotframework'
+}
+
+version = '0.0.1'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+tasks.register('rebotRun', de.qualersoft.robotframework.gradleplugin.tasks.RebotTask) {
+    sources = files("builds/test-results/robot/*.xml")
+}

@@ -1,0 +1,18 @@
+plugins {
+  id 'de.qualersoft.robotframework'
+}
+
+version = '0.0.1'
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+tasks.register('tidyRun', de.qualersoft.robotframework.gradleplugin.tasks.TidyTask) {
+  sources = files("src/test/robot/pipeTidy.robot")
+  tidy {
+    usepipes.set(true)
+    inplace.set(true)
+  }
+}

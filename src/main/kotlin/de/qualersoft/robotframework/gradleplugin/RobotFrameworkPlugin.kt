@@ -6,27 +6,41 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 
 private const val EXTENSION_NAME = "robotframework"
+const val ROBOT_CONFIGURATION_NAME = "robot"
 
 class RobotFrameworkPlugin : Plugin<Project> {
 
   override fun apply(target: Project) {
-    target.extensions.create(
+    val extension = target.extensions.create(
       EXTENSION_NAME,
       RobotFrameworkExtension::class.java,
-      target)
+      target
+    )
 
-    if (!target.pluginManager.hasPlugin("java")) {
+    applyJavaPluginIfRequired(target)
+    registerRobotConfiguration(target)
+
+    target.afterEvaluate {
+      val robConf = it.configurations.findByName(ROBOT_CONFIGURATION_NAME)
+      it.configurations.findByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)?.also { cnf ->
+        cnf.extendsFrom(robConf)
+      }
+
+      it.configurations.findByName(JavaPlugin.RUNTIME_ONLY_CONFIGURATION_NAME)?.also { rtConf ->
+        extension.robotVersion.get().applyTo(rtConf)
+      }
+    }
+  }
+
+  private fun applyJavaPluginIfRequired(project: Project) {
+    if (null == project.configurations.findByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)) {
       println("Applying java plugin")
-      target.pluginManager.apply(JavaPlugin::class.java)
+      project.pluginManager.apply(JavaPlugin::class.java)
     }
+  }
 
-    val robConf = target.configurations.register("robot")
-    val conf = target.configurations.findByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)
-    if (null != conf) {
-      conf.extendsFrom(robConf.get())
-    } else {
-      println("No configuration found for 'implementation', not even after the 'java' plugin has been applied!")
-    }
+  private fun registerRobotConfiguration(project: Project) {
+    project.configurations.create(ROBOT_CONFIGURATION_NAME)
   }
 }
 

@@ -1,0 +1,24 @@
+plugins {
+  id 'de.qualersoft.robotframework'
+  id 'java'
+}
+
+version = "0.0.1"
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+tasks.register("libdocRun", de.qualersoft.robotframework.gradleplugin.tasks.LibdocTask) {
+  libdoc {
+    outputFile.set(file("libdoc.html"))
+    libraryOrResourceFile = "ALib"
+    additionalPythonPaths.from(files(project.jar.outputs.files,
+        project.configurations.getByName("runtimeClasspath").files))
+  }
+}
+
+dependencies {
+  implementation(group: "org.robotframework", name: "javalib-core", version: "2.0.3")
+}

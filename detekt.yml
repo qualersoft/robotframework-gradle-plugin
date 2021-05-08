@@ -239,9 +239,9 @@ formatting:
     active: false
     autoCorrect: true
   Indentation:
-    active: false
-    autoCorrect: true
-    indentSize: 4
+    active: true
+    autoCorrect: false
+    indentSize: 2
     continuationIndentSize: 4
   MaximumLineLength:
     active: true
@@ -469,6 +469,8 @@ potential-bugs:
 
 style:
   active: true
+  ClassOrdering:
+    active: false
   CollapsibleIfStatements:
     active: false
   DataClassContainsFunctions:
@@ -489,8 +491,8 @@ style:
     includeLineWrapping: false
   ForbiddenComment:
     active: true
-    values: ['TODO:', 'FIXME:', 'STOPSHIP:']
-    allowedPatterns: ''
+    values: ['BUG:', 'FIXME:', 'STOPSHIP:']
+    allowedPatterns: '\wBUG'
   ForbiddenImport:
     active: false
     imports: []

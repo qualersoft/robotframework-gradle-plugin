@@ -1,14 +1,28 @@
 pluginManagement {
-  val kotlinVersion = "1.3.72"
+  val kotlinVersion = "1.4.32"
   repositories {
     gradlePluginPortal()
-    mavenLocal()
     mavenCentral()
   }
   plugins {
+    // realization
     kotlin("jvm") version kotlinVersion
-    id("org.jetbrains.dokka") version "0.10.1"
-    id("org.sonarqube") version "2.8"
-    id("io.gitlab.arturbosch.detekt") version "1.9.0"
+
+    // quality
+    id("org.unbroken-dome.test-sets") version "4.0.0"
+    // workaround to integrate jacoco coverage into integration tests. (See https://github.com/gradle/gradle/issues/1465)
+    id("pl.droidsonroids.jacoco.testkit") version "1.0.8"
+    id("org.sonarqube") version "3.1.1"
+    id("io.gitlab.arturbosch.detekt") version "1.16.0"
+
+    // documentation
+    id("org.jetbrains.dokka") version "1.4.32"
+    id("org.asciidoctor.jvm.convert") version "3.3.2"
+
+    // publishing
+    id("com.gradle.plugin-publish") version "0.14.0"
+    id("com.github.ben-manes.versions") version "0.38.0"
   }
 }
+
+rootProject.name = "robotframework-gradle-plugin"

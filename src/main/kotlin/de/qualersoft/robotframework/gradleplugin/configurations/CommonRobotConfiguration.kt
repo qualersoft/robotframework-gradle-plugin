@@ -1,20 +1,21 @@
 package de.qualersoft.robotframework.gradleplugin.configurations
 
-
 import de.qualersoft.robotframework.gradleplugin.utils.Arguments
 import de.qualersoft.robotframework.gradleplugin.utils.GradleFileNullableProperty
-import de.qualersoft.robotframework.gradleplugin.utils.GradleFileProperty
-import de.qualersoft.robotframework.gradleplugin.utils.GradleListProperty
-import de.qualersoft.robotframework.gradleplugin.utils.GradleNullableProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleStringListProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleStringMapProperty
 import org.gradle.api.Project
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import java.io.File
+import javax.inject.Inject
 
-open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(project) {
+open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(project.objects) {
 
-  //<editor-fold desc="properties">
+  // <editor-fold desc="properties">
 
   /**
    * Turn on the generic automation mode (aka **R**obot **P**rocess **A**utomation).
@@ -23,7 +24,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * @since RF 3.1.
    */
   @Suppress("private")
-  var rpa by GradleProperty(project, Boolean::class, false)
+  var rpa by GradleProperty(objects, Boolean::class, false)
 
   /**
    * Set the documentation of the top level suite.
@@ -33,7 +34,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    *    doc = "Very *good* example"
    */
   @Suppress("private")
-  var doc by GradleNullableProperty(project, String::class)
+  var doc by GradleProperty(objects, String::class)
 
   /**
    * Set metadata of the top level suite. Value can contain formatting similarly as [doc].
@@ -41,13 +42,13 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    *    metaData = mapOf("Version" to "1.2")
    */
   @Suppress("private")
-  var metaData by GradleStringMapProperty(project)
+  var metaData by GradleStringMapProperty(objects)
 
   /**
    * Sets given tag(s) to all tests.
    */
   @Suppress("private")
-  var setTags by GradleStringListProperty(project)
+  var setTags by GradleStringListProperty(objects)
 
   /**
    * Select tests by name or by long name containing also
@@ -58,13 +59,13 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * in brackets.
    */
   @Suppress("private")
-  var test by GradleStringListProperty(project)
+  var test by GradleStringListProperty(objects)
 
   /**
    * Alias to [test]. Especially applicable with [rpa].
    */
   @Suppress("private")
-  var task by GradleStringListProperty(project)
+  var task by GradleStringListProperty(objects)
 
   /**
    * Select suites by name. When this option is used with
@@ -76,7 +77,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * selects suite `Y` only if its parent is `X`.
    */
   @Suppress("private")
-  var suite by GradleStringListProperty(project)
+  var suite by GradleStringListProperty(objects)
 
   /**
    * Select tests by tag. Similarly as name with [test],
@@ -90,7 +91,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    *    include = "fooANDbar*"
    */
   @Suppress("private")
-  var include by GradleStringListProperty(project)
+  var include by GradleStringListProperty(objects)
 
   /**
    * Specify tests not to be included by tag. They are not
@@ -98,7 +99,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * matched using same rules as with [include].
    */
   @Suppress("private")
-  var exclude by GradleStringListProperty(project)
+  var exclude by GradleStringListProperty(objects)
 
   /**
    * Tests having the given tag are considered critical.
@@ -107,7 +108,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * [include].
    */
   @Suppress("private")
-  var critical by GradleStringListProperty(project)
+  var critical by GradleStringListProperty(objects)
 
   /**
    * Tests having the given tag are not critical even if
@@ -115,16 +116,19 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * a pattern.
    */
   @Suppress("private")
-  var nonCritical by GradleStringListProperty(project)
+  var nonCritical by GradleStringListProperty(objects)
 
   /**
    * Where to create output files. The given path is considered
    * relative to command execution directory unless it is absolute.
    *
-   * Default: `${project.buildDir}/robotframework-reports`.
+   * Default: `${project.buildDir}/reports/robotframework`.
    */
   @Suppress("private")
-  var outputDir by GradleFileProperty(project, File(project.buildDir, "robotframework-reports"))
+  val outputDir: DirectoryProperty = objects.directoryProperty()
+    .convention(
+      project.layout.buildDirectory.dir(joinPaths("reports", "robotframework"))
+    )
 
   /**
    * XML output file. Not created unless this option is
@@ -133,7 +137,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * [outputDir] unless given as an absolute path.
    */
   @Suppress("private")
-  var output by GradleFileNullableProperty(project)
+  var output by GradleFileNullableProperty(objects)
 
   /**
    * HTML log file. Can be disabled by passing `null`.
@@ -145,7 +149,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    *    log = null
    */
   @Suppress("private")
-  var log by GradleFileNullableProperty(project, File("log.html"))
+  var log by GradleFileNullableProperty(objects, File("log.html"))
 
   /**
    * HTML report file. Can be disabled by passing `null`
@@ -154,7 +158,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * Default: `report.html`
    */
   @Suppress("private")
-  var report by GradleFileNullableProperty(project, File("report.html"))
+  var report by GradleFileNullableProperty(objects, File("report.html"))
 
   /**
    * xUnit compatible result file. Not created unless this
@@ -162,7 +166,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * Default: `robot-xunit-results.xml`
    */
   @Suppress("private")
-  var xUnit by GradleFileNullableProperty(project, File("robot-xunit-results.xml"))
+  var xUnit by GradleFileNullableProperty(objects, File("robot-xunit-results.xml"))
 
   /**
    * Mark non-critical tests in xUnit output as skipped.
@@ -170,7 +174,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * Default: disabled (`false`)
    */
   @Suppress("private")
-  var xUnitSkipNonCritical by GradleProperty(project, Boolean::class, false)
+  var xUnitSkipNonCritical by GradleProperty(objects, Boolean::class, false)
 
   /**
    * When this option is used, timestamp in a format
@@ -189,7 +193,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * Default: `false`
    */
   @Suppress("private")
-  var timestampOutputs by GradleProperty(project, Boolean::class, false)
+  var timestampOutputs by GradleProperty(objects, Boolean::class, false)
 
   /**
    * Split the log file into smaller pieces that open in
@@ -198,21 +202,21 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * Default: `false`
    */
   @Suppress("private")
-  var split by GradleNullableProperty(project, Boolean::class, false)
+  var split by GradleProperty(objects, Boolean::class, false)
 
   /**
    * Title for the generated log file. The default title
    * is `<SuiteName> Test Log`.
    */
   @Suppress("private")
-  var logTitle by GradleNullableProperty(project, String::class)
+  var logTitle by GradleProperty(objects, String::class)
 
   /**
    * Title for the generated report file. The default
    * title is `<SuiteName> Test Report`.
    */
   @Suppress("private")
-  var reportTitle by GradleNullableProperty(project, String::class)
+  var reportTitle by GradleProperty(objects, String::class)
 
   /**
    * Background colors to use in the report file.
@@ -224,7 +228,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    *    reportBackground = "#00E:#E00"
    */
   @Suppress("private")
-  var reportBackground by GradleNullableProperty(project, String::class)
+  var reportBackground by GradleProperty(objects, String::class)
 
   /**
    * The threshold level for logging.
@@ -238,7 +242,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    *    logLevel = "DEBUG:INFO"
    */
   @Suppress("private")
-  var logLevel by GradleNullableProperty(project, String::class)
+  var logLevel by GradleProperty(objects, String::class)
 
   /**
    * How many levels to show in `Statistics by Suite`
@@ -248,7 +252,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    *    suiteStatLevel = 3
    */
   @Suppress("private")
-  var suiteStatLevel by GradleNullableProperty(project, Int::class)
+  var suiteStatLevel by GradleProperty(objects, Int::class)
 
   /**
    * Include only matching tags in `Statistics by Tag`
@@ -256,7 +260,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * Given tag can be a pattern like with [include].
    */
   @Suppress("private")
-  var tagStatInclude by GradleStringListProperty(project)
+  var tagStatInclude by GradleStringListProperty(objects)
 
   /**
    * Exclude matching tags from `Statistics by Tag`.
@@ -264,7 +268,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * similarly as [exclude] is used with [include].
    */
   @Suppress("private")
-  var tagStatExclude by GradleStringListProperty(project)
+  var tagStatExclude by GradleStringListProperty(objects)
 
   /**
    * Create combined statistics based on tags.
@@ -277,7 +281,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    *    tagstatcombine = mapOf("tag1ANDtag2" to "My_name")
    */
   @Suppress("private")
-  var tagStatCombine by GradleStringMapProperty(project)
+  var tagStatCombine by GradleStringMapProperty(objects)
 
   /**
    * Add documentation to tags matching the given
@@ -290,7 +294,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    *    tagDoc = mapOf("owner-*" to "Original author")
    */
   @Suppress("private")
-  var tagDoc by GradleStringMapProperty(project)
+  var tagDoc by GradleStringMapProperty(objects)
 
   /**
    * Add external links into `Statistics by
@@ -303,7 +307,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    *    tagStatLink = listOf("bug-*:http://url/id=%1:Issue Tracker")
    */
   @Suppress("private")
-  var tagStatLink by GradleStringListProperty(project, mutableListOf())
+  var tagStatLink by GradleStringListProperty(objects, mutableListOf())
 
   /**
    * Remove keywords and their messages altogether.
@@ -322,7 +326,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * and it supports simple patterns with * and ? as wildcards.
    */
   @Suppress("private")
-  var removeKeywords by GradleStringListProperty(project, mutableListOf())
+  var removeKeywords by GradleStringListProperty(objects, mutableListOf())
 
   /**
    * Flatten keywords and their messages altogether.
@@ -336,14 +340,14 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * and it supports simple patterns with * and ? as wildcards.
    */
   @Suppress("private")
-  var flattenKeywords by GradleStringListProperty(project, mutableListOf())
+  var flattenKeywords by GradleStringListProperty(objects, mutableListOf())
 
   /**
    * Sets the return code to zero regardless of failures
    * in test cases. Error codes are returned normally.
    */
   @Suppress("private")
-  var noStatusSrc by GradleProperty(project, Boolean::class, false)
+  var noStatusSrc by GradleProperty(objects, Boolean::class, false)
 
   /**
    * Use colors on console output or not.
@@ -354,7 +358,7 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    * Note that colors do not work with Jython on Windows.
    */
   @Suppress("private")
-  var consoleColors by GradleNullableProperty(project, String::class)
+  var consoleColors by GradleProperty(objects, String::class)
 
   /**
    * Text file to read more arguments from. Use special
@@ -375,14 +379,14 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
    *    argumentFile = "STDIN"
    */
   @Suppress("private")
-  var argumentFiles by GradleStringListProperty(project)
+  var argumentFiles by GradleStringListProperty(objects)
 
-  //</editor-fold>
+  // </editor-fold>
 
   override fun generateArguments(): Array<String> = Arguments().apply {
     addArgs(super.generateArguments())
-    addFlagToArguments(rpa, "--rpa")
-    addStringToArguments(doc, "--doc")
+    addFlagToArguments(rpa.orNull, "--rpa")
+    addStringToArguments(doc.orNull, "--doc")
     addMapToArguments(metaData, "--metadata")
     addListToArguments(setTags, "--settag")
     addListToArguments(test, "--test")
@@ -392,19 +396,19 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
     addListToArguments(exclude, "--exclude")
     addListToArguments(critical, "--critical")
     addListToArguments(nonCritical, "--noncritical")
-    addFileToArguments(outputDir, "-d")
+    addFileToArguments(outputDir.get().asFile, "-d")
     addOptionalFile(output, "-o")
     addFileToArguments(log, "-l")
     addFileToArguments(report, "-r")
     addOptionalFile(xUnit, "-x")
-    addFlagToArguments(xUnitSkipNonCritical, "--xunitskipnoncritical")
-    addFlagToArguments(timestampOutputs, "--timestampoutputs")
-    addFlagToArguments(split, "--splitoutputs")
-    addNonEmptyStringToArguments(logTitle, "--logtitle")
-    addNonEmptyStringToArguments(reportTitle, "--reporttitle")
-    addNonEmptyStringToArguments(reportBackground, "--reportbackground")
-    addNonEmptyStringToArguments(logLevel, "-L")
-    addStringToArguments(suiteStatLevel?.toString(), "--suitestatlevel")
+    addFlagToArguments(xUnitSkipNonCritical.orNull, "--xunitskipnoncritical")
+    addFlagToArguments(timestampOutputs.orNull, "--timestampoutputs")
+    addFlagToArguments(split.orNull, "--splitoutputs")
+    addNonEmptyStringToArguments(logTitle.orNull, "--logtitle")
+    addNonEmptyStringToArguments(reportTitle.orNull, "--reporttitle")
+    addNonEmptyStringToArguments(reportBackground.orNull, "--reportbackground")
+    addNonEmptyStringToArguments(logLevel.orNull, "-L")
+    addStringToArguments(suiteStatLevel.orNull?.toString(), "--suitestatlevel")
     addListToArguments(tagStatInclude, "--tagstatinclude")
     addListToArguments(tagStatExclude, "--tagstatexclude")
     addMapToArguments(tagStatCombine, "--tagstatcombine")
@@ -412,30 +416,32 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
     addListToArguments(tagStatLink, "--tagstatlink")
     addListToArguments(removeKeywords, "--removekeywords")
     addListToArguments(flattenKeywords, "--flattenkeywords")
-    addFlagToArguments(noStatusSrc, "--nostatusrc")
-    addStringToArguments(consoleColors, "--consolecolors")
+    addFlagToArguments(noStatusSrc.orNull, "--nostatusrc")
+    addStringToArguments(consoleColors.orNull, "--consolecolors")
     addListToArguments(argumentFiles, "--argumentfile")
   }.toArray()
 }
 
-
-open class CommonRobotConfiguration(project: Project) {
+open class CommonRobotConfiguration @Inject constructor(protected val objects: ObjectFactory) {
 
   /**
    * Sets the name of the documented library or resource.
    */
   @Suppress("private")
-  var name by GradleNullableProperty(project, String::class)
+  val name: Property<String?> = objects.property(String::class.java)
 
   /**
    * Additional locations where to search for libraries and resources.
    * e.g. src/main/java/com/test/
    */
   @Suppress("private")
-  var additionalPythonPaths by GradleListProperty(project, File::class)
+  var additionalPythonPaths: ConfigurableFileCollection = objects.fileCollection()
 
   open fun generateArguments(): Array<String> = Arguments().apply {
-    addStringToArguments(name, "--name")
-    addFileListToArguments(additionalPythonPaths, "--pythonpath")
+    addStringToArguments(name.orNull, "--name")
+    val files = additionalPythonPaths.files.toList()
+    addFileListToArguments(files, "--pythonpath")
   }.toArray()
+
+  protected fun joinPaths(vararg parts: String): String = parts.joinToString(File.separator)
 }

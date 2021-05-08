@@ -1,0 +1,17 @@
+plugins {
+    id 'de.qualersoft.robotframework'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+tasks.register("robotRun", de.qualersoft.robotframework.gradleplugin.tasks.RunRobotTask) {
+    sources = fileTree("src/test") {
+        include("**/*.robot")
+    }
+    robot {
+        exclude = ["Ignore"]
+    }
+}
