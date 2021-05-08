@@ -9,6 +9,9 @@ pluginManagement {
     kotlin("jvm") version kotlinVersion
 
     // quality
+    id("org.unbroken-dome.test-sets") version "4.0.0"
+    // workaround to integrate jacoco coverage into integration tests. (See https://github.com/gradle/gradle/issues/1465)
+    id("pl.droidsonroids.jacoco.testkit") version "1.0.8"
     id("org.sonarqube") version "3.1.1"
     id("io.gitlab.arturbosch.detekt") version "1.16.0"
 
@@ -18,6 +21,7 @@ pluginManagement {
 
     // publishing
     id("com.gradle.plugin-publish") version "0.14.0"
+    id("com.github.ben-manes.versions") version "0.38.0"
   }
 }
 

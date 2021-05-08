@@ -9,9 +9,8 @@ plugins {
 
   // quality
   jacoco
-  id("org.unbroken-dome.test-sets") version "3.0.1"
-  // workaround to integrate jacoco coverage into integration tests. (See https://github.com/gradle/gradle/issues/1465)
-  id("pl.droidsonroids.jacoco.testkit") version "1.0.8"
+  id("org.unbroken-dome.test-sets")
+  id("pl.droidsonroids.jacoco.testkit")
   id("io.gitlab.arturbosch.detekt")
   id("org.sonarqube")
 
@@ -22,15 +21,16 @@ plugins {
   // publishing
   `maven-publish`
   id("com.gradle.plugin-publish")
+  id("com.github.ben-manes.versions")
 
   idea
-  id("com.github.ben-manes.versions") version "0.38.0"
 }
 
 group = "de.qualersoft"
-val funcTest by sourceSets.creating {
-  compileClasspath += sourceSets.main.get().output
-  runtimeClasspath += sourceSets.main.get().output
+testSets {
+  "funcTest" {
+    description = "Runs the functional tests"
+  }
 }
 
 repositories {
@@ -52,13 +52,6 @@ dependencies {
   testImplementation(group = "io.kotest", name = "kotest-assertions-core-jvm", version = kotestVer)
 
   testRuntimeOnly(kotlin("script-runtime"))
-
-  "funcTestImplementation"(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.6.2")
-  "funcTestImplementation"(kotlin("test-junit5"))
-  "funcTestImplementation"(group = "io.kotest", name = "kotest-runner-junit5", version = kotestVer)
-  "funcTestImplementation"(group = "io.kotest", name = "kotest-assertions-core-jvm", version = kotestVer)
-
-  "funcTestImplementation"(kotlin("script-runtime"))
 }
 
 gradlePlugin {
@@ -103,24 +96,6 @@ tasks.detekt {
   this.jvmTarget = JavaVersion.VERSION_11.toString()
 }
 
-val funcTestTask = tasks.register<Test>("funcTest") {
-  description = "Runs the functional tests."
-  group = "verification"
-  testClassesDirs = funcTest.output.classesDirs
-  classpath = funcTest.runtimeClasspath
-}
-
-val jacocoFuncTestReport = tasks.create<JacocoReport>("jacocoFuncTestReport") {
-  group = tasks.jacocoTestReport.get().group
-  sourceDirectories.from(sourceSets.main.get().allSource.srcDirs)
-  classDirectories.from(sourceSets.main.get().output.classesDirs)
-  executionData(funcTestTask.get())
-}
-
-tasks.check {
-  dependsOn(funcTestTask)
-}
-
 tasks.withType<Test> {
   useJUnitPlatform()
 
@@ -148,20 +123,27 @@ tasks.withType<Test> {
   finalizedBy(
     when(name) {
       tasks.test.name -> tasks.jacocoTestReport
-      funcTestTask.name -> jacocoFuncTestReport
+      "funcTest" -> tasks.named("jacocoFuncTestReport")
       else -> throw IllegalArgumentException("Unknown test task '$name' don't know which jacoco report to apply")
     }
   )
 }
 
-val jacocoMerge = tasks.create<JacocoMerge>("jacocoMerge") {
-  mustRunAfter(tasks.jacocoTestReport, jacocoFuncTestReport)
-  val reportsTasks = tasks.withType<JacocoReport>().filter { it.name != "reportMerge" }.toTypedArray()
-  executionData(*reportsTasks.flatMap { it.executionData.files }.toTypedArray())
+tasks.named<Test>("funcTest") {
+  mustRunAfter(tasks.generateJacocoTestKitProperties)
 }
 
-tasks.create<JacocoReport>("reportMerge") {
-  mustRunAfter(jacocoMerge)
+val jacocoMerge = tasks.create<JacocoMerge>("jacocoMerge") {
+  description = "Create the merged execution data of all test runs"
+  val reportsTasks = tasks.withType<JacocoReport>().filter { it.name != "reportMerge" }.toTypedArray()
+  executionData(*reportsTasks.flatMap { it.executionData.files }.toTypedArray())
+  mustRunAfter(reportsTasks)
+}
+
+tasks.create<JacocoReport>("jacocoMergedReport") {
+  description = "Create the final reports of the merged execution data"
+  group = tasks.test.get().group
+  dependsOn(jacocoMerge)
   sourceDirectories.from(sourceSets.main.get().allSource.srcDirs)
   classDirectories.from(sourceSets.main.get().output.classesDirs)
   executionData(tasks.getByName<JacocoMerge>("jacocoMerge").destinationFile)
