@@ -183,7 +183,7 @@ jobs:
 
   publish:
     runs-on: ubuntu-latest
-    if: !startsWith(github.event.pull_request.head.ref, 'main')
+    if: "!startsWith(github.event.pull_request.head.ref, 'main')"
     needs:
       - report
       - licenceCheck
