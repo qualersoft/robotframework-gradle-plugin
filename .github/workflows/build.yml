@@ -181,9 +181,9 @@ jobs:
       - name: "Publish Report"
         run: bash <(curl -s https://codecov.io/bash) -B ${{ needs.init.outputs.branch }}
 
-  publish:
+  publishSnapshot:
     runs-on: ubuntu-latest
-    if: "!startsWith(github.event.pull_request.head.ref, 'main')"
+    if: github.event.pull_request.head.ref == 'develop'
     needs:
       - report
       - licenceCheck
