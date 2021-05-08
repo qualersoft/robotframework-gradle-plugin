@@ -38,7 +38,7 @@ jobs:
           sudo bash install.sh -b .
       - name: init gradle
         if: steps.gradle-cache.outputs.cache-hit != 'true'
-        run: ./gradlew
+        run: ./gradlew --no-daemon
 
   staticDetektCheck:
     name: "Detekt - static check"
@@ -58,7 +58,7 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ secrets.GRADLE_CACHE_VERSION }}-${{ hashFiles('./*.gradle', './*.gradle.kts', './gradle.properties') }}
           restore-keys: ${{ runner.os }}-gradle-${{ secrets.GRADLE_CACHE_VERSION }}-
       - name: "Detekt"
-        run: ${{ github.workspace }}/gradlew detekt
+        run: ${{ github.workspace }}/gradlew detekt --no-daemon
 
   staticFossaCheck:
     name: "Fossa licence analyze - static check"
@@ -96,7 +96,7 @@ jobs:
           path: ${{ github.workspace }}/**
           key: ${{ runner.os }}-compile-${{ github.run_id }}
       - name: "Compile"
-        run: ${{ github.workspace }}/gradlew classes
+        run: ${{ github.workspace }}/gradlew classes --no-daemon
 
   test:
     runs-on: ubuntu-latest
@@ -120,7 +120,7 @@ jobs:
           path: ${{ github.workspace }}/**
           key: ${{ runner.os }}-test-${{ github.run_id }}
       - name: "Unit test"
-        run: ${{ github.workspace }}/gradlew test
+        run: ${{ github.workspace }}/gradlew test --no-daemon
 
   funcTest:
     runs-on: ubuntu-latest
@@ -144,7 +144,7 @@ jobs:
           path: ${{ github.workspace }}/**
           key: ${{ runner.os }}-funcTest-${{ github.run_id }}
       - name: "Functional tests"
-        run: ${{ github.workspace }}/gradlew funcTest
+        run: ${{ github.workspace }}/gradlew funcTest --no-daemon
 
   licenceCheck:
     runs-on: ubuntu-latest
@@ -177,7 +177,7 @@ jobs:
           path: ${{ github.workspace }}/**
           key: ${{ runner.os }}-functest-${{ github.run_id }}
       - name: "Generate Report"
-        run: ${{ github.workspace }}/gradlew jacocoMergedReport
+        run: ${{ github.workspace }}/gradlew jacocoMergedReport --no-daemon
       - name: "Publish Report"
         run: bash <(curl -s https://codecov.io/bash) -B ${{ needs.init.outputs.branch }}
 
@@ -203,4 +203,4 @@ jobs:
         env:
           USERNAME: ${{ github.actor }}
           TOKEN: ${{ github.token }}
-        run: ${{ github.workspace }}/gradlew publish
+        run: ${{ github.workspace }}/gradlew publish --no-daemon
