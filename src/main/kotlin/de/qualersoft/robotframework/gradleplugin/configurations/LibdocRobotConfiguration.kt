@@ -131,6 +131,12 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
   var version by GradleProperty(objects, String::class, project.version.toString())
 
   /**
+   * Do not print the path of the generated output file
+   * to the console.
+   */
+  var quite = objects.property(Boolean::class.java).convention(false)
+
+  /**
    * Specifies the directory where documentation files are written.
    *
    * *Default-value:* `${project.buildDir}/robotdoc/libdoc`
@@ -221,6 +227,7 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
     addNonEmptyStringToArguments(format.orNull, "--format")
     addNonEmptyStringToArguments(specDocFormat.orNull, "--specdocformat")
     addNonEmptyStringToArguments(docFormat.orNull, "--docformat")
+    addFlagToArguments(quite.orNull, "--quite")
 
     if (multiOutput) {
       val partName = extractFileName(fileArgument)
