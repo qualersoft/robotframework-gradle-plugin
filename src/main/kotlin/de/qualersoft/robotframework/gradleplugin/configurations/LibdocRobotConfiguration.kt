@@ -4,6 +4,7 @@ import de.qualersoft.robotframework.gradleplugin.utils.Arguments
 import de.qualersoft.robotframework.gradleplugin.utils.GradleDirectoryProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import org.gradle.api.Project
+import org.gradle.api.provider.Property
 import java.io.File
 import javax.inject.Inject
 
@@ -134,7 +135,8 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
    * Do not print the path of the generated output file
    * to the console.
    */
-  var quite = objects.property(Boolean::class.java).convention(false)
+  @Suppress("private")
+  var quite: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
 
   /**
    * Specifies the directory where documentation files are written.
