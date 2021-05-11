@@ -179,7 +179,7 @@ jobs:
       - name: "Generate Report"
         run: ${{ github.workspace }}/gradlew jacocoMergedReport --no-daemon
       - name: "Publish Report"
-        run: bash <(curl -s https://codecov.io/bash) -B ${{ needs.init.outputs.branch }} -f './build/reports/jacoco/jacocoMergedReport/jacocoMergedReport.xml'
+        run: bash <(curl -s https://codecov.io/bash) -B '${{ needs.init.outputs.branch }}' -f "./build/reports/jacoco/jacocoMergedReport/jacocoMergedReport.xml"
 
   publishSnapshot:
     runs-on: ubuntu-latest
