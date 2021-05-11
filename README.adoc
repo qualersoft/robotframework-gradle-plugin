@@ -1,6 +1,10 @@
 = robotframework-gradle-plugin
 ifdef::env-github[]
-:note-caption: ℹ
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
 endif::[]
 ifndef::env-github[]
 :icons: font
@@ -10,6 +14,9 @@ Gradle plugin for using the https://robotframework.org/[Robot Framework].
 This project is inspired by the https://github.com/robotframework/MavenPlugin[robotframework maven plugin].
 Its goal is to enable you to use the Robot Framework in a gradle project without the need to install anything extra
 (e.g. Robotframework, Jython, etc.).
+
+[IMPORTANT]
+This plugin is just a convenient wrapper for the https://github.com/robotframework/robotframework/blob/master/INSTALL.rst#standalone-jar-distribution[robotframework standalone-jar-distribution]! Therefore, it primarily addresses RF libraries written in java.
 
 [cols="1,~", frame=none, grid=none]
 |===

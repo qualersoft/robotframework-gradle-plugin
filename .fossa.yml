@@ -5,7 +5,7 @@ version: 2
 cli:
   server: https://app.fossa.com
   fetcher: custom
-  project: robotframework-gradle-plugin
+  project: https://github.com/qualersoft/robotframework-gradle-plugin.git
 analyze:
   modules:
       - name: .
