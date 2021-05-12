@@ -178,6 +178,12 @@ jobs:
           key: ${{ runner.os }}-functest-${{ github.run_id }}
       - name: "Generate Report"
         run: ${{ github.workspace }}/gradlew jacocoMergedReport --no-daemon
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: code-coverage-report
+          path: output/reports/jacoco
+
       - name: "Publish Report"
         run: bash <(curl -s https://codecov.io/bash) -B '${{ needs.init.outputs.branch }}' -f "./build/reports/jacoco/jacocoMergedReport/jacocoMergedReport.xml"
 
