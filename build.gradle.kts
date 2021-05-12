@@ -135,7 +135,7 @@ tasks.named<Test>("funcTest") {
 
 val jacocoMerge = tasks.create<JacocoMerge>("jacocoMerge") {
   description = "Create the merged execution data of all test runs"
-  val reportsTasks = tasks.withType<JacocoReport>().filter { it.name != "reportMerge" }.toTypedArray()
+  val reportsTasks = tasks.withType<JacocoReport>().filter { it.name != "jacocoMergedReport" }.toTypedArray()
   executionData(*reportsTasks.flatMap { it.executionData.files }.toTypedArray())
   mustRunAfter(reportsTasks)
 }
