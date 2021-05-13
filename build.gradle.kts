@@ -36,6 +36,8 @@ testSets {
 
 repositories {
   mavenCentral()
+  // required by detekt unless upgraded to 1.17
+  jcenter()
 }
 
 dependencies {
