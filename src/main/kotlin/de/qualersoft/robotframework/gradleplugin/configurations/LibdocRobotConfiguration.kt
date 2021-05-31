@@ -241,18 +241,27 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
     addNonEmptyStringToArguments(version.orNull, "--version")
     add(fileArgument)
 
-    val normalizedName = if (multiOutput) extractFileName(fileArgument) else outputFile.asFile.get().name
+    val normalizedName = if (!multiOutput) {
+      outputFile.asFile.get().name
+    } else {
+      extractFileName(fileArgument) + "." + retrieveTargetExtension()
+    }
+
     add(joinPaths(outputDirectory.asFile.get().absolutePath, normalizedName))
     if (!outputDirectory.asFile.get().exists()) {
       outputDirectory.asFile.get().mkdirs()
     }
   }
 
-  private fun extractFileName(file: String): String {
-    val tmp = File(file)
-    val ext = tmp.extension
-    val name = tmp.nameWithoutExtension.replace("/|\\.|\\\\", "_")
-      .replace(Regex("_+"), "_")
-    return "$name.$ext"
+  private fun extractFileName(file: String): String = File(file)
+    // Replace strange chars by '_'
+    .nameWithoutExtension.replace("/|\\.|\\\\", "_")
+    // reduce multiple occurence of '_' by single '_'
+    .replace(Regex("_+"), "_")
+
+  private fun retrieveTargetExtension() = if (format.isPresent) {
+    format.get()
+  } else {
+    outputFile.asFile.get().extension
   }
 }

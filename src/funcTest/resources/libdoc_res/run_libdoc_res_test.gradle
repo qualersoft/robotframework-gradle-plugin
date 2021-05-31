@@ -1,0 +1,21 @@
+import java.nio.file.Paths
+
+plugins {
+  id 'de.qualersoft.robotframework'
+  id 'java'
+}
+
+version = "0.0.1"
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+tasks.register("libdocRun", de.qualersoft.robotframework.gradleplugin.tasks.LibdocTask) {
+  libdoc {
+    outputDirectory.set(Paths.get(buildDir.absolutePath, "doc", "libdoc").toFile())
+    libraryOrResourceFile = "src/test/robots/keywords"
+    format.set("html")
+  }
+}
