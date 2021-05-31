@@ -108,11 +108,36 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
     getFolderAction = { "libdoc" }
     val result = setupGroovyTest("run_libdoc_java_lib_test")
       .withArguments("assemble", "libdocRun")
-      .withDebug(true)
       .build()
 
     runShouldSucceed(result)
     checkForHtmlDoc(::checkJavaLib)
+  }
+
+  @Test
+  @KotlinTag
+  @DisplayName("When run libdoc with folder containing multiple resource files from kotlin script, each gets a single doc-file.")
+  fun testLibdocFromResourceFolderKotlin() {
+    getFolderAction = { "libdoc_res" }
+    val result = setupKotlinTest("run_libdoc_res_test")
+      .withArguments("libdocRun")
+      .build()
+
+    runShouldSucceed(result)
+    checkForMultipleHtmlDocs(3, ::checkResourceFiles)
+  }
+
+  @Test
+  @GroovyTag
+  @DisplayName("When run libdoc with folder containing multiple resource files from groovy script, each gets a single doc-file.")
+  fun testLibdocFromResourceFolderGroovy() {
+    getFolderAction = { "libdoc_res" }
+    val result = setupGroovyTest("run_libdoc_res_test")
+      .withArguments("libdocRun")
+      .build()
+
+    runShouldSucceed(result)
+    checkForMultipleHtmlDocs(3, ::checkResourceFiles)
   }
 
   private fun checkJavaLib(file: File) {
@@ -128,8 +153,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
     val files = testProjectDir.root.walkBottomUp().filter {
       it.isFile && it.path.let { path ->
         path.contains("robotdoc") &&
-          path.contains("libdoc") &&
-          path.contains("libdoc.html")
+            path.contains("libdoc") &&
+            path.contains("libdoc.html")
       }
     }
 
@@ -143,5 +168,45 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
         }
       )
     }
+  }
+
+  private fun checkResourceFiles(file: File) {
+    val content = file.readText(StandardCharsets.UTF_8)
+    when (file.nameWithoutExtension.toLowerCase()) {
+      "common" -> assertAll(
+        { content should contain("Close browser") },
+        { content should contain("Close the current active browser") },
+        { content should contain("Open google") },
+        { content should contain("Opens a browser") }
+      )
+      "countries" -> assertAll(
+        { content should contain("Assert that '\${countries}' contains '\${expectedCountry}'") },
+        { content should contain("Create default country germany") },
+        { content should contain("Search country by name contains a country") },
+        { content should contain("expectedCountry") }
+      )
+      "google" -> assertAll(
+        { content should contain("Do google search") },
+        { content should contain("Performs a google search with the given term") },
+        { content should contain("The title should contain") },
+        { content should contain("term") }
+      )
+      else -> throw AssertionError("Got unexpected file $file")
+    }
+  }
+
+  private fun checkForMultipleHtmlDocs(expectedFiles: Int, contentChecker: (File) -> Unit) {
+    val files = testProjectDir.root.walkBottomUp().filter {
+      it.isFile && it.path.let { path ->
+        path.contains("doc") &&
+            path.contains("libdoc") &&
+            path.endsWith(".html")
+      }
+    }
+
+    files shouldNot beNull()
+    val asserts =
+      files.map { { contentChecker(it) } }.toMutableList().apply { add({ files shouldHaveSize expectedFiles }) }
+    assertAll(asserts)
   }
 }

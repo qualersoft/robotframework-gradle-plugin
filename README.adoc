@@ -76,3 +76,7 @@ TidyTask:: same as `robot.tidy` command
 
 [[package-note]]
 (*) All task implementations are in package `de.qualersoft.robotframework.gradleplugin.tasks`
+
+== Remark on tasks
+=== LibdocTask
+When using libdoc with more than one file, the target file extension is determined either by the value of the `format` parameter (if not `null`) or by the extension given to the `outputFile` property. This ensures maximum compatibility with older RF versions that do not support the `format` flag. In case `outputFile` will be used, the name itself is ignored. In case `format` is used, its value is directly used! Take care to use a valid value, otherwise it could cause strange errors.

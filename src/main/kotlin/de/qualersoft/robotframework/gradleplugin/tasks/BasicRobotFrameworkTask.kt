@@ -34,7 +34,8 @@ abstract class BasicRobotFrameworkTask : JavaExec() {
     val robotArgs = listOf(cmd) + rfArgs + (additionalArgs ?: listOf())
     println("Starting cmd '$cmd' with arguments $rfArgs and task specific additional arguments $additionalArgs")
     ensureLibraries()
-    args(robotArgs)
+    args = robotArgs
+    println("DEBUG: execArgs: $args")
     super.exec()
   }
 
