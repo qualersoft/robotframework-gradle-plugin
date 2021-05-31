@@ -200,14 +200,14 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
 
       // 2. we have path structure (\ | /)
       pattern.contains("\\") ||
-          pattern.contains("/") -> harvestPath(pattern, file)
+        pattern.contains("/") -> harvestPath(pattern, file)
 
       // 3. we assume a class name
       else -> listOf(pattern)
     } ?: throw IllegalArgumentException(
       "The value <'$pattern'> of libraryOrResourceFile" +
-          " can not interpreted as path or name! Maybe the pattern is invalid or" +
-          " the specified path does not exist."
+        " can not interpreted as path or name! Maybe the pattern is invalid or" +
+        " the specified path does not exist."
     )
   }
 
@@ -241,10 +241,12 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
     addNonEmptyStringToArguments(version.orNull, "--version")
     add(fileArgument)
 
-    val normalizedName = if (!multiOutput) outputFile.asFile.get().name else {
+    val normalizedName = if (!multiOutput) {
+      outputFile.asFile.get().name
+    } else {
       extractFileName(fileArgument) + "." + retrieveTargetExtension()
     }
-    
+
     add(joinPaths(outputDirectory.asFile.get().absolutePath, normalizedName))
     if (!outputDirectory.asFile.get().exists()) {
       outputDirectory.asFile.get().mkdirs()

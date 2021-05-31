@@ -116,7 +116,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
 
   @Test
   @KotlinTag
-  @DisplayName("When run libdoc with folder containing multiple resource files from kotlin script, each gets a single doc-file.")
+  @DisplayName("When run libdoc with folder containing multiple resource files " +
+    "from kotlin script, each gets a single doc-file.")
   fun testLibdocFromResourceFolderKotlin() {
     getFolderAction = { "libdoc_res" }
     val result = setupKotlinTest("run_libdoc_res_test")
@@ -129,7 +130,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
 
   @Test
   @GroovyTag
-  @DisplayName("When run libdoc with folder containing multiple resource files from groovy script, each gets a single doc-file.")
+  @DisplayName("When run libdoc with folder containing multiple resource files " +
+    "from groovy script, each gets a single doc-file.")
   fun testLibdocFromResourceFolderGroovy() {
     getFolderAction = { "libdoc_res" }
     val result = setupGroovyTest("run_libdoc_res_test")
@@ -153,8 +155,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
     val files = testProjectDir.root.walkBottomUp().filter {
       it.isFile && it.path.let { path ->
         path.contains("robotdoc") &&
-            path.contains("libdoc") &&
-            path.contains("libdoc.html")
+          path.contains("libdoc") &&
+          path.contains("libdoc.html")
       }
     }
 
@@ -199,8 +201,8 @@ open class LibdocRunTest : BaseRobotFrameworkFunctionalTest() {
     val files = testProjectDir.root.walkBottomUp().filter {
       it.isFile && it.path.let { path ->
         path.contains("doc") &&
-            path.contains("libdoc") &&
-            path.endsWith(".html")
+          path.contains("libdoc") &&
+          path.endsWith(".html")
       }
     }
 
