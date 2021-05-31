@@ -32,6 +32,7 @@ open class LibdocTask : BasicRobotFrameworkTask() {
     val tmp = rfArgs
     libdoc.get().generateRunArguments().forEach {
       rfArgs = tmp + it.toArray()
+      args?.clear()
       executeRobotCommand("libdoc")
     }
   }

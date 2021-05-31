@@ -1,6 +1,10 @@
 = robotframework-gradle-plugin
 ifdef::env-github[]
-:note-caption: ℹ
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
 endif::[]
 ifndef::env-github[]
 :icons: font
@@ -11,16 +15,19 @@ This project is inspired by the https://github.com/robotframework/MavenPlugin[ro
 Its goal is to enable you to use the Robot Framework in a gradle project without the need to install anything extra
 (e.g. Robotframework, Jython, etc.).
 
+[IMPORTANT]
+This plugin is just a convenient wrapper for the https://github.com/robotframework/robotframework/blob/master/INSTALL.rst#standalone-jar-distribution[robotframework standalone-jar-distribution]! Therefore, it primarily addresses RF libraries written in java.
+
 [cols="1,~", frame=none, grid=none]
 |===
 |General
-|image:https://img.shields.io/github/license/qualersoft/robotframework-gradle-plugin[link=https://github.com/qualersoft/robotframework-gradle-plugin/blob/master/LICENSE]
-image:https://app.fossa.com/api/projects/git%2Bgithub.com%2Fqualersoft%2Frobot-gradle-plugin.svg?type=shield[link=https://app.fossa.com/projects/custom%2B17788%2Frobotframework-gradle-plugin/refs/branch/master/]
+|image:https://img.shields.io/github/license/qualersoft/robotframework-gradle-plugin[link=https://github.com/qualersoft/robotframework-gradle-plugin/blob/main/LICENSE]
+image:https://app.fossa.com/api/projects/git%2Bgithub.com%2Fqualersoft%2Frobot-gradle-plugin.svg?type=shield[link=https://app.fossa.com/projects/custom%2B17788%2Frobotframework-gradle-plugin/refs/branch/main/]
 
-|Master
-|image:https://github.com/qualersoft/robotframework-gradle-plugin/actions/workflows/build.yml/badge.svg?branch=master[title="Build status", link=https://github.com/qualersoft/robotframework-gradle-plugin/blob/master/.github/workflows/build.yml]
-image:https://www.codefactor.io/repository/github/qualersoft/robotframework-gradle-plugin/badge/master?s=2996b4322bfcdca3d8e6250191d67a1410cf3a16[title="Code quality", link=https://www.codefactor.io/repository/github/qualersoft/robotframework-gradle-plugin/overview/master]
-image:https://codecov.io/gh/qualersoft/robotframework-gradle-plugin/branch/master/graph/badge.svg?token=Z5CT2C7LN1[title="Coverage", link=https://codecov.io/gh/qualersoft/robotframework-gradle-plugin]
+|Main
+|image:https://github.com/qualersoft/robotframework-gradle-plugin/actions/workflows/build.yml/badge.svg?branch=main[title="Build status", link=https://github.com/qualersoft/robotframework-gradle-plugin/blob/main/.github/workflows/build.yml]
+image:https://www.codefactor.io/repository/github/qualersoft/robotframework-gradle-plugin/badge/main?s=2996b4322bfcdca3d8e6250191d67a1410cf3a16[title="Code quality", link=https://www.codefactor.io/repository/github/qualersoft/robotframework-gradle-plugin/overview/main]
+image:https://codecov.io/gh/qualersoft/robotframework-gradle-plugin/branch/main/graph/badge.svg?token=Z5CT2C7LN1[title="Coverage", link=https://codecov.io/gh/qualersoft/robotframework-gradle-plugin]
 
 |Develop
 |image:https://github.com/qualersoft/robotframework-gradle-plugin/actions/workflows/build.yml/badge.svg?branch=develop[title="Build status", link=https://github.com/qualersoft/robotframework-gradle-plugin/blob/develop/.github/workflows/build.yml]
@@ -69,3 +76,7 @@ TidyTask:: same as `robot.tidy` command
 
 [[package-note]]
 (*) All task implementations are in package `de.qualersoft.robotframework.gradleplugin.tasks`
+
+== Remark on tasks
+=== LibdocTask
+When using libdoc with more than one file, the target file extension is determined either by the value of the `format` parameter (if not `null`) or by the extension given to the `outputFile` property. This ensures maximum compatibility with older RF versions that do not support the `format` flag. In case `outputFile` will be used, the name itself is ignored. In case `format` is used, its value is directly used! Take care to use a valid value, otherwise it could cause strange errors.

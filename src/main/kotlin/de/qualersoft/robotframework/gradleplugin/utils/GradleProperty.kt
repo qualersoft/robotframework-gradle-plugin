@@ -11,19 +11,13 @@ import java.io.File
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
-internal class GradleProperty<T, V : Any> {
+internal class GradleProperty<T, V : Any>(objects: ObjectFactory, type: KClass<V>, default: V? = null) {
 
   private val property: Property<V>
 
-  constructor(objects: ObjectFactory, type: KClass<V>, default: V? = null) {
+  init {
     property = createProperty(objects, type).apply {
       convention(default)
-    }
-  }
-
-  constructor(objects: ObjectFactory, type: KClass<V>, provider: Provider<V>) {
-    property = createProperty(objects, type).apply {
-      convention(provider)
     }
   }
 

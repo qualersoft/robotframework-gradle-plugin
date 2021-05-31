@@ -1,6 +1,7 @@
-import java.util.Properties
-import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+import java.util.Properties
 
 plugins {
   // realization
@@ -35,7 +36,6 @@ testSets {
 
 repositories {
   mavenCentral()
-  jcenter()
 }
 
 dependencies {
@@ -52,6 +52,14 @@ dependencies {
   testImplementation(group = "io.kotest", name = "kotest-assertions-core-jvm", version = kotestVer)
 
   testRuntimeOnly(kotlin("script-runtime"))
+}
+
+jacoco {
+  toolVersion = "0.8.7"
+}
+
+jacocoTestKit {
+  applyTo("funcTestRuntimeOnly", tasks.named("funcTest"))
 }
 
 gradlePlugin {
@@ -112,16 +120,18 @@ tasks.withType<Test> {
       if (null == suite.parent) { // root suite
         logger.lifecycle("----")
         logger.lifecycle("Test result: ${result.resultType}")
-        logger.lifecycle("Test summary: ${result.testCount} tests, " +
-            "${result.successfulTestCount} succeeded, " +
-            "${result.failedTestCount} failed, " +
-            "${result.skippedTestCount} skipped")
+        logger.lifecycle(
+          "Test summary: ${result.testCount} tests, " +
+              "${result.successfulTestCount} succeeded, " +
+              "${result.failedTestCount} failed, " +
+              "${result.skippedTestCount} skipped"
+        )
       }
     }
   })
 
   finalizedBy(
-    when(name) {
+    when (name) {
       tasks.test.name -> tasks.jacocoTestReport
       "funcTest" -> tasks.named("jacocoFuncTestReport")
       else -> throw IllegalArgumentException("Unknown test task '$name' don't know which jacoco report to apply")
@@ -131,11 +141,26 @@ tasks.withType<Test> {
 
 tasks.named<Test>("funcTest") {
   mustRunAfter(tasks.generateJacocoTestKitProperties)
+  // Workaround for https://github.com/koral--/jacoco-gradle-testkit-plugin/issues/9
+  if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+    fun File.isLocked() = !renameTo(this)
+    val waitUntilJacocoTestExecIsUnlocked = Action<Task> {
+      val jacocoTestExec = checkNotNull(extensions.getByType(JacocoTaskExtension::class).destinationFile)
+      val waitMillis = 100L
+      var tries = 0
+      while (jacocoTestExec.isLocked() && (tries++ < 100)) {
+        logger.info("Waiting $waitMillis ms (${jacocoTestExec.name} is locked)...")
+        Thread.sleep(waitMillis)
+      }
+      logger.info("Done waiting (${jacocoTestExec.name} is unlocked).")
+    }
+    doLast(waitUntilJacocoTestExecIsUnlocked)
+  }
 }
 
 val jacocoMerge = tasks.create<JacocoMerge>("jacocoMerge") {
   description = "Create the merged execution data of all test runs"
-  val reportsTasks = tasks.withType<JacocoReport>().filter { it.name != "reportMerge" }.toTypedArray()
+  val reportsTasks = tasks.withType<JacocoReport>().filter { it.name != "jacocoMergedReport" }.toTypedArray()
   executionData(*reportsTasks.flatMap { it.executionData.files }.toTypedArray())
   mustRunAfter(reportsTasks)
 }

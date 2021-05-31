@@ -102,20 +102,17 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
   var exclude by GradleStringListProperty(objects)
 
   /**
-   * Tests having the given tag are considered critical.
-   * If no critical tags are set, all tests are critical.
-   * Tags can be given as a pattern same way as with
-   * [include].
+   * Opposite of [nonCritical]
    */
   @Suppress("private")
+  @Deprecated("Since RF 4.0")
   var critical by GradleStringListProperty(objects)
 
   /**
-   * Tests having the given tag are not critical even if
-   * they have a tag set with [critical]. Tag can be
-   * a pattern.
+   * Alias for [RunRobotConfiguration.skipOnFailure].
    */
   @Suppress("private")
+  @Deprecated("Since RF 4.0")
   var nonCritical by GradleStringListProperty(objects)
 
   /**
@@ -169,11 +166,14 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
   var xUnit by GradleFileNullableProperty(objects, File("robot-xunit-results.xml"))
 
   /**
+   * **Has no effect anymore.**
+   *
    * Mark non-critical tests in xUnit output as skipped.
    *
    * Default: disabled (`false`)
    */
   @Suppress("private")
+  @Deprecated("Since RF 4.0")
   var xUnitSkipNonCritical by GradleProperty(objects, Boolean::class, false)
 
   /**
@@ -220,11 +220,11 @@ open class BotRobotConfiguration(project: Project) : CommonRobotConfiguration(pr
 
   /**
    * Background colors to use in the report file.
-   * Either `all_passed:critical_passed:failed` or
-   * `passed:failed`. Both color names and codes work.
+   * Order is `passed:failed:skipped`. Both color names
+   * and codes work. `skipped` can be omitted.
    *
    * ### Examples:
-   *    reportBackground = "green:yellow:red"
+   *    reportBackground = "green:red:yellow"
    *    reportBackground = "#00E:#E00"
    */
   @Suppress("private")

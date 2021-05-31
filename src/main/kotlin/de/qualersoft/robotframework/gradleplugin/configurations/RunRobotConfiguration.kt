@@ -1,6 +1,7 @@
 package de.qualersoft.robotframework.gradleplugin.configurations
 
 import de.qualersoft.robotframework.gradleplugin.utils.Arguments
+import de.qualersoft.robotframework.gradleplugin.utils.GradleStringListProperty
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
@@ -89,7 +90,7 @@ import javax.inject.Inject
  * $ robot --SuiteStatLevel 2 --Metadata Version:3 tests\*.robot more/tests.robot
  *
  * # Setting default options and syslog file before running tests.
- * $ export ROBOT_OPTIONS="--critical regression --suitestatlevel 2"
+ * $ export ROBOT_OPTIONS="--outputdir results --suitestatlevel 2"
  * $ export ROBOT_SYSLOG_FILE=/tmp/syslog.txt
  * $ robot tests.robot
  * ```
@@ -97,6 +98,21 @@ import javax.inject.Inject
 class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConfiguration(project) {
 
   // <editor-fold desc="run specific configuration properties">
+
+  /**
+   * Tests having given tag will be skipped.
+   * Tag can be a pattern.
+   */
+  @Suppress("private")
+  var skip by GradleStringListProperty(objects)
+
+  /**
+   * Tests having given tag will be skipped if they fail.
+   * Tag can be a pattern.
+   */
+  @Suppress("private")
+  var skipOnFailure by GradleStringListProperty(objects)
+
   /**
    * Parse only files with this extension when executing
    * a directory. Has no effect when running individual
@@ -304,10 +320,14 @@ class RunRobotConfiguration @Inject constructor(project: Project) : BotRobotConf
 
   override fun generateArguments(): Array<String> = Arguments().apply {
     addArgs(super.generateArguments())
+
+    addListToArguments(skip, "--skip")
+    addListToArguments(skipOnFailure, "--skiponfailure")
+
     addListToArguments(extension.orNull, "-F")
     addMapToArguments(variables.get(), "-v")
     addListToArguments(variableFiles.orNull, "-V")
-    addStringToArguments(debugFile.orNull?.let { it.asFile.absolutePath }, "-b")
+    addStringToArguments(debugFile.orNull?.asFile?.absolutePath, "-b")
 
     if (0 > maxErrorLines.get()) {
       addStringToArguments("NONE", "--maxerrorlines")

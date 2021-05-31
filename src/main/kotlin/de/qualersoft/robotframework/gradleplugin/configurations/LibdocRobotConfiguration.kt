@@ -4,6 +4,7 @@ import de.qualersoft.robotframework.gradleplugin.utils.Arguments
 import de.qualersoft.robotframework.gradleplugin.utils.GradleDirectoryProperty
 import de.qualersoft.robotframework.gradleplugin.utils.GradleProperty
 import org.gradle.api.Project
+import org.gradle.api.provider.Property
 import java.io.File
 import javax.inject.Inject
 
@@ -72,6 +73,72 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
 
   // <editor-fold desc="Properties">
   /**
+   * Specifies whether to generate an HTML output for
+   * humans or a machine readable spec file in XML or JSON
+   * format. The `libspec` format means XML spec with
+   * documentations converted to HTML. The default format
+   * is got from the output file extension.
+   *
+   * Valid values:
+   *  * HTML
+   *  * XML
+   *  * JSON
+   *  * LIBSPEC
+   *
+   * @see specDocFormat
+   */
+  @Suppress("private")
+  var format by GradleProperty(objects, String::class)
+
+  /**
+   * Specifies the documentation format used with XML and
+   * JSON spec files. `raw` means preserving the original
+   * documentation format and `html` means converting
+   * documentation to HTML. The default is `raw` with XML
+   * spec files and `html` with JSON specs and when using
+   * the special `libspec` format.
+   *
+   * Valid values:
+   *  * RAW
+   *  * HTML
+   *
+   * @see format
+   */
+  @Suppress("private")
+  var specDocFormat by GradleProperty(objects, String::class)
+
+  /**
+   * Specifies the source documentation format. Possible
+   * values are Robot Framework's documentation format,
+   * HTML, plain text, and reStructuredText. The default
+   * value can be specified in library source code and
+   * the initial default value is `ROBOT`.
+   *
+   * Valid values:
+   *  * ROBOT
+   *  * HTML
+   *  * TEXT
+   *  * REST
+   */
+  @Suppress("private")
+  var docFormat by GradleProperty(objects, String::class)
+
+  /**
+   * Sets the version of the documented library or resource.
+   *
+   * *Default-value:* project.version
+   */
+  @Suppress("private")
+  var version by GradleProperty(objects, String::class, project.version.toString())
+
+  /**
+   * Do not print the path of the generated output file
+   * to the console.
+   */
+  @Suppress("private")
+  var quite: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+
+  /**
    * Specifies the directory where documentation files are written.
    *
    * *Default-value:* `${project.buildDir}/robotdoc/libdoc`
@@ -91,14 +158,6 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
   @Suppress("private")
   var outputFile = objects.fileProperty()
     .convention(outputDirectory.file("libdoc.html"))
-
-  /**
-   * Sets the version of the documented library or resource.
-   *
-   * *Default-value:* project.version
-   */
-  @Suppress("private")
-  var version by GradleProperty(objects, String::class, project.version.toString())
 
   /**
    * Name of the library or path to the resource file.
@@ -165,29 +224,44 @@ class LibdocRobotConfiguration @Inject constructor(private val project: Project)
   }
 
   private fun generateLibdocArgumentList(fileArgument: String, multiOutput: Boolean) = Arguments().apply {
-    this.addArgs(generateArguments())
+    addArgs(generateArguments())
+
+    addNonEmptyStringToArguments(format.orNull, "--format")
+    addNonEmptyStringToArguments(specDocFormat.orNull, "--specdocformat")
+    addNonEmptyStringToArguments(docFormat.orNull, "--docformat")
+    addFlagToArguments(quite.orNull, "--quite")
+
     if (multiOutput) {
       val partName = extractFileName(fileArgument)
-      this.addNonEmptyStringToArguments(partName, "--name")
+      addNonEmptyStringToArguments(partName, "--name")
     } else {
-      this.addNonEmptyStringToArguments(name.orNull, "--name")
+      addNonEmptyStringToArguments(name.orNull, "--name")
     }
 
-    this.addNonEmptyStringToArguments(version.orNull, "--version")
-    this.add(fileArgument)
+    addNonEmptyStringToArguments(version.orNull, "--version")
+    add(fileArgument)
 
-    val normalizedName = if (multiOutput) extractFileName(fileArgument) else outputFile.asFile.get().name
-    this.add(joinPaths(outputDirectory.asFile.get().absolutePath, normalizedName))
+    val normalizedName = if (!multiOutput) {
+      outputFile.asFile.get().name
+    } else {
+      extractFileName(fileArgument) + "." + retrieveTargetExtension()
+    }
+
+    add(joinPaths(outputDirectory.asFile.get().absolutePath, normalizedName))
     if (!outputDirectory.asFile.get().exists()) {
       outputDirectory.asFile.get().mkdirs()
     }
   }
 
-  private fun extractFileName(file: String): String {
-    val tmp = File(file)
-    val ext = tmp.extension
-    val name = tmp.nameWithoutExtension.replace("/|\\.|\\\\", "_")
-      .replace(Regex("_+"), "_")
-    return "$name.$ext"
+  private fun extractFileName(file: String): String = File(file)
+    // Replace strange chars by '_'
+    .nameWithoutExtension.replace("/|\\.|\\\\", "_")
+    // reduce multiple occurence of '_' by single '_'
+    .replace(Regex("_+"), "_")
+
+  private fun retrieveTargetExtension() = if (format.isPresent) {
+    format.get()
+  } else {
+    outputFile.asFile.get().extension
   }
 }
