@@ -184,6 +184,12 @@ jobs:
           name: code-coverage-report
           path: build
 
+      - name: "Upload Report"
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          files: build/test-results/**/*.xml
+
       - name: "Publish Report"
         run: bash <(curl -s https://codecov.io/bash) -B '${{ needs.init.outputs.branch }}' -f "./build/reports/jacoco/jacocoMergedReport/jacocoMergedReport.xml"
 

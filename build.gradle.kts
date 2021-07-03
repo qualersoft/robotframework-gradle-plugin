@@ -74,6 +74,16 @@ gradlePlugin {
   testSourceSets(*sourceSets.filter { it.name.contains("test", true) }.toTypedArray())
 }
 
+pluginBundle {
+  website = "https://github.com/qualersoft/robotframework-gradle-plugin"
+  vcsUrl = "https://github.com/qualersoft/robotframework-gradle-plugin"
+  tags = listOf("robotframework", "test", "integration test", "e2e testing")
+}
+
+if (project.version.toString().endsWith("-SNAPSHOT", true)) {
+  status = "snapshot"
+}
+
 detekt {
   allRules = false
   buildUponDefaultConfig = true
@@ -95,118 +105,104 @@ sonarqube {
   }
 }
 
-tasks.validatePlugins {
-  enableStricterValidation.set(true)
-}
+tasks {
 
-tasks.detekt {
-  // Target version of the generated JVM bytecode. It is used for type resolution.
-  this.jvmTarget = JavaVersion.VERSION_11.toString()
-}
-
-tasks.withType<Test> {
-  useJUnitPlatform()
-
-  testLogging {
-    events = mutableSetOf(TestLogEvent.FAILED)
-    exceptionFormat = TestExceptionFormat.FULL
+  validatePlugins {
+    enableStricterValidation.set(true)
   }
 
-  addTestListener(object : TestListener {
-    override fun beforeSuite(suite: TestDescriptor) {}
-    override fun beforeTest(testDescriptor: TestDescriptor) {}
-    override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
-    override fun afterSuite(suite: TestDescriptor, result: TestResult) {
-      if (null == suite.parent) { // root suite
-        logger.lifecycle("----")
-        logger.lifecycle("Test result: ${result.resultType}")
-        logger.lifecycle(
-          "Test summary: ${result.testCount} tests, " +
+  this.detekt {
+    // Target version of the generated JVM bytecode. It is used for type resolution.
+    this.jvmTarget = JavaVersion.VERSION_11.toString()
+  }
+
+  withType<Test> {
+    useJUnitPlatform()
+
+    testLogging {
+      events = mutableSetOf(TestLogEvent.FAILED)
+      exceptionFormat = TestExceptionFormat.FULL
+    }
+
+    addTestListener(object : TestListener {
+      override fun beforeSuite(suite: TestDescriptor) {}
+      override fun beforeTest(testDescriptor: TestDescriptor) {}
+      override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
+      override fun afterSuite(suite: TestDescriptor, result: TestResult) {
+        if (null == suite.parent) { // root suite
+          logger.lifecycle("----")
+          logger.lifecycle("Test result: ${result.resultType}")
+          logger.lifecycle(
+            "Test summary: ${result.testCount} tests, " +
               "${result.successfulTestCount} succeeded, " +
               "${result.failedTestCount} failed, " +
               "${result.skippedTestCount} skipped"
-        )
+          )
+        }
       }
-    }
-  })
+    })
 
-  finalizedBy(
-    when (name) {
-      tasks.test.name -> tasks.jacocoTestReport
-      "funcTest" -> tasks.named("jacocoFuncTestReport")
-      else -> throw IllegalArgumentException("Unknown test task '$name' don't know which jacoco report to apply")
-    }
-  )
-}
-
-tasks.named<Test>("funcTest") {
-  mustRunAfter(tasks.generateJacocoTestKitProperties)
-  // Workaround for https://github.com/koral--/jacoco-gradle-testkit-plugin/issues/9
-  if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-    fun File.isLocked() = !renameTo(this)
-    val waitUntilJacocoTestExecIsUnlocked = Action<Task> {
-      val jacocoTestExec = checkNotNull(extensions.getByType(JacocoTaskExtension::class).destinationFile)
-      val waitMillis = 100L
-      var tries = 0
-      while (jacocoTestExec.isLocked() && (tries++ < 100)) {
-        logger.info("Waiting $waitMillis ms (${jacocoTestExec.name} is locked)...")
-        Thread.sleep(waitMillis)
+    finalizedBy(
+      when (name) {
+        test.name -> jacocoTestReport
+        "funcTest" -> named("jacocoFuncTestReport")
+        else -> throw IllegalArgumentException("Unknown test task '$name' don't know which jacoco report to apply")
       }
-      logger.info("Done waiting (${jacocoTestExec.name} is unlocked).")
+    )
+  }
+
+  named<Test>("funcTest") {
+    mustRunAfter(generateJacocoTestKitProperties)
+    // Workaround for https://github.com/koral--/jacoco-gradle-testkit-plugin/issues/9
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+      fun File.isLocked() = !renameTo(this)
+      val waitUntilJacocoTestExecIsUnlocked = Action<Task> {
+        val jacocoTestExec = checkNotNull(extensions.getByType(JacocoTaskExtension::class).destinationFile)
+        val waitMillis = 100L
+        var tries = 0
+        while (jacocoTestExec.isLocked() && (tries++ < 100)) {
+          logger.info("Waiting $waitMillis ms (${jacocoTestExec.name} is locked)...")
+          Thread.sleep(waitMillis)
+        }
+        logger.info("Done waiting (${jacocoTestExec.name} is unlocked).")
+      }
+      doLast(waitUntilJacocoTestExecIsUnlocked)
     }
-    doLast(waitUntilJacocoTestExecIsUnlocked)
   }
-}
 
-val jacocoMerge = tasks.create<JacocoMerge>("jacocoMerge") {
-  description = "Create the merged execution data of all test runs"
-  val reportsTasks = tasks.withType<JacocoReport>().filter { it.name != "jacocoMergedReport" }.toTypedArray()
-  executionData(*reportsTasks.flatMap { it.executionData.files }.toTypedArray())
-  mustRunAfter(reportsTasks)
-}
-
-tasks.create<JacocoReport>("jacocoMergedReport") {
-  description = "Create the final reports of the merged execution data"
-  group = tasks.test.get().group
-  dependsOn(jacocoMerge)
-  sourceDirectories.from(sourceSets.main.get().allSource.srcDirs)
-  classDirectories.from(sourceSets.main.get().output.classesDirs)
-  executionData(tasks.getByName<JacocoMerge>("jacocoMerge").destinationFile)
-}
-
-tasks.withType<JacocoReport> {
-  reports {
-    xml.isEnabled = true
-    html.isEnabled = true
-    csv.isEnabled = false
+  val jacocoMerge = create<JacocoMerge>("jacocoMerge") {
+    description = "Create the merged execution data of all test runs"
+    val reportsTasks = withType<JacocoReport>().filter { it.name != "jacocoMergedReport" }.toTypedArray()
+    executionData(*reportsTasks.flatMap { it.executionData.files }.toTypedArray())
+    mustRunAfter(reportsTasks)
   }
-}
 
-tasks.dokkaHtml {
-  outputDirectory.set(file("$buildDir/javadoc"))
-}
+  create<JacocoReport>("jacocoMergedReport") {
+    description = "Create the final reports of the merged execution data"
+    group = test.get().group
+    dependsOn(jacocoMerge)
+    sourceDirectories.from(sourceSets.main.get().allSource.srcDirs)
+    classDirectories.from(sourceSets.main.get().output.classesDirs)
+    executionData(getByName<JacocoMerge>("jacocoMerge").destinationFile)
+  }
 
-val dokkaJar by tasks.creating(Jar::class) {
-  group = JavaBasePlugin.DOCUMENTATION_GROUP
-  description = "Assembles Kotlin docs with Dokka"
-  archiveClassifier.set("javadoc")
-  from(tasks.dokkaHtml)
-}
+  withType<JacocoReport> {
+    reports {
+      xml.isEnabled = true
+      html.isEnabled = true
+      csv.isEnabled = false
+    }
+  }
 
-pluginBundle {
-  website = "https://github.com/qualersoft/robotframework-gradle-plugin"
-  vcsUrl = "https://github.com/qualersoft/robotframework-gradle-plugin"
-  tags = listOf("robotframework", "test", "integration test", "e2e testing")
+  dokkaJavadoc.configure { 
+    outputDirectory.set(javadoc.get().destinationDir)
+  }
+  javadoc {
+    dependsOn(dokkaJavadoc)
+  }
 }
 
 publishing {
-  publications {
-    create<MavenPublication>("pluginMaven") {
-      // customize main publications here
-      artifact(tasks.kotlinSourcesJar)
-      artifact(dokkaJar)
-    }
-  }
 
   repositories {
     maven {
@@ -231,6 +227,8 @@ compileTestKotlin.kotlinOptions {
 
 java {
   targetCompatibility = JavaVersion.VERSION_11
+  withSourcesJar()
+  withJavadocJar()
 }
 
 tasks.register("updateVersion") {
@@ -247,7 +245,7 @@ tasks.register("updateVersion") {
     var newVersion = project.findProperty("newVersion") as String?
       ?: throw IllegalArgumentException(
         "No `newVersion` specified!" +
-            " Usage: ./gradlew updateVersion -PnewVersion=<version>"
+          " Usage: ./gradlew updateVersion -PnewVersion=<version>"
       )
 
     if (newVersion.contains("snapshot", true)) {
