@@ -21,7 +21,7 @@ pluginManagement {
     id("org.asciidoctor.jvm.convert") version "3.3.2"
 
     // publishing
-    id("com.gradle.plugin-publish") version "0.14.0"
+    id("com.gradle.plugin-publish") version "0.15.0"
     id("com.github.ben-manes.versions") version "0.38.0"
   }
 }
