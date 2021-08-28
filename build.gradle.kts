@@ -143,9 +143,11 @@ tasks {
     this.jvmTarget = JavaVersion.VERSION_11.toString()
   }
 
-  withType<Test> {
+  test {
     useJUnitPlatform()
+  }
 
+  withType<Test> {
     testLogging {
       events = mutableSetOf(TestLogEvent.FAILED)
       exceptionFormat = TestExceptionFormat.FULL
