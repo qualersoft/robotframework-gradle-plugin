@@ -75,6 +75,7 @@ jobs:
         uses: burrunan/gradle-cache-action@v1
         with:
           remote-build-cache-proxy-enabled: false
+          save-local-build-cache: false
           arguments: |
             test
             jacocoTestReport
@@ -109,6 +110,7 @@ jobs:
         uses: burrunan/gradle-cache-action@v1
         with:
           remote-build-cache-proxy-enabled: false
+          save-local-build-cache: false
           arguments: |
             functionalGroovyTest
             jacocoGroovyReport
