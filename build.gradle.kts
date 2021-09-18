@@ -13,7 +13,6 @@ plugins {
   id("org.unbroken-dome.test-sets")
   id("pl.droidsonroids.jacoco.testkit")
   id("io.gitlab.arturbosch.detekt")
-  id("org.sonarqube")
 
   // documentation
   id("org.jetbrains.dokka")
@@ -93,14 +92,6 @@ detekt {
   }
 }
 
-sonarqube {
-  properties {
-    property("sonar.projectName", project.name)
-    property("sonar.version", project.version)
-    property("sonar.projectKey", "qualersoft_robotframework-gradle-plugin")
-  }
-}
-
 // Setup functional test sets
 listOf("groovy", "kotlin").forEach {
   val testName = it.capitalizeAsciiOnly()
@@ -144,6 +135,10 @@ tasks {
   }
 
   test {
+    useJUnitPlatform()
+  }
+
+  named<Test>("funcTest") {
     useJUnitPlatform()
   }
 
@@ -202,8 +197,8 @@ publishing {
       name = "GitHubPackages"
       url = uri("https://maven.pkg.github.com/qualersoft/robotframework-gradle-plugin")
       credentials {
-        username = project.findProperty("publish.gh.mathze.gpr.usr") as String? ?: System.getenv("USERNAME")
-        password = project.findProperty("publish.gh.mathze.gpr.key") as String? ?: System.getenv("TOKEN")
+        username = project.findProperty("gh.qualersoft.publish.gpr.usr") as String? ?: System.getenv("USERNAME")
+        password = project.findProperty("gh.qualersoft.publish.gpr.key") as String? ?: System.getenv("TOKEN")
       }
     }
   }
