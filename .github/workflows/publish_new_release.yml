@@ -50,10 +50,14 @@ jobs:
           ref: main
 
       - name: Publish artifact to GitHub
+        uses: burrunan/gradle-cache-action@v1
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
           USERNAME: ${{ github.actor }}
-        run: ./gradlew publish
+        with:
+          remote-build-cache-proxy-enabled: false
+          save-local-build-cache: false
+          arguments: publish
 
       - name: Publish to gradle
         uses: burrunan/gradle-cache-action@v1

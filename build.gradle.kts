@@ -1,7 +1,7 @@
-import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import java.util.Properties
+import org.jetbrains.kotlin.util.capitalizeDecapitalize.capitalizeAsciiOnly
+import java.util.*
 
 plugins {
   // realization
@@ -13,7 +13,6 @@ plugins {
   id("org.unbroken-dome.test-sets")
   id("pl.droidsonroids.jacoco.testkit")
   id("io.gitlab.arturbosch.detekt")
-  id("org.sonarqube")
 
   // documentation
   id("org.jetbrains.dokka")
@@ -58,10 +57,6 @@ jacoco {
   toolVersion = "0.8.7"
 }
 
-jacocoTestKit {
-  applyTo("funcTestRuntimeOnly", tasks.named("funcTest"))
-}
-
 gradlePlugin {
   plugins {
     create("robotframework") {
@@ -97,15 +92,38 @@ detekt {
   }
 }
 
-sonarqube {
-  properties {
-    property("sonar.projectName", project.name)
-    property("sonar.version", project.version)
-    property("sonar.projectKey", "qualersoft_robotframework-gradle-plugin")
+// Setup functional test sets
+listOf("groovy", "kotlin").forEach {
+  val testName = it.capitalizeAsciiOnly()
+  val theTest = tasks.register<Test>("functional${testName}Test") {
+    configureDefaultFuncTest(this)
+    useJUnitPlatform {
+      includeTags.add(it)
+    }
+    mustRunAfter(project.tasks.test)
+  }
+
+  tasks.check {
+    dependsOn(theTest)
+  }
+  jacocoTestKit.applyTo("funcTestRuntimeOnly", theTest as TaskProvider<Task>)
+  project.tasks.register<JacocoReport>("jacoco${testName}Report") {
+    group = "verification"
+    additionalClassDirs(sourceSets.main.get().output.classesDirs)
+    additionalSourceDirs(sourceSets.main.get().allSource.sourceDirectories)
+    val jacocoExt = theTest.get().extensions.getByName<JacocoTaskExtension>("jacoco")
+    executionData(jacocoExt.destinationFile)
+    mustRunAfter(theTest)
   }
 }
 
 tasks {
+
+  withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions {
+      jvmTarget = JavaVersion.VERSION_11.toString()
+    }
+  }
 
   validatePlugins {
     enableStricterValidation.set(true)
@@ -116,9 +134,15 @@ tasks {
     this.jvmTarget = JavaVersion.VERSION_11.toString()
   }
 
-  withType<Test> {
+  test {
     useJUnitPlatform()
+  }
 
+  named<Test>("funcTest") {
+    useJUnitPlatform()
+  }
+
+  withType<Test> {
     testLogging {
       events = mutableSetOf(TestLogEvent.FAILED)
       exceptionFormat = TestExceptionFormat.FULL
@@ -141,56 +165,21 @@ tasks {
         }
       }
     })
-
-    finalizedBy(
-      when (name) {
-        test.name -> jacocoTestReport
-        "funcTest" -> named("jacocoFuncTestReport")
-        else -> throw IllegalArgumentException("Unknown test task '$name' don't know which jacoco report to apply")
-      }
-    )
-  }
-
-  named<Test>("funcTest") {
-    mustRunAfter(generateJacocoTestKitProperties)
-    // Workaround for https://github.com/koral--/jacoco-gradle-testkit-plugin/issues/9
-    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-      fun File.isLocked() = !renameTo(this)
-      val waitUntilJacocoTestExecIsUnlocked = Action<Task> {
-        val jacocoTestExec = checkNotNull(extensions.getByType(JacocoTaskExtension::class).destinationFile)
-        val waitMillis = 100L
-        var tries = 0
-        while (jacocoTestExec.isLocked() && (tries++ < 100)) {
-          logger.info("Waiting $waitMillis ms (${jacocoTestExec.name} is locked)...")
-          Thread.sleep(waitMillis)
-        }
-        logger.info("Done waiting (${jacocoTestExec.name} is unlocked).")
-      }
-      doLast(waitUntilJacocoTestExecIsUnlocked)
-    }
-  }
-
-  val jacocoMerge = create<JacocoMerge>("jacocoMerge") {
-    description = "Create the merged execution data of all test runs"
-    val reportsTasks = withType<JacocoReport>().filter { it.name != "jacocoMergedReport" }.toTypedArray()
-    executionData(*reportsTasks.flatMap { it.executionData.files }.toTypedArray())
-    mustRunAfter(reportsTasks)
   }
 
   create<JacocoReport>("jacocoMergedReport") {
     description = "Create the final reports of the merged execution data"
     group = test.get().group
-    dependsOn(jacocoMerge)
     sourceDirectories.from(sourceSets.main.get().allSource.srcDirs)
     classDirectories.from(sourceSets.main.get().output.classesDirs)
-    executionData(getByName<JacocoMerge>("jacocoMerge").destinationFile)
+    withType<Test>().map { executionData(it) }
   }
 
   withType<JacocoReport> {
     reports {
-      xml.isEnabled = true
-      html.isEnabled = true
-      csv.isEnabled = false
+      xml.required.set(true)
+      html.required.set(true)
+      csv.required.set(false)
     }
   }
 
@@ -203,26 +192,16 @@ tasks {
 }
 
 publishing {
-
   repositories {
     maven {
       name = "GitHubPackages"
       url = uri("https://maven.pkg.github.com/qualersoft/robotframework-gradle-plugin")
       credentials {
-        username = project.findProperty("publish.gh.mathze.gpr.usr") as String? ?: System.getenv("USERNAME")
-        password = project.findProperty("publish.gh.mathze.gpr.key") as String? ?: System.getenv("TOKEN")
+        username = project.findProperty("gh.qualersoft.publish.gpr.usr") as String? ?: System.getenv("USERNAME")
+        password = project.findProperty("gh.qualersoft.publish.gpr.key") as String? ?: System.getenv("TOKEN")
       }
     }
   }
-}
-
-val compileKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-  jvmTarget = JavaVersion.VERSION_11.toString()
-}
-val compileTestKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-  jvmTarget = JavaVersion.VERSION_11.toString()
 }
 
 java {
@@ -277,4 +256,27 @@ fun persistVersion(newVersion: String) {
   props.load(propsFile.inputStream())
   props.setProperty("version", newVersion)
   props.store(propsFile.outputStream(), null)
+}
+
+fun configureDefaultFuncTest(test: Test) {
+  test.group = "verification"
+  val funcTestSourceSet = sourceSets.named("funcTest").get()
+  test.testClassesDirs = funcTestSourceSet.output.classesDirs
+  test.classpath = funcTestSourceSet.runtimeClasspath
+
+  // Workaround on gradle/jacoco keeping *.exec file locked
+  if (org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS)) {
+    fun File.isLocked() = !renameTo(this)
+    val waitUntilJacocoTestExecIsUnlocked = Action<Task> {
+      val jacocoTestExec = checkNotNull(extensions.getByType(JacocoTaskExtension::class).destinationFile)
+      val waitMillis = 100L
+      var tries = 0
+      while (jacocoTestExec.isLocked() && (tries++ < 100)) {
+        logger.info("Waiting $waitMillis ms (${jacocoTestExec.name} is locked)...")
+        Thread.sleep(waitMillis)
+      }
+      logger.info("Done waiting (${jacocoTestExec.name} is unlocked).")
+    }
+    test.doLast(waitUntilJacocoTestExecIsUnlocked)
+  }
 }
