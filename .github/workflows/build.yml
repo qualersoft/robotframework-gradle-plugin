@@ -197,7 +197,7 @@ jobs:
 
   publishSnapshot:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.head.ref == 'develop'
+    if: contains(github.event.ref, 'develop')
     needs:
       - report
       - licenceCheck
